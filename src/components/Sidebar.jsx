@@ -12,7 +12,7 @@ import settingsIcon from "../assets/settings.png";
 
 const Sidebar = () => {
   return (
-    <div className="bg-[#652D96] text-white w-64 space-y-6">
+    <div className="bg-[#652D96] text-white w-64 flex flex-col justify-between">
       
       <nav className="space-y-4 mb-24 mt-2">
         
@@ -25,7 +25,7 @@ const Sidebar = () => {
         </a> */}
 
         <a
-          href="#"
+          href="/"
           className="flex items-center space-x-3 p-2 bg-white text-black hover:bg-purple-300 active:bg-purple-300 active:text-black"
         >
           <img src={trackingIcon} alt="Tracking" className="h-6 w-6" />
@@ -33,7 +33,7 @@ const Sidebar = () => {
         </a>
 
         <a
-          href="#"
+          href="/backgroundChecks"
           className="flex items-center space-x-3 p-2 hover:bg-purple-300 active:bg-purple-300 active:text-black"
         >
           <img src={backgroundIcon} alt="Background" className="h-6 w-6" />
@@ -41,7 +41,7 @@ const Sidebar = () => {
         </a>
 
         <a
-          href="#"
+          href="/offerIntelligence"
           className="flex items-center space-x-3 p-2 hover:bg-purple-300 active:bg-purple-300 active:text-black"
         >
           <img src={offerIcon} alt="Offer Intelligence" className="h-6 w-6" />
@@ -82,8 +82,7 @@ const Sidebar = () => {
         </a> */}
       </nav>
 
-      <div className="mt-auto mx-4">
-
+      <div className="mx-4 mb-4">
         <button className="w-full flex items-center space-x-3 p-2 rounded-full bg-purple-700 hover:bg-purple-800 active:bg-white active:text-black">
           <img src={supportIcon} alt="Support" className="h-6 w-6" />
           <span>Support</span>

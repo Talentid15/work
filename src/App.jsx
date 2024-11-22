@@ -1,17 +1,23 @@
 import React from "react";
-import Sidebar from "./components/Sidebar";
-import Header from "./components/Header";
-import MainContent from "./components/MainContent";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import CandidateTracking from "./pages/CTS/index";
+import BackgroundChecks from "./pages/backgroundChecks/index";
+import OfferIntelligence from "./pages/offerIntelligence/index";
 
 function App() {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      <Header />
-      <div className="flex flex-1">
-        <Sidebar />
-        <MainContent />
-      </div>
-    </div>
+    <>
+      <Router>
+        <Routes>
+          <Route path="/" element={<CandidateTracking />} />
+          {/* <Route path="/login" element={<PublicRoute><Login /></PublicRoute>}/>
+          <Route path="/signup" element={<PublicRoute><SignUp/></PublicRoute>} /> */}
+          <Route path="/backgroundChecks" element={<BackgroundChecks />} />
+          <Route path="/offerIntelligence" element={<OfferIntelligence />} />         
+        </Routes>
+      </Router>
+
+    </>
   );
 }
 

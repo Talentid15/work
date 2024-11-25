@@ -3,10 +3,10 @@ import offerIcon from "../assets/offerIcon.png";
 import dashboardIcon from "../assets/dashboard.png";
 import trackingIcon from "../assets/tracking.png";
 import backgroundIcon from "../assets/background.png";
-import onboardingIcon from "../assets/onboarding.png";
-import assetIcon from "../assets/asset.png";
-import performanceIcon from "../assets/performance.png";
-import offboardingIcon from "../assets/offboarding.png";
+// import onboardingIcon from "../assets/onboarding.png";
+// import assetIcon from "../assets/asset.png";
+// import performanceIcon from "../assets/performance.png";
+// import offboardingIcon from "../assets/offboarding.png";
 import supportIcon from "../assets/support.png";
 import settingsIcon from "../assets/settings.png";
 
@@ -33,7 +33,7 @@ const Sidebar = () => {
         </a>
 
         <a
-          href="/backgroundChecks"
+          href="/backgroundchecks"
           className="flex items-center space-x-3 p-2 hover:bg-purple-300 active:bg-purple-300 active:text-black"
         >
           <img src={backgroundIcon} alt="Background" className="h-6 w-6" />

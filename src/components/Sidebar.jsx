@@ -1,6 +1,6 @@
 import React from "react";
 import offerIcon from "../assets/offerIcon.png";
-import dashboardIcon from "../assets/dashboard.png";
+// import dashboardIcon from "../assets/dashboard.png";
 import trackingIcon from "../assets/tracking.png";
 import backgroundIcon from "../assets/background.png";
 // import onboardingIcon from "../assets/onboarding.png";
@@ -9,48 +9,51 @@ import backgroundIcon from "../assets/background.png";
 // import offboardingIcon from "../assets/offboarding.png";
 import supportIcon from "../assets/support.png";
 import settingsIcon from "../assets/settings.png";
+import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
   return (
     <div className="bg-[#652D96] text-white w-64 flex flex-col justify-between">
       
-      <nav className="space-y-4 mb-24 mt-2">
+      <nav className="pb-24 ">
         
         {/* <a
           href="#"
-          className="flex items-center space-x-3 p-2 hover:bg-purple-300 active:bg-purple-300 active:text-black"
+          className="flex items-center space-x-3 p-3 hover:bg-purple-300 active:bg-purple-300 active:text-black"
         >
           <img src={dashboardIcon} alt="Dashboard" className="h-6 w-6" />
           <span>Dashboard</span>
         </a> */}
 
-        <a
-          href="/"
-          className="flex items-center space-x-3 p-2 bg-white text-black hover:bg-purple-300 active:bg-purple-300 active:text-black"
+        <NavLink
+          to="/"
+          className="flex items-center space-x-3 p-3 bg-white text-black hover:bg-purple-300 active:bg-purple-300 active:text-black"
         >
           <img src={trackingIcon} alt="Tracking" className="h-6 w-6" />
           <span>Candidate tracking system</span>
-        </a>
+        </NavLink>
 
-        <a
-          href="/backgroundchecks"
-          className="flex items-center space-x-3 p-2 hover:bg-purple-300 active:bg-purple-300 active:text-black"
+        <NavLink
+          to="/backgroundchecks"
+          className={({ isActive }) => isActive ? "flex items-center space-x-3 p-3 hover:bg-purple-300 active:bg-purple-300 active:text-black" 
+            : "flex items-center space-x-3 p-3 hover:bg-purple-300 active:text-black" 
+          }
         >
           <img src={backgroundIcon} alt="Background" className="h-6 w-6" />
           <span>Background checks</span>
-        </a>
+        </NavLink>
 
-        <a
-          href="/offerIntelligence"
-          className="flex items-center space-x-3 p-2 hover:bg-purple-300 active:bg-purple-300 active:text-black"
+        <NavLink
+          to="/offerIntelligence"
+          className="flex items-center space-x-3 p-3 hover:bg-purple-300 active:bg-purple-300 active:text-black"
         >
           <img src={offerIcon} alt="Offer Intelligence" className="h-6 w-6" />
           <span>Offer intelligence</span>
-        </a>
+        </NavLink>
 
         {/* <a
           href="#"
-          className="flex items-center space-x-3 p-2 hover:bg-purple-300 active:bg-purple-300 active:text-black"
+          className="flex items-center space-x-3 p-3 hover:bg-purple-300 active:bg-purple-300 active:text-black"
         >
           <img src={onboardingIcon} alt="Onboarding" className="h-6 w-6" />
           <span>Onboarding</span>
@@ -58,7 +61,7 @@ const Sidebar = () => {
 
         {/* <a
           href="#"
-          className="flex items-center space-x-3 p-2 hover:bg-purple-300 active:bg-purple-300 active:text-black"
+          className="flex items-center space-x-3 p-3 hover:bg-purple-300 active:bg-purple-300 active:text-black"
         >
           <img src={assetIcon} alt="Asset Management" className="h-6 w-6" />
           <span>Asset Management</span>
@@ -66,7 +69,7 @@ const Sidebar = () => {
 
         {/* <a
           href="#"
-          className="flex items-center space-x-3 p-2 hover:bg-purple-300 active:bg-purple-300 active:text-black"
+          className="flex items-center space-x-3 p-3 hover:bg-purple-300 active:bg-purple-300 active:text-black"
         >
           <img src={performanceIcon} alt="Performance" className="h-6 w-6" />
           <span>Performance Management</span>
@@ -75,7 +78,7 @@ const Sidebar = () => {
 
         {/* <a
           href="#"
-          className="flex items-center space-x-3 p-2 hover:bg-purple-300 active:bg-purple-300 active:text-black"
+          className="flex items-center space-x-3 p-3 hover:bg-purple-300 active:bg-purple-300 active:text-black"
         >
           <img src={offboardingIcon} alt="Offboarding" className="h-6 w-6" />
           <span>Offboarding</span>
@@ -83,12 +86,12 @@ const Sidebar = () => {
       </nav>
 
       <div className="mx-4 mb-4">
-        <button className="w-full flex items-center space-x-3 p-2 rounded-full bg-purple-700 hover:bg-purple-800 active:bg-white active:text-black">
+        <button className="w-full flex items-center space-x-3 p-3 rounded-full bg-purple-700 hover:bg-purple-800 active:bg-white active:text-black">
           <img src={supportIcon} alt="Support" className="h-6 w-6" />
           <span>Support</span>
         </button>
 
-        <button className="w-full flex items-center space-x-3 p-2 mt-2 rounded-full bg-white text-black hover:bg-purple-800 active:bg-white active:text-black">
+        <button className="w-full flex items-center space-x-3 p-3 mt-2 rounded-full bg-white text-black hover:bg-purple-800 active:bg-white active:text-black">
           <img src={settingsIcon} alt="Settings" className="h-6 w-6" />
           <span>Settings</span>
         </button>

@@ -1,7 +1,7 @@
 import React from 'react';
-import Sidebar from "../../components/Sidebar";
-import Header from "../../components/Header";
-import MainContent from "../../components/CTS/MainContent";
+import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
+import { Outlet } from 'react-router-dom';
 // import SearchHistory from '../../components/CTS/SearchHistory';
 
 function index() {
@@ -10,7 +10,7 @@ function index() {
           <Header />
           <div className="flex flex-1">
             <Sidebar />
-            <MainContent />
+            <Outlet />
           </div>
         </div>
     )

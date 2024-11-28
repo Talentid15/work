@@ -9,10 +9,6 @@ import { Outlet } from "react-router-dom";
 function BackgroundChecks() {
   return (
     <>
-      <div className="flex flex-col min-h-screen bg-gray-100">
-        <Header />
-        <div className="flex">
-          <Sidebar />
           <div className="flex justify-between items-start mt-6 px-6 flex-row">
             {/* Back Button and Heading */}
             <div className="flex items-center">
@@ -30,10 +26,6 @@ function BackgroundChecks() {
           <div className="">
           <Outlet />
           </div>
-
-        </div>
-
-      </div>
     </>
   );
 }

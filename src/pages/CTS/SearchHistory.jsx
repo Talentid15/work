@@ -1,5 +1,4 @@
 import React from 'react';
-// import ellipse from "../assets/ellipse.png"
 import ellipse from "../../assets/ellipse.png"
 import { HiOutlineUsers } from "react-icons/hi";
 import { FaFileCircleQuestion } from "react-icons/fa6";
@@ -52,11 +51,11 @@ const SearchHistory = () => {
       <table className="w-full bg-gray-100 shadow-lg rounded-xl overflow-hidden">
         <thead>
           <tr className="bg-white text-gray-700 text-left text-sm font-semibold py-7">
-            <th className="ps-10 py-7 text-md">Profile</th> {/* Increased padding to py-4 */}
-            <th className="px-2 py-7 text-md">Name</th>    {/* Increased padding to py-4 */}
-            <th className="px-2 py-7 text-md">Email</th>   {/* Increased padding to py-4 */}
-            <th className="px-2 py-7 text-md">Last Searched on</th> {/* Increased padding to py-4 */}
-            <th className="px-2 py-7 text-md">View pipeline</th>   {/* Increased padding to py-4 */}
+            <th className="ps-10 py-7 text-md">Profile</th> 
+            <th className="px-2 py-7 text-md">Name</th>    
+            <th className="px-2 py-7 text-md">Email</th>   
+            <th className="px-2 py-7 text-md">Last Searched on</th> 
+            <th className="px-2 py-7 text-md">View pipeline</th>   
           </tr>
         </thead>
         <tbody>

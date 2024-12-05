@@ -2,7 +2,7 @@ import React from "react";
 import { BiSearch } from "react-icons/bi";
 import { HiOutlineUsers } from "react-icons/hi";
 import { FaCircle, FaFileCircleQuestion } from "react-icons/fa6";
-// import { , NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const MainContent = () => {
   return (
@@ -14,11 +14,12 @@ const MainContent = () => {
             <HiOutlineUsers className="h-5 w-5" />
             <span>Track Candidate</span>
           </button>
-
+        <Link to="history">
           <button className="flex items-center px-5 py-2 bg-white text-gray-800 rounded-full hover:bg-gray-100 space-x-3 transition duration-200">
             <FaFileCircleQuestion className="h-5 w-5" />
             <span>History</span>
           </button>
+          </Link>
         </div>
       </header>
 

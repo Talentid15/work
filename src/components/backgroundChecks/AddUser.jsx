@@ -61,7 +61,7 @@ import SearchUser from "./SearchUser";
 
 const AddUser = () => {
   return (
-    <div className="flex flex-wrap gap-4 mt-4 flex-col">
+    <div className="flex gap-4 mt-4 flex-row">
     <InviteForm />
     <SearchUser />
     </div>

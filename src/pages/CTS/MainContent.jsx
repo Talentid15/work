@@ -15,10 +15,12 @@ const MainContent = () => {
             <span>Track Candidate</span>
           </button>
 
+          <a href='/history'>
           <button className="flex items-center px-5 py-2 bg-white text-gray-800 rounded-full hover:bg-gray-100 space-x-3 transition duration-200">
             <FaFileCircleQuestion className="h-5 w-5" />
             <span>History</span>
           </button>
+          </a>
         </div>
       </header>
 

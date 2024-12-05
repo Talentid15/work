@@ -8,6 +8,7 @@ import Insufficiency from "./pages/backgroundChecks/Insufficiency";
 import AddUser from "./components/backgroundChecks/AddUser";
 import SearchHistory from "./pages/CTS/SearchHistory";
 import MainContent from "./pages/CTS/MainContent";
+import candidateList from "./components/offerIntelligence/candidateList";
 
 function App() {
   return (
@@ -25,7 +26,8 @@ function App() {
               <Route path='insufficiency' element={<Insufficiency/>} />
               <Route path='adduser' element={<AddUser/>} />
           </Route>
-          <Route path="offerIntelligence" element={<OfferIntelligence />} />   
+          <Route path="offerIntelligence" element={<OfferIntelligence />} /> 
+              <Route index element={<candidateList/>}/>  
           </Route>      
         </Routes>
 

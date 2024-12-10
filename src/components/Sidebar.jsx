@@ -48,7 +48,7 @@ const Sidebar = () => {
           className="flex items-center space-x-3 p-3 hover:bg-purple-300 active:bg-purple-300 active:text-black"
         >
           <img src={offerIcon} alt="Offer Intelligence" className="h-6 w-6" />
-          <span>Offer intelligence</span>
+          <span>Offer Lens</span>
         </NavLink>
 
         {/* <a

@@ -1,9 +1,10 @@
 import React from 'react'
 
-function candidateList() {
+function CandidateList() {
   return (
-    <div>candidateList</div>
+    <div>
+      <h2>Candidate List</h2></div>
   )
 }
 
-export default candidateList
+export default CandidateList

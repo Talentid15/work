@@ -19,25 +19,25 @@ function App() {
     <>
       <Router>
         <Routes>
-        <Route path="/login" element={<Login/>}/>
-        <Route path="/signup" element={<Signup/>}/>
-        <Route path="/" element={<CandidateTracking />} >
-          <Route index element={<MainContent/>} />
-          <Route path="history" element={<SearchHistory />} />
-          
-          {/* <Route path="/login" element={<PublicRoute><Login /></PublicRoute>}/>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/" element={<CandidateTracking />} >
+            <Route index element={<MainContent />} />
+            <Route path="history" element={<SearchHistory />} />
+
+            {/* <Route path="/login" element={<PublicRoute><Login /></PublicRoute>}/>
           <Route path="/signup" element={<PublicRoute><SignUp/></PublicRoute>} /> */}
-          <Route path="backgroundchecks" element={<BackgroundChecks />} >
-              <Route index element={<People/>} />
-              <Route path='insufficiency' element={<Insufficiency/>} />
-              <Route path='adduser' element={<AddUser/>} />
-          </Route>
-          <Route path="offerIntelligence" element={<OfferIntelligence />} > 
-              <Route index element={<CandidateList/>}/>  
-              <Route path='profile' element={<Profile/>} />
-              <Route path='predictions' element={<Predictions/>} />
+            <Route path="backgroundchecks" element={<BackgroundChecks />} >
+              <Route index element={<People />} />
+              <Route path='insufficiency' element={<Insufficiency />} />
+              <Route path='adduser' element={<AddUser />} />
             </Route>
-          </Route>      
+            <Route path="offerIntelligence" element={<OfferIntelligence />} >
+              <Route index element={<CandidateList />} />
+              <Route path='profile' element={<Profile />} />
+              <Route path='predictions' element={<Predictions />} />
+            </Route>
+          </Route>
         </Routes>
 
       </Router>

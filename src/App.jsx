@@ -7,11 +7,11 @@ import BackgroundChecks from "./pages/backgroundChecks/BackgroundChecks";
 import OfferIntelligence from "./pages/offerIntelligence/OfferIntelligence";
 import People from "./components/backgroundChecks/People";
 import Insufficiency from "./pages/backgroundChecks/Insufficiency";
-import AddUser from "./components/backgroundChecks/AddUser";
+import AddUser from "./pages/backgroundChecks/AddUser";
 import SearchHistory from "./pages/CTS/SearchHistory";
 import MainContent from "./pages/CTS/MainContent";
 import CandidateList from "./components/offerIntelligence/List";
-import Profile from "./components/offerIntelligence/Profile";
+import Profile from "./pages/offerIntelligence/Profile";
 import Predictions from "./components/offerIntelligence/Predictions";
 
 function App() {

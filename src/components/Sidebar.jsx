@@ -13,9 +13,9 @@ import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
   return (
-    <div className="bg-[#652D96] text-white w-64 flex flex-col justify-between">
+    <div className="bg-[#652D96] text-white w-[280px] flex flex-col justify-between">
       
-      <nav className="pb-24 ">
+      <nav className="pb-24">
         
         {/* <a
           href="#"
@@ -27,16 +27,18 @@ const Sidebar = () => {
 
         <NavLink
           to="/"
-          className="flex items-center space-x-3 p-3 bg-white text-black hover:bg-purple-300 active:bg-purple-300 active:text-black"
+          className={({ isActive }) => isActive ? "flex items-center bg-[#E8DEF8] space-x-3 p-5 hover:bg-purple-300 active:bg-purple-300 text-black" 
+            : "flex items-center bg-[#74449D] space-x-3 p-5 hover:bg-purple-300 active:text-black" 
+          }
         >
-          <img src={trackingIcon} alt="Tracking" className="h-6 w-6" />
+          <img src={trackingIcon} alt="Tracking" className="h-6 w-6 color-white" />
           <span>Candidate tracking system</span>
         </NavLink>
 
         <NavLink
           to="/backgroundchecks"
-          className={({ isActive }) => isActive ? "flex items-center space-x-3 p-3 hover:bg-purple-300 active:bg-purple-300 active:text-black" 
-            : "flex items-center space-x-3 p-3 hover:bg-purple-300 active:text-black" 
+          className={({ isActive }) => isActive ? "flex items-center bg-[#E8DEF8] space-x-3 p-5 hover:bg-purple-300 active:bg-purple-300 text-black" 
+            : "flex items-center bg-[#74449D] space-x-3 p-5 hover:bg-purple-300 active:text-black" 
           }
         >
           <img src={backgroundIcon} alt="Background" className="h-6 w-6" />
@@ -45,7 +47,9 @@ const Sidebar = () => {
 
         <NavLink
           to="/offerIntelligence"
-          className="flex items-center space-x-3 p-3 hover:bg-purple-300 active:bg-purple-300 active:text-black"
+          className={({ isActive }) => isActive ? "flex items-center bg-[#E8DEF8] space-x-3 p-5 hover:bg-purple-300 active:bg-purple-300 text-black" 
+            : "flex items-center bg-[#74449D] space-x-3 p-5 hover:bg-purple-300 active:text-black" 
+          }
         >
           <img src={offerIcon} alt="Offer Intelligence" className="h-6 w-6" />
           <span>Offer Lens</span>

@@ -1,5 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import CandidateTracking from "./pages/index";
 import BackgroundChecks from "./pages/backgroundChecks/BackgroundChecks";
 import OfferIntelligence from "./pages/offerIntelligence/OfferIntelligence";
@@ -8,7 +10,7 @@ import Insufficiency from "./pages/backgroundChecks/Insufficiency";
 import AddUser from "./components/backgroundChecks/AddUser";
 import SearchHistory from "./pages/CTS/SearchHistory";
 import MainContent from "./pages/CTS/MainContent";
-import CandidateList from "./components/offerIntelligence/CandidateList";
+import CandidateList from "./components/offerIntelligence/List";
 import Profile from "./components/offerIntelligence/Profile";
 import Predictions from "./components/offerIntelligence/Predictions";
 
@@ -17,6 +19,8 @@ function App() {
     <>
       <Router>
         <Routes>
+        <Route path="/login" element={<Login/>}/>
+        <Route path="/signup" element={<Signup/>}/>
         <Route path="/" element={<CandidateTracking />} >
           <Route index element={<MainContent/>} />
           <Route path="history" element={<SearchHistory />} />

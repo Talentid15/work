@@ -1,5 +1,4 @@
 import React from "react";
-import BackButton from "../../assets/backButton.png";
 import { Outlet } from "react-router-dom";
 
 function OfferIntelligence() {
@@ -11,9 +10,7 @@ function OfferIntelligence() {
             {/* <div className="flex items-center justify-between mb-4"> */}
               {/* Back Button and Heading */}
               <div className="flex items-center">
-                <button className="flex text-gray-600 hover:text-gray-800">
-                  <img src={BackButton} alt="Back" className="w-6 h-6 mr-2" />
-                </button>
+                
                 <Outlet />
                 {/* <h2 className="text-lg font-semibold text-black-700">
                   Candidate List

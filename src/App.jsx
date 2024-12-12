@@ -13,6 +13,7 @@ import MainContent from "./pages/CTS/MainContent";
 import CandidateList from "./components/offerIntelligence/List";
 import Profile from "./pages/offerIntelligence/Profile";
 import Predictions from "./components/offerIntelligence/Predictions";
+import Pipeline from "./pages/CTS/Pipeline";
 
 function App() {
   return (
@@ -24,6 +25,8 @@ function App() {
           <Route path="/" element={<CandidateTracking />} >
             <Route index element={<MainContent />} />
             <Route path="history" element={<SearchHistory />} />
+            <Route path="pipeline" element={<Pipeline />} />
+
 
             {/* <Route path="/login" element={<PublicRoute><Login /></PublicRoute>}/>
           <Route path="/signup" element={<PublicRoute><SignUp/></PublicRoute>} /> */}

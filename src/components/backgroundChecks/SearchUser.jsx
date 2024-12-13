@@ -30,10 +30,9 @@ const SearchHistoryTable = () => {
   ];
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6 w-full">
-      <table className="w-full border-collapse border border-gray-200 text-sm">
+      <table className="w-full p-6 border-collapse border border-gray-200 shadow-lg rounded-lg text-sm">
         <thead>
-          <tr className="bg-gray-100 text-left text-gray-600 font-medium">
+          <tr className="bg-white text-left text-gray-600 font-medium">
             <th className="p-4">User Details</th>
             <th className="p-4">Joining</th>
             <th className="p-4">Actions</th>
@@ -46,11 +45,11 @@ const SearchHistoryTable = () => {
               className="border-t border-gray-200 hover:bg-gray-50"
             >
               {/* User Details */}
-              <td className="p-4 flex flex-col">
+              <td className="p-4 m-2 flex flex-col bg-white shadow h-full rounded">
                 <span className="font-medium text-gray-800">{user.name}</span>
                 <span className="text-gray-500 text-sm">{user.email}</span>
                 <span className="text-gray-500 text-sm">{user.phone}</span>
-                <span className="mt-1 inline-block bg-green-100 text-green-600 text-xs px-2 py-1 rounded-md">
+                <span className="mt-10 bg-[#3DBF284F] text-black-600 w-full text-xs px-2 py-1 rounded-md">
                   Staff ID: {user.staffId}
                 </span>
               </td>
@@ -77,7 +76,6 @@ const SearchHistoryTable = () => {
           ))}
         </tbody>
       </table>
-    </div>
   );
 };
 

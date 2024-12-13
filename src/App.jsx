@@ -14,6 +14,7 @@ import CandidateList from "./components/offerIntelligence/List";
 import Profile from "./pages/offerIntelligence/Profile";
 import Predictions from "./components/offerIntelligence/Predictions";
 import Pipeline from "./pages/CTS/Pipeline";
+import ProfileUpdate from "./pages/offerIntelligence/ProfileUpdate";
 
 function App() {
   return (
@@ -39,6 +40,8 @@ function App() {
               <Route index element={<CandidateList />} />
               <Route path='profile' element={<Profile />} />
               <Route path='predictions' element={<Predictions />} />
+              <Route path='profileUpdate' element={<ProfileUpdate />} />
+
             </Route>
           </Route>
         </Routes>

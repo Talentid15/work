@@ -41,7 +41,6 @@ function App() {
               <Route path='profile' element={<Profile />} />
               <Route path='predictions' element={<Predictions />} />
               <Route path='profileUpdate' element={<ProfileUpdate />} />
-
             </Route>
           </Route>
         </Routes>

@@ -9,8 +9,8 @@ function Verification() {
       BankAccount: "Bank Account",
       CourtRecord: "CCR",
       LocalAddress: "Local Add",
-      PermanentAddress: "Permanent Add PV",
       Address: "Local Add PV",
+      PermanentAddress: "Permanent Add PV",
       EducationRecord: "Ed Record",
       EmploymentRecord: "Employment Record",
       EmploymentHistory: "Employment History",
@@ -80,7 +80,7 @@ function Verification() {
             return (
               <div
                 key={key}
-                className={`flex items-center p-1 border rounded-full shadow-sm ${bg} ${text}`}
+                className={`flex items-center p-1 border border-gray-300 rounded-full shadow-sm ${bg} ${text}`}
                 style={{ width: "fit-content" }}
               >
                 <div
@@ -103,7 +103,7 @@ function Verification() {
             return (
               <div
                 key={key}
-                className={`flex items-center p-1 border rounded-full shadow-sm ${bg} ${text}`}
+                className={`flex items-center p-1 border border-gray-300 rounded-full shadow-sm ${bg} ${text}`}
                 style={{ width: "fit-content" }}
               >
                 <div
@@ -117,86 +117,88 @@ function Verification() {
         </div>
 
         {/* Third row: Two items */}
-        <div className="flex gap-1">
-          {firstFive.slice(3, 5).map(([key, value]) => {
-            const { bg, text } = colorMapping[key] || {
-              bg: "bg-gray-100",
-              text: "text-gray-800",
-            };
-            return (
-              <div
-                key={key}
-                className={`flex items-center p-1 border rounded-full shadow-sm ${bg} ${text}`}
-                style={{ width: "fit-content" }}
-              >
+        {/* Third row: Two items with View More Button */}
+        <div className="flex justify-between items-center gap-1">
+          <div className="flex gap-1">
+            {firstFive.slice(3, 5).map(([key, value]) => {
+              const { bg, text } = colorMapping[key] || {
+                bg: "bg-gray-100",
+                text: "text-gray-800",
+              };
+              return (
                 <div
-                  className={`w-2 h-2 rounded-full mr-1 ${text}`}
-                  style={{ backgroundColor: "currentColor" }}
-                ></div>
-                <span className="text-sm">{value}</span>
-              </div>
-            );
-          })}
+                  key={key}
+                  className={`flex items-center p-1 border border-gray-300 rounded-full shadow-sm ${bg} ${text}`}
+                  style={{ width: "fit-content" }}
+                >
+                  <div
+                    className={`w-2 h-2 rounded-full mr-1 ${text}`}
+                    style={{ backgroundColor: "currentColor" }}
+                  ></div>
+                  <span className="text-sm">{value}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* View More Button */}
+          {!showMore && (
+            <button
+              onClick={() => setShowMore(true)}
+              className="flex items-center gap-1 text-blue-500"
+            >
+              <MdArrowDropDown className="h-[20px] w-[20px] text-gray-500" />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* View More Button */}
-      <div className="flex justify-end">
-        {!showMore && (
-          <button
-            onClick={() => setShowMore(true)}
-            className="mt-4 text-blue-500 flex items-center gap-1"
-          >
-            View More
-            <MdArrowDropDown className="h-[20px] w-[20px] text-blue-500" />
-          </button>
-        )}
-      </div>
-
       {/* Remaining Items Popup */}
       {/* Remaining Items Popup */}
-{showMore && (
-  <div className="absolute top-0 left-full mt-2 ml-2 w-[400px] p-4 border rounded-xl bg-white shadow-lg z-10">
-    <div className="p-1">
-      {/* Popup Header */}
-      <div className="flex justify-between items-center mb-2">
-        <div className="text-lg font-bold">More Verifications</div>
-        <button
-          onClick={() => setShowMore(false)}
-          className="text-red-500 underline text-sm"
-        >
-          Close
-        </button>
-      </div>
-
-      {/* Grid Layout for Checks */}
-      <div className="grid grid-cols-2 gap-1" style={{
-          columnGap: "0", 
-        }}>
-        {remaining.map(([key, value]) => {
-          const { bg, text } = colorMapping[key] || {
-            bg: "bg-gray-100",
-            text: "text-gray-800",
-          };
-          return (
-            <div
-              key={key}
-              className={`flex items-center p-2 border rounded-full shadow-sm ${bg} ${text}`}
-              style={{ width: "fit-content"}}
-            >
-              <div
-                className={`w-2 h-2 rounded-full mr-1`}
-                style={{ backgroundColor: "currentColor" }}
-              ></div>
-              <span className="text-sm">{value}</span>
+      {showMore && (
+        <div className="absolute top-0 left-1/2 mt-20 ml-0 w-[370px] p-4 border rounded-xl bg-white shadow-lg z-10">
+          <div className="p-1">
+            {/* Popup Header */}
+            <div className="flex justify-between items-center mb-2">
+              <div className="text-lg font-bold">More Verifications</div>
+              <button
+                onClick={() => setShowMore(false)}
+                className="text-red-500 underline text-sm"
+              >
+                Close
+              </button>
             </div>
-          );
-        })}
-      </div>
-    </div>
-  </div>
-)}
 
+            {/* Grid Layout for Checks */}
+            <div
+              className="flex flex-wrap gap-1"
+              style={{
+                maxHeight: "400px", // Set desired height of the box
+              }}
+            >
+              {remaining.map(([key, value]) => {
+                const { bg, text } = colorMapping[key] || {
+                  bg: "bg-gray-100",
+                  text: "text-gray-800",
+                };
+                return (
+                  <div
+                    key={key}
+                    className={`flex items-center p-1 border border-gray-300 rounded-full shadow-sm ${bg} ${text}`}
+                    style={{ width: "fit-content" }}
+                  >
+                    <div
+                      className={`w-2 h-2 rounded-full mr-1`}
+                      style={{ backgroundColor: "currentColor" }}
+                    ></div>
+                    <span className="text-sm">{value}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

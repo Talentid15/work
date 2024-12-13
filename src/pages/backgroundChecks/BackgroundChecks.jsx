@@ -7,7 +7,7 @@ import { Outlet } from "react-router-dom";
 function BackgroundChecks() {
   return (
     <>
-          <div className="flex flex-col flex-1 mt-6 px-6">
+          <div className="flex flex-col flex-1 mt-6 px-6 font-poppins">
           <div className="">
             {/* Back Button and Heading */}
             <div className="flex items-center justify-between mb-4">
@@ -16,7 +16,7 @@ function BackgroundChecks() {
                 <button className="flex text-gray-600 hover:text-gray-800">
                   <img src={BackButton} alt="Back" className="w-6 h-6 mr-2" />
                 </button>
-                <h2 className="text-lg font-semibold text-black-700">
+                <h2 className="text-xl font-medium text-black-700">
                   Recent Searches
                 </h2>
               </div>

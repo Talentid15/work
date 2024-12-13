@@ -1,5 +1,7 @@
 import React from "react";
 import photo from '../../assets/photo.png'
+import { MdOutlineRemoveRedEye } from "react-icons/md";
+import { NavLink } from "react-router-dom";
 
 const ProfileCard = () => {
   return (
@@ -46,23 +48,13 @@ const ProfileCard = () => {
       </div>
 
       {/* View Predictions Button */}
+      <NavLink to="/offerIntelligence/prediction">
       <button className="bg-black text-white flex items-center justify-center gap-2 px-4 py-2 w-full rounded">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="2"
-          stroke="currentColor"
-          className="w-5 h-5"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15 10l4.553-2.276A2 2 0 0018 6.117V4a2 2 0 10-4 0v2.117a2 2 0 01-1.553 1.607L8 10m7 0v4m0 0v2.5a2.5 2.5 0 01-5 0V14m5 0H8"
-          />
-        </svg>
+      <i className="text-xl"><MdOutlineRemoveRedEye />
+        </i>
         View Predictions
       </button>
+      </NavLink>
     </div>
     </div>
   );

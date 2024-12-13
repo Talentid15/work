@@ -2,6 +2,7 @@ import React from "react";
 import { AiOutlineUsergroupAdd } from "react-icons/ai";
 import photo from "../../assets/photo.png";
 import BackButton from "../../assets/backButton.png";
+import { NavLink } from "react-router-dom";
 
 function CandidateList() {
   const users = [
@@ -62,87 +63,89 @@ function CandidateList() {
             </button>
             <h1 className="text-xl font-bold ml-2">Candidate List</h1>
           </div>
+          <NavLink to="/offerIntelligence/profileUpdate" >
           <button className="flex items-center gap-2 bg-[#652D96] text-white p-2 rounded-xl mr-4">
             <AiOutlineUsergroupAdd className="h-5 w-5" />
             Add Candidate
           </button>
+          </NavLink>
         </div>
 
         <div className="p-4 w-full mt-4">
-          <div className="max-h-[590px] overflow-y-auto">
-            <table className="w-full table-auto border-collapse rounded-md text-sm">
-              {/* Table Header */}
-              <thead>
-                <tr className="bg-white text-center text-left text-gray-800 font-medium">
-                  <th className="p-4">Details</th>
-                  <th className="p-4">Offer Date</th>
-                  <th className="p-4">Joining Date</th>
-                  <th className="p-4">Personal Details</th>
-                </tr>
-              </thead>
+          <table className="w-full table-auto border-collapse border border-gray-300  rounded-md text-sm">
+            {/* Table Header */}
+            <thead>
+              <tr className="bg-white text-center text-left text-gray-800 font-medium">
+                <th className="p-4">Details</th>
+                <th className="p-4">Offer Date</th>
+                <th className="p-4">Joining Date</th>
+                <th className="p-4">Personal Details</th>
+              </tr>
+            </thead>
 
-              {/* Table Body */}
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.id} className="bg-[#EEEEEE]">
-                    {/* Details */}
-                    <td className="p-4 w-[300px]">
-                      <div className="flex items-center gap-4 bg-white p-2 rounded-md">
-                        {/* User Image */}
-                        <div className="h-12 w-12 rounded-full overflow-hidden">
-                          <img
-                            src={photo}
-                            alt="Photo"
-                            className="h-full w-full object-cover"
-                          />
-                        </div>
-                        {/* User Info */}
-                        <div>
-                          <div className="flex justify-between items-center">
-                            <p className="font-semibold text-lg text-gray-800">
-                              {user.name}
-                            </p>
-                            <div
-                              className={`flex items-center gap-2 font-semibold px-3 rounded-md ${
-                                user.status === "Active"
-                                  ? "bg-green-200 text-green-600"
-                                  : "bg-red-200 text-red-600"
-                              }`}
-                            >
-                              <div
-                                className="h-2 w-2 rounded-full"
-                                style={{ backgroundColor: "currentColor" }}
-                              ></div>
-                              {user.status}
-                            </div>
-                          </div>
-                          <p className="text-sm text-[#7C7C7C]">{user.email}</p>
-                          <p className="text-sm text-[#7C7C7C]">{user.phone}</p>
-                        </div>
+            {/* Table Body */}
+            <tbody>
+              {users.map((user) => (
+                <tr
+                  key={user.id}
+                  className="border-t border-gray-300 bg-[#EEEEEE]"
+                >
+                  {/* Details */}
+                  <td
+                    className="p-4"
+                  >
+                    <NavLink to="/offerIntelligence/profile">
+                    <div className="inline-flex items-center gap-4 bg-white p-2 rounded-md">
+                      {/* User Image */}
+                      <div className="h-12 w-12 rounded-full overflow-hidden">
+                        <img
+                          src={photo}
+                          alt="Photo"
+                          className="h-full w-full object-cover"
+                        />
                       </div>
-                    </td>
+                      {/* User Info */}
+                      <div>
+                        <div className="flex gap-14 ">
+                          <p className="font-medium text-gray-800">
+                            {user.name}
+                          </p>
+                          <div
+                            className={
+                              user.status == "Active"
+                                ? "flex bg-green-200 text-green-600 px-3 rounded-md gap-2"
+                                : "flex bg-red-200 text-red-600 px-3 rounded-md gap-2"
+                            }
+                          >
+                            <div className="h-2 w-2 rounded-full mt-1.5"  style={{ backgroundColor: "currentColor" }}></div>
+                            {user.status}
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-600">{user.email}</p>
+                        <p className="text-sm text-gray-600">{user.phone}</p>
+                      </div>
+                    </div>
+                    </NavLink>
+                  </td>
 
-                    {/* Offer Date */}
-                    <td className="p-4 text-center text-[#525151]">
-                      {user.offerDate}
-                    </td>
+                  {/* offer date */}
+                  <td className="p-4 border text-[#838383]">
+                    {user.offerDate}
+                  </td>
 
-                    {/* Joining Date */}
-                    <td className="p-4 text-center text-[#525151]">
-                      {user.joiningDate}
-                    </td>
+                  {/* joining date */}
+                  <td className="p-4 border text-center">{user.joiningDate}</td>
 
-                    {/* Personal Details */}
-                    <td className="p-4 text-center">
-                      <button className="bg-white text-black border border-gray-300 font-semibold px-3 py-1 rounded-full">
-                        View more
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                  {/* personal details */}
+                  <td className="p-4 border text-center">
+                    <button className="bg-white text-black px-3 py-1 rounded-full">
+                      View more
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </>

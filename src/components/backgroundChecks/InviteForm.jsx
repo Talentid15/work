@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FiX, FiPlus } from "react-icons/fi";
+import { FiX } from "react-icons/fi";
 import { BiCalendar } from "react-icons/bi";
 import { FaRegFlag } from "react-icons/fa";
 
@@ -76,14 +76,14 @@ const InviteForm = () => {
             placeholder="Additional Details"
             className="w-full border border-gray-300 rounded-md p-2 text-sm h-24 focus:outline-none focus:ring-2 focus:ring-purple-600"
           ></textarea>
-          <button className="text-sm font-medium text-purple-600 hover:underline ml-4">
+          <button className="text-sm font-medium hover:underline ml-4">
             + Add Tags
           </button>
         </div>
         <div className="text-right">
-          <button className="flex items-center justify-center gap-2 bg-purple-700 text-white py-2 px-6 rounded-lg text-sm">
+          <button className="bg-[#652D96] text-white py-2 px-6 rounded-lg text-sm">
             Add to invite list
-            <FiPlus />
+            
           </button>
         </div>
       </form>

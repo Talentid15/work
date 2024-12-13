@@ -2,10 +2,12 @@ import React, { useState, useRef, useEffect } from "react";
 import loginImage from "../assets/loginImage.png";
 import logo from "../assets/logo.png";
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const modalRef = useRef(null); // Add this ref
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -24,7 +26,6 @@ function Login() {
       closeModal();
     }
   };
-
 
   useEffect(() => {
     if (isModalOpen) {
@@ -97,9 +98,12 @@ function Login() {
               </button>
               <p className="text-[#8080808C] ml-12 py-4">
                 Don't have an account yet?{" "}
-                <span className="text-[#465685] underline cursor-pointer">
+                <Link
+                  to="/signup"
+                  className="text-[#465685] underline cursor-pointer"
+                >
                   Sign up for free
-                </span>
+                </Link>
               </p>
             </form>
           </div>
@@ -110,11 +114,13 @@ function Login() {
         </div>
       </div>
 
-      {/*Modal for forget password */}
-
+      {/* Modal for forget password */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white w-[400px] p-8 rounded-lg text-center">
+          <div
+            ref={modalRef} // Attach ref to the modal container
+            className="bg-white w-[400px] p-8 rounded-lg text-center"
+          >
             <h2 className="text-xl font-bold mb-4 text-black">
               Forgot Password
             </h2>
@@ -127,22 +133,22 @@ function Login() {
             <input
               type="text"
               id="modal-username"
-              placeholder="username@mail.com"
+              placeholder="username@gmail.com"
               className="w-full border border-gray-300 rounded-lg p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#652D96] mt-2"
             />
             <div className="w-full">
               <button
-                className="bg-[#652D96] w-full text-white px-4 py-2 mt-2 rounded-lg"
+                className="bg-[#652D96] w-full font-semibold text-white px-4 py-2 mt-2 rounded-lg"
                 onClick={() => {
                   alert("Password reset link sent!");
                   closeModal();
                 }}
               >
-                Reset Password
+                Reset password
               </button>
               <div className="mt-5 ">
                 <p className="text-[#656565]">
-                  we will send you an email with the intructions to rest your
+                  We will send you an email with the instructions to reset your
                   password
                 </p>
               </div>

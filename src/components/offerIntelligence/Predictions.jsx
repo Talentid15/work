@@ -42,16 +42,16 @@ const Predictions = () => {
           </button>
         </div>
 
-        <div className="flex flex-1 justify-between mt-10">
+        <div className="flex flex-1 bg-[#EEEEEE] py-8 justify-between mt-10">
           <div className="flex flex-col items-center ml-16">
-            <div className="h-20 w-20 rounded-full overflow-hidden">
+            <div className="h-20 w-20 mr-16 rounded-full overflow-hidden">
               <img
                 src={photo}
                 alt="Photo"
                 className="h-full w-full object-cover"
               />
             </div>
-            <div className="text-center mt-4">
+            <div className="items-center ml-12 mt-4">
               <p className="font-bold text-xl">{users[0].name}</p>
               <p className="flex text-[#00000080] gap-2">
                 <MdOutlineLocalPhone className="text-black mt-1"/>
@@ -70,11 +70,11 @@ const Predictions = () => {
 
           <div className="flex flex-col items-center">
             <img src={BarChart} alt="barchart" className="w-2/3" />
-            <button className="bg-[#652D96] text-white p-2 w-[190px] rounded-full gap-2 flex items-center justify-center mt-6 ml-40">
+            <button className="bg-[#652D96] text-white p-2 w-[200px] rounded-full gap-2 flex items-center justify-center mt-6 ml-40">
               <MdOutlineStopCircle className="w-5 h-5" />
               Pause Engagement
             </button>
-          </div>
+          </div>  
         </div>
       </div>
     </>

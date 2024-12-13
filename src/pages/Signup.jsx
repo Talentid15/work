@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import loginImage from "../assets/loginImage.png";
 import logo from "../assets/logo.png";
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 function Signup() {
   const [showPassword, setShowPassword] = useState(false);
@@ -55,7 +56,7 @@ function Signup() {
                 <input
                   type="text"
                   id="username"
-                  placeholder="username@mail.com"
+                  placeholder="Enter your full name"
                   className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#652D96]"
                   required
                 />
@@ -150,9 +151,12 @@ function Signup() {
               </button>
               <p className="text-[#8080808C] ml-20 py-4">
                 Already have an account?{" "}
+                <Link to="/login">
+                  
                 <span className="text-[#465685] underline cursor-pointer">
                   Login
                 </span>
+                </Link>
               </p>
             </form>
           </div>

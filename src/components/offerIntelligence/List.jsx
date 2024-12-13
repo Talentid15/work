@@ -2,6 +2,7 @@ import React from "react";
 import { AiOutlineUsergroupAdd } from "react-icons/ai";
 import photo from "../../assets/photo.png";
 import BackButton from "../../assets/backButton.png";
+import { NavLink } from "react-router-dom";
 
 function CandidateList() {
   const users = [
@@ -62,10 +63,12 @@ function CandidateList() {
             </button>
             <h1 className="text-xl font-bold ml-2">Candidate List</h1>
           </div>
+          <NavLink to="/offerIntelligence/profileUpdate" >
           <button className="flex items-center gap-2 bg-[#652D96] text-white p-2 rounded-xl mr-4">
             <AiOutlineUsergroupAdd className="h-5 w-5" />
             Add Candidate
           </button>
+          </NavLink>
         </div>
 
         <div className="p-4 w-full mt-4">
@@ -91,6 +94,7 @@ function CandidateList() {
                   <td
                     className="p-4"
                   >
+                    <NavLink to="/offerIntelligence/profile">
                     <div className="inline-flex items-center gap-4 bg-white p-2 rounded-md">
                       {/* User Image */}
                       <div className="h-12 w-12 rounded-full overflow-hidden">
@@ -121,6 +125,7 @@ function CandidateList() {
                         <p className="text-sm text-gray-600">{user.phone}</p>
                       </div>
                     </div>
+                    </NavLink>
                   </td>
 
                   {/* offer date */}

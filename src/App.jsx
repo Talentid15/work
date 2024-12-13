@@ -39,7 +39,7 @@ function App() {
             <Route path="offerIntelligence" element={<OfferIntelligence />} >
               <Route index element={<CandidateList />} />
               <Route path='profile' element={<Profile />} />
-              <Route path='predictions' element={<Predictions />} />
+              <Route path='prediction' element={<Predictions />} />
               <Route path='profileUpdate' element={<ProfileUpdate />} />
             </Route>
           </Route>

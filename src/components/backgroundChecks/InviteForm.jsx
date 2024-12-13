@@ -72,10 +72,10 @@ const InviteForm = () => {
           />
         </div>
         <div className="flex justify-between items-center">
-          <textarea
-            placeholder="Additional Details"
-            className="w-full border border-gray-300 rounded-md p-2 text-sm h-24 focus:outline-none focus:ring-2 focus:ring-purple-600"
-          ></textarea>
+          <input 
+          placeholder="Additional Details"
+          className="w-60 placeholder-black rounded-md p-2  h-12 focus:outline-none focus:ring-2 focus:ring-purple-600">      
+          </input>
           <button className="text-sm font-medium hover:underline ml-4">
             + Add Tags
           </button>

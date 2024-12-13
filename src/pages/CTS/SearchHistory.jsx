@@ -3,6 +3,7 @@ import ellipse from "../../assets/ellipse.png"
 import { HiOutlineUsers } from "react-icons/hi";
 import { FaFileCircleQuestion } from "react-icons/fa6";
 import { IoIosArrowBack } from "react-icons/io";
+import { Link } from 'react-router-dom';
 
 const SearchHistory = () => {
   const candidates = [
@@ -31,24 +32,30 @@ const SearchHistory = () => {
       </div>
 
 
-      <div className="flex items-start justify-start space-x-6">
-          <button className="flex items-center px-6 py-3 bg-[#74449E] text-white font-semibold rounded-full hover:bg-[#5a2889] shadow-md space-x-3">
-          <HiOutlineUsers className="h-5 w-5" />
+      <div className="w-auto max-w-[330px] ml-auto flex justify-end items-center mb-2 bg-white rounded-full p-2">
+        <div className="flex items-center">
+        <Link to="/">
+          <button className="flex items-center px-3 py-2 bg-white  font-semibold rounded-full  text-gray-800  hover:bg-gray-100  space-x-3 transition duration-200">
+            <HiOutlineUsers className="h-5 w-5" />
             <span>Track Candidate</span>
           </button>
+          </Link>
 
-          <button className="flex items-center px-6 py-3 bg-white text-gray-800 border border-gray-300 rounded-full hover:bg-gray-100 shadow-md space-x-3">
-            <FaFileCircleQuestion className="h-5 w-5" />
-            <span>History</span>
-          </button>
+          
+            <button className="flex items-center px-5 py-2 bg-[#74449E] text-white  rounded-full hover:bg-[#5a2889] space-x-3 transition duration-200">
+              <FaFileCircleQuestion className="h-5 w-5" />
+              <span>History</span>
+            </button>
         </div>
+      </div>
 
         </div>
 
 
 
       {/* Table */}
-      <table className="w-full bg-gray-100 shadow-lg rounded-xl overflow-hidden">
+      <div className="h-[550px] overflow-y-auto">
+      <table className="w-full bg-gray-100 shadow-lg rounded-xl ">
         <thead>
           <tr className="bg-white text-gray-700 text-left text-sm font-semibold py-7">
             <th className="ps-10 py-7 text-md">Profile</th> 
@@ -76,6 +83,7 @@ const SearchHistory = () => {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };

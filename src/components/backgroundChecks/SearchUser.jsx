@@ -49,7 +49,7 @@ const SearchHistoryTable = () => {
                 <span className="font-medium text-gray-800">{user.name}</span>
                 <span className="text-gray-500 text-sm">{user.email}</span>
                 <span className="text-gray-500 text-sm">{user.phone}</span>
-                <span className="mt-10 bg-[#3DBF284F] text-black-600 w-full text-xs px-2 py-1 rounded-md">
+                <span className="mt-10 bg-[#3DBF284F] text-black-600 w-full text-xs py-1 rounded-md">
                   Staff ID: {user.staffId}
                 </span>
               </td>
@@ -58,7 +58,7 @@ const SearchHistoryTable = () => {
               <td className="p-4 text-gray-600">{user.joiningDate}</td>
 
               {/* Actions */}
-              <td className="p-4 flex items-center gap-4">
+              <td className="p-4 flex justify-center content-center gap-4">
                 <button
                   className="text-gray-500 hover:text-purple-600"
                   aria-label="Edit"

@@ -16,14 +16,6 @@ const Sidebar = () => {
     <div className="bg-[#652D96] text-white w-[280px] flex flex-col justify-between">
       
       <nav className="pb-24">
-        
-        {/* <a
-          href="#"
-          className="flex items-center space-x-3 p-3 hover:bg-purple-300 active:bg-purple-300 active:text-black"
-        >
-          <img src={dashboardIcon} alt="Dashboard" className="h-6 w-6" />
-          <span>Dashboard</span>
-        </a> */}
 
         <NavLink
           to="/"

@@ -33,15 +33,17 @@ const MainContent = () => {
           <div className="relative flex-1">
             <input
               type="text"
-              placeholder="Enter email address or phone number"
+              placeholder="Enter email address"
               className="w-full p-4 pl-12 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-md"
             />
             <BiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-500" />
           </div>
 
-          <button className="px-6 py-3 bg-[#803CD8] text-white font-medium rounded-full shadow-custom-purple hover:shadow-xl transition duration-200">
-            Check Status
-          </button>
+          <Link to='pipeline'>
+            <button className="px-6 py-3 bg-[#803CD8] text-white font-medium rounded-full shadow-custom-purple hover:shadow-xl transition duration-200">
+              Check Status
+            </button>
+          </Link>
         </div>
 
         <div className="flex items-center justify-center border-2 border-[#c7c6c6] bg-[#E7E7E7] rounded-3xl p-6 max-w-[720px] mx-auto">

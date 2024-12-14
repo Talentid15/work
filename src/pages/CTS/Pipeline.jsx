@@ -4,6 +4,9 @@ import { BiSearch } from "react-icons/bi";
 import { MdSearch } from "react-icons/md";
 import StepProgress from "../../components/CTS/Temp";
 import { IoChevronBack } from "react-icons/io5";
+import { HiOutlineUsers } from "react-icons/hi";
+import { Link } from "react-router-dom";
+import { FaFileCircleQuestion } from "react-icons/fa6";
 
 function Pipeline({ user }) {
   // const { pipeline, setPipeline } = useContext(MyContext);
@@ -40,7 +43,25 @@ function Pipeline({ user }) {
   const recommended_status = ["hire"];
 
   return (
-    <div className="flex flex-col gap-6 w-full bg-[#f2f2f2] shadow-lg border-gray-300 border rounded-3xl py-6 lg:p-8">
+    <div className="flex flex-col gap-6 w-full bg-[#f2f2f2] shadow-lg border-gray-300 border py-6 lg:p-8">
+      <header className="w-auto max-w-[330px] ml-auto flex justify-end items-center mb-2 bg-white rounded-full p-2">
+        <div className="flex items-center">
+          <Link to="/">
+            <button className="flex items-center px-3 py-2 bg-white  font-semibold rounded-full  text-gray-800  hover:bg-gray-100  space-x-3 transition duration-200">
+              <HiOutlineUsers className="h-5 w-5" />
+              <span>Track Candidate</span>
+            </button>
+          </Link>
+
+          <Link to='/history'>
+            <button className="flex items-center px-5 py-2 bg-white text-gray-800 rounded-full hover:bg-gray-100 space-x-3 transition duration-200">
+              <FaFileCircleQuestion className="h-5 w-5" />
+              <span>History</span>
+            </button>
+          </Link>
+        </div>
+      </header>
+
       <div className="flex flex-col justify-center items-center p-4">
         <h1 className="text-4xl font-bold text-gray-900 text-center mb-8">
           Track Candidate Status
@@ -61,8 +82,9 @@ function Pipeline({ user }) {
           </button>
         </div>
       </div>
+
       <div className="bg-[#EDEDED] rounded border border-gray-300">
-        <div className="mt-10 ml-8">
+        <div className="mt-8 ml-8">
           <button className="flex border border-gray-300 font-bold rounded-full bg-white p-2 gap-2">
             <IoChevronBack className="text-gray-400 mt-1" />
             Jainayak's Profile
@@ -77,7 +99,7 @@ function Pipeline({ user }) {
         </div>
 
         <div className="flex justify-end px-4 lg:px-8 mt-20 mb-10">
-          <button className="flex gap-2 bg-[#652D96] text-white px-5 py-2 rounded-full font-semibold hover:bg-purple-600 transition duration-300">
+          <button className="flex gap-2 bg-[#652D96] text-white px-5 py-2 rounded-full font-semibold hover:bg-purple-900 transition duration-300">
             <MdSearch className="h-6 w-6 mt-0" />
             Check another
           </button>

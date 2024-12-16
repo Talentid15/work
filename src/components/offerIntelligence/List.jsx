@@ -4,7 +4,12 @@ import photo from "../../assets/photo.png";
 import BackButton from "../../assets/backButton.png";
 import { NavLink } from "react-router-dom";
 
+import { useNavigate } from "react-router-dom";
+
 function CandidateList() {
+
+  const navigate = useNavigate();
+
   const users = [
     {
       id: 1,
@@ -63,10 +68,15 @@ function CandidateList() {
             </button>
             <h1 className="text-xl font-semibold ml-2">Candidate List</h1>
           </div>
-          <button className="flex items-center gap-2 bg-[#652D96] text-white p-2 rounded-xl mr-4">
+          <button className="flex items-center gap-2 bg-[#652D96] text-white p-2 rounded-xl mr-4" onClick={()=>{
+
+            navigate("addCandidate")
+
+          }}>
             <AiOutlineUsergroupAdd className="h-5 w-5" />
             Add Candidate
           </button>
+
         </div>
 
         <div className="p-4 w-full mt-4">

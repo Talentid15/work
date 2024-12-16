@@ -1,8 +1,8 @@
 import React from "react";
-import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/webpack";
+// import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/webpack";
 
-// Set the worker source to the latest version
-GlobalWorkerOptions.workerSrc = "pdfjs-dist/build/pdf.worker.min.js";
+// // Set the worker source to the latest version
+// GlobalWorkerOptions.workerSrc = "pdfjs-dist/build/pdf.worker.min.js";
 
 const parsePDF = async (file) => {
   console.log("Parsing PDF...");

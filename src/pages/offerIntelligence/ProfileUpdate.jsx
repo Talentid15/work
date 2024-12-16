@@ -1,6 +1,6 @@
 import React from "react";
 import BackButton from "../../assets/backButton.png";
-import ProfileUpdateCard from "../../components/offerIntelligence/ProfUpCard";
+import ProfileUpdateCard from "../../components/offerIntelligence/AddCandidate";
 import { AiOutlineUsergroupAdd } from "react-icons/ai";
 
 function ProfileUpdate() {

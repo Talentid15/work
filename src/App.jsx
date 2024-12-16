@@ -15,6 +15,8 @@ import Profile from "./pages/offerIntelligence/Profile";
 import Predictions from "./components/offerIntelligence/Predictions";
 import Pipeline from "./pages/CTS/Pipeline";
 import ProfileUpdate from "./pages/offerIntelligence/ProfileUpdate";
+import AddCandidate from "./components/offerIntelligence/AddCandidate";
+import ExtractDataFromPdf from "./pages/ExtractDataFromPdf";
 
 function App() {
   return (
@@ -28,6 +30,7 @@ function App() {
             <Route path="history" element={<SearchHistory />} />
             <Route path="pipeline" element={<Pipeline />} />
 
+            <Route path="/extractInfo" element={<ExtractDataFromPdf></ExtractDataFromPdf>}></Route>
 
             {/* <Route path="/login" element={<PublicRoute><Login /></PublicRoute>}/>
           <Route path="/signup" element={<PublicRoute><SignUp/></PublicRoute>} /> */}
@@ -40,7 +43,7 @@ function App() {
               <Route index element={<CandidateList />} />
               <Route path='profile' element={<Profile />} />
               <Route path='prediction' element={<Predictions />} />
-              <Route path='profileUpdate' element={<ProfileUpdate />} />
+              <Route path='addCandidate' element={<AddCandidate />} />
             </Route>
           </Route>
         </Routes>

@@ -1,16 +1,61 @@
 // components/ProfileCard.js
-import React from "react";
+import React, { useState } from "react";
 import { BsUpload } from "react-icons/bs";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { MdOutlineLocalPhone } from "react-icons/md";
 import { MdOutlineMail } from "react-icons/md";
 import { MdOutlineLocationOn } from "react-icons/md";
+import { IoIosArrowBack } from "react-icons/io";
 
-const ProfileUpdateCard = () => {
+import { useNavigate } from "react-router-dom";
+
+import { MdDelete } from "react-icons/md";
+import { FaPlus } from "react-icons/fa";
+
+
+
+const AddCandidate = () => {
+
+  const navigate = useNavigate();
+
+  const [skills, setSkills] = useState([{ id: Date.now(), value: "" }]);
+
+  // Add a new skill input fieldW
+  const addSkillField = () => {
+    setSkills((prevSkills) => [...prevSkills, { id: Date.now(), value: "" }]);
+  };
+
+  // Handle skill input value change
+  const handleSkillChange = (id, value) => {
+    setSkills((prevSkills) =>
+      prevSkills.map((skill) =>
+        skill.id === id ? { ...skill, value } : skill
+      )
+    );
+  };
+
+  // Remove a skill input field
+  const removeSkillField = (id) => {
+    setSkills((prevSkills) => prevSkills.filter((skill) => skill.id !== id));
+  };
+
   return (
-    <div className="bg-[#EEEEEE] rounded shadow mt-6 p-4 w-full mx-auto">
+    <div className="bg-[#EEEEEE] rounded flex flex-col shadow mt-6 p-4 w-full mx-auto">
+
+      <div className="flex gap-2 justify-start items-center cursor-pointer" onClick={() => {
+
+        navigate(-1);
+
+      }}>
+
+        <IoIosArrowBack size={30}></IoIosArrowBack>
+        <h1 className="text-slate-700 text-2xl font-semibold">Profile</h1>
+
+      </div>
+
       <div className="flex items-center space-x-6">
-        {/* <div className="w-24 h-24 bg-gray-300 rounded-full"></div> */}
+
+
         <div className="w-24 h-24 bg-gray-300 rounded-full relative overflow-hidden flex items-center justify-center cursor-pointer">
           <label
             htmlFor="photoInput"
@@ -36,24 +81,24 @@ const ProfileUpdateCard = () => {
           </h2>
           <div className="w-1/2 h-[1px] bg-[#818181] my-2"></div>
           <hr className="text-black" />
-          <p className="flex gap-1 text-sm text-[#818181]">
-            <MdOutlineLocalPhone className="text-black mt-1" />
+          <p className="flex gap-2 text-sm text-[#818181]">
+            <MdOutlineLocalPhone className="text-black mt-1" size={25} />
             <input
               type="text"
               placeholder="Phone number"
               className="bg-transparent outline-none text-[#818181] w-full"
             />
           </p>
-          <p className="flex gap-1 text-sm text-[#818181]">
-            <MdOutlineMail className="text-black mt-1" />
+          <p className="flex gap-2 text-sm text-[#818181]">
+            <MdOutlineMail className="text-black mt-1" size={25} />
             <input
               type="text"
               placeholder="Email address"
               className="bg-transparent outline-none text-[#818181] w-full"
             />
           </p>
-          <p className="flex gap-1 text-sm text-[#818181]">
-            <MdOutlineLocationOn className="text-black mt-1" />
+          <p className="flex gap-2 text-sm text-[#818181]">
+            <MdOutlineLocationOn className="text-black mt-1" size={25} />
             <input
               type="text"
               placeholder="Address"
@@ -139,22 +184,49 @@ const ProfileUpdateCard = () => {
             />
           </div>
         </div>
-        <div className="mt-8 flex justify-between items-center">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800">
-              Engagement preference
-            </h3>
-            <button className="w-10 mt-2 h-8 bg-white border border-black rounded flex items-center justify-center hover:bg-gray-300">
-              +
-            </button>
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold text-gray-800">
+            Engagement Preference
+          </h3>
+          <div className=" relative flex flex-wrap w-[60vw] gap-4 mt-4">
+            {skills.map((skill, index) => (
+              <div key={skill.id} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={skill.value}
+                  onChange={(e) => handleSkillChange(skill.id, e.target.value)}
+                  placeholder={`Skill ${index + 1}`}
+                  className="border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                <div
+                  onClick={() => removeSkillField(skill.id)}
+                  className=" text-white rounded px-2 py-1 "
+                >
+                  <MdDelete className="text-slate-700" size={40}></MdDelete>
+
+                </div>
+              </div>
+            ))}
+            <div
+              onClick={addSkillField}
+              className=" bg-white rounded flex items-center justify-center"
+            >
+              <FaPlus size={35}></FaPlus>
+
+            </div>
           </div>
-          <button className="px-4 py-2 bg-[#652D96] text-white rounded-3xl hover:bg-purple-800">
-            Start Engagement
-          </button>
+
+          <div className="flex justify-end items-end">
+
+            <button className="px-4 py-2 bg-[#652D96] text-white rounded-3xl hover:bg-purple-800">
+              Start Engagement
+            </button>
+
+          </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
-export default ProfileUpdateCard;
+export default AddCandidate;

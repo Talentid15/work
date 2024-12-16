@@ -28,7 +28,7 @@ const ProfileCard = () => {
       
       <div className="bg-white shadow rounded-lg p-6 w-full max-w-sm">
       {/* Offer and Joining Dates */}
-      <div className="text-sm text-gray-800">
+      <div className="text-sm text-gray-800 font-medium">
         <div className="flex justify-between mb-2">
           <span className="font-bold">Offer Date</span>
           <span>: October 25, 2019</span>

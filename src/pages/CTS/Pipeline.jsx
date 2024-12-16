@@ -43,11 +43,11 @@ function Pipeline({ user }) {
   const recommended_status = ["hire"];
 
   return (
-    <div className="flex flex-col gap-6 w-full bg-[#f2f2f2] shadow-lg border-gray-300 border py-6 lg:p-8">
-      <header className="w-auto max-w-[330px] ml-auto flex justify-end items-center mb-2 bg-white rounded-full p-2">
+    <div className="flex flex-col flex-1 bg-[#f2f2f2] shadow-lg border-gray-300 border lg:p-2">
+      <header className="w-auto max-w-[350px] ml-auto flex justify-end items-center mb-2 bg-white rounded-full p-2">
         <div className="flex items-center">
           <Link to="/">
-            <button className="flex items-center px-3 py-2 bg-white  font-semibold rounded-full  text-gray-800  hover:bg-gray-100  space-x-3 transition duration-200">
+            <button className="flex items-center px-3 py-2 bg-[#74449E]  font-semibold rounded-full  text-white  hover:bg-[#5a2889] space-x-3 transition duration-200">
               <HiOutlineUsers className="h-5 w-5" />
               <span>Track Candidate</span>
             </button>
@@ -83,7 +83,7 @@ function Pipeline({ user }) {
         </div>
       </div>
 
-      <div className="bg-[#EDEDED] rounded border border-gray-300">
+      <div className="bg-[#EDEDED] rounded-3xl border border-gray-300 mx-4">
         <div className="mt-8 ml-8">
           <button className="flex border border-gray-300 font-bold rounded-full bg-white p-2 gap-2">
             <IoChevronBack className="text-gray-400 mt-1" />

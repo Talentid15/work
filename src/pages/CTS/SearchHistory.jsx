@@ -32,7 +32,7 @@ const SearchHistory = () => {
         </div>
 
 
-        <div className="w-auto max-w-[330px] ml-auto flex justify-end items-center mb-2 bg-white rounded-full p-2">
+        <div className="w-auto max-w-[350px] ml-auto flex justify-end items-center mb-2 bg-white rounded-full p-2">
           <div className="flex items-center">
             <Link to="/">
               <button className="flex items-center px-3 py-2 bg-white  font-semibold rounded-full  text-gray-800  hover:bg-gray-100  space-x-3 transition duration-200">

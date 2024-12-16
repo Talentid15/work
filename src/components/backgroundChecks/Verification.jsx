@@ -67,7 +67,7 @@ function Verification() {
   const remaining = entries.slice(5);
 
   return (
-    <div className="p-6 rounded-xl max-w-xl mx-auto relative">
+    <div className="p-6 rounded-xl max-w-xl mx-auto relative font-medium">
       {/* First five items layout */}
       <div className="flex flex-col items-start gap-1">
         {/* First row: Two items */}

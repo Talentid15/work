@@ -23,7 +23,7 @@ const Sidebar = () => {
         <NavLink
           to="/"
           className={({ isActive }) => isActive ? "flex items-center bg-[#E8DEF8] space-x-3 p-5 hover:bg-purple-300 active:bg-purple-300 text-black"
-            : "border-b-white flex items-center bg-[#74449D] space-x-3 p-5 hover:bg-purple-800 active:text-black"
+            : "flex items-center bg-[#74449D] space-x-3 p-5 hover:bg-purple-800 active:text-black border-b border-[#C6C6C626]"
           }
         >
           <TbFlagBolt className="h-6 w-6" />
@@ -34,7 +34,7 @@ const Sidebar = () => {
         <NavLink
           to="/backgroundchecks"
           className={({ isActive }) => isActive ? "flex items-center bg-[#E8DEF8] space-x-3 p-5 hover:bg-purple-300 active:bg-purple-300 text-black"
-            : "flex items-center bg-[#74449D] space-x-3 p-5 hover:bg-purple-800 active:text-black"
+            : "flex items-center bg-[#74449D] space-x-3 p-5 hover:bg-purple-800 active:text-black border-b border-[#C6C6C626]"
           }
         >
           <TbUserCheck className="h-6 w-6" />
@@ -45,7 +45,7 @@ const Sidebar = () => {
         <NavLink
           to="/offerIntelligence"
           className={({ isActive }) => isActive ? "flex items-center bg-[#E8DEF8] space-x-3 p-5 hover:bg-purple-300 active:bg-purple-300 text-black"
-            : "flex items-center bg-[#74449D] space-x-3 p-5 hover:bg-purple-800 active:text-black"
+            : "flex items-center bg-[#74449D] space-x-3 p-5 hover:bg-purple-800 active:text-black border-b border-[#C6C6C626]"
           }
         >
           <TbFileStack className="h-6 w-6" />

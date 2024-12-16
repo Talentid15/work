@@ -80,7 +80,7 @@ const PeopleCard = () => {
                   <Verification />
                 </td>
                 <td className="p-4 text-center">
-                  <button className="bg-white p-2 border border-gray-300 font-medium rounded-full">Upload +</button>
+                  <button className="bg-white p-2 px-4 border border-gray-300 font-medium rounded-full">Upload +</button>
                 </td>
                 <td className="p-4 text-center">
                   <button className="bg-white border border-gray-300 text-black px-3 py-1 rounded-full">

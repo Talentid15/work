@@ -34,7 +34,7 @@ const Predictions = () => {
             <button className="text-gray-600 hover:text-gray-800">
               <img src={BackButton} alt="Back" className="w-6 h-6" />
             </button>
-            <h1 className="text-xl font-bold ml-2">Predictions of candidate</h1>
+            <h1 className="text-xl font-medium ml-2">Predictions of candidate</h1>
           </div>
           <button className="flex items-center gap-2 bg-[#652D96] text-white p-2 rounded-xl mr-4">
             <AiOutlineUsergroupAdd className="h-5 w-5" />
@@ -42,9 +42,9 @@ const Predictions = () => {
           </button>
         </div>
 
-        <div className="flex flex-1 bg-[#EEEEEE] py-8 justify-between mt-10">
+        <div className="flex flex-1 bg-[#EEEEEE] py-8 justify-between mt-10 rounded-2xl">
           <div className="flex flex-col items-center ml-16">
-            <div className="h-20 w-20 mr-16 rounded-full overflow-hidden">
+            <div className="h-32 w-32 mr-32 rounded-full overflow-hidden">
               <img
                 src={photo}
                 alt="Photo"
@@ -70,7 +70,7 @@ const Predictions = () => {
 
           <div className="flex flex-col items-center">
             <img src={BarChart} alt="barchart" className="w-2/3" />
-            <button className="bg-[#652D96] text-white p-2 w-[200px] rounded-full gap-2 flex items-center justify-center mt-6 ml-40">
+            <button className="bg-[#652D96] text-white font-medium p-2 w-[230px] rounded-full gap-2 flex items-center justify-center mt-6 ml-40">
               <MdOutlineStopCircle className="w-5 h-5" />
               Pause Engagement
             </button>

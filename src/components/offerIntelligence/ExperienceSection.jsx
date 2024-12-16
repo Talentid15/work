@@ -25,16 +25,16 @@ const ExperienceSection = () => {
           <h4 className="text-xl font-bold mt-6">Engagement Preference</h4>
           <div className="flex gap-x-32 mt-4">
             <div className="flex flex-wrap gap-4 ">
-            <button className="flex text-gray-800 border-black border-2 px-4 py-2 rounded">Technology <i className="text-2xl ps-1 bolder"><GoPlus /></i>
+            <button className="flex text-black font-semibold border-black border-2 px-4 py-2 rounded">Technology <i className="text-2xl ps-1 bolder"><GoPlus /></i>
             </button>
-            <button className="flex text-gray-800 border-black border-2 px-4 py-2 rounded">Education <i className="text-2xl ps-1 bolder"><GoPlus /></i>
+            <button className="flex text-black font-semibold border-black border-2 px-4 py-2 rounded">Education <i className="text-2xl ps-1 bolder"><GoPlus /></i>
             </button>
-            <button className="flex text-gray-800 border-black border-2 px-4 py-2 rounded">Personal Details <i className="text-2xl ps-1 bolder"><GoPlus /></i>
+            <button className="flex text-black font-semibold border-black border-2 px-4 py-2 rounded">Personal Details <i className="text-2xl ps-1 bolder"><GoPlus /></i>
             </button>
-            <button className="flex text-gray-800 border-black border-2 px-4 py-2 rounded">Random <i className="text-2xl ps-1 bolder"><GoPlus /></i>
+            <button className="flex text-black font-semibold border-black border-2 px-4 py-2 rounded">Random <i className="text-2xl ps-1 bolder"><GoPlus /></i>
             </button>
             </div>
-            <button className="bg-[#652D96] text-white px-6 py-2 mx-5 rounded-full">
+            <button className="bg-[#652D96] text-white font-semibold px-6 py-2 mx-5 rounded-full">
             Start Engagement
             </button>
           </div>

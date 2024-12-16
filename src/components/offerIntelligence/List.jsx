@@ -61,7 +61,7 @@ function CandidateList() {
             <button className="text-gray-600 hover:text-gray-800">
               <img src={BackButton} alt="Back" className="w-6 h-6" />
             </button>
-            <h1 className="text-xl font-bold ml-2">Candidate List</h1>
+            <h1 className="text-xl font-semibold ml-2">Candidate List</h1>
           </div>
           <button className="flex items-center gap-2 bg-[#652D96] text-white p-2 rounded-xl mr-4">
             <AiOutlineUsergroupAdd className="h-5 w-5" />
@@ -74,7 +74,7 @@ function CandidateList() {
             <table className="w-full table-auto border-collapse rounded-md text-sm">
               {/* Table Header */}
               <thead>
-                <tr className="bg-white text-center text-left text-gray-800 font-medium">
+                <tr className="bg-white text-center text-gray-800 font-medium">
                   <th className="p-4 w-1/4">Details</th>
                   <th className="p-4">Offer Date</th>
                   <th className="p-4">Joining Date</th>

@@ -9,7 +9,7 @@ function ButtonGroup() {
   const [active, setActive] = useState("People"); // Default active button is "People"
 
   return (
-    <div className="w-full h-12 max-w-md p-2 bg-white-200 rounded-full shadow-md mx-auto">
+    <div className="w-full h-12 max-w-md p-2 bg-white rounded-full shadow-md mx-auto">
       <div className="flex justify-around">
         {/* People Button */}
         <Link to="/backgroundchecks">

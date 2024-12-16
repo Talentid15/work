@@ -147,7 +147,7 @@ function Login() {
                 Reset password
               </button>
               <div className="mt-5 ">
-                <p className="text-[#656565]">
+                <p className="text-[#656565] font-normal">
                   We will send you an email with the instructions to reset your
                   password
                 </p>

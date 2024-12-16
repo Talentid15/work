@@ -8,7 +8,7 @@ const MainContent = () => {
   return (
     <div className="flex-1 p-5 bg-[#F4F4F4]">
 
-      <header className="w-auto max-w-[330px] ml-auto flex justify-end items-center mb-2 bg-white rounded-full p-2">
+      <header className="w-auto max-w-[350px] ml-auto flex justify-end items-center mb-2 bg-white rounded-full p-2">
         <div className="flex items-center">
           <button className="flex items-center px-3 py-2 bg-[#74449E] text-white font-semibold rounded-full hover:bg-[#5a2889] space-x-3 transition duration-200">
             <HiOutlineUsers className="h-5 w-5" />

@@ -19,6 +19,7 @@ const AddCandidate = () => {
   const navigate = useNavigate();
 
   const [skills, setSkills] = useState([{ id: Date.now(), value: "" }]);
+  const [imagePreview, setImagePreview] = useState(null);
 
   // Add a new skill input fieldW
   const addSkillField = () => {
@@ -39,6 +40,17 @@ const AddCandidate = () => {
     setSkills((prevSkills) => prevSkills.filter((skill) => skill.id !== id));
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="bg-[#EEEEEE] rounded flex flex-col shadow mt-6 p-4 w-full mx-auto">
 
@@ -57,17 +69,22 @@ const AddCandidate = () => {
 
 
         <div className="w-24 h-24 bg-gray-300 rounded-full relative overflow-hidden flex items-center justify-center cursor-pointer">
-          <label
-            htmlFor="photoInput"
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <span className="text-sm text-gray-500">+ Upload</span>
-          </label>
+        {imagePreview ? (
+            <img src={imagePreview} alt="Uploaded Preview" className="w-full h-full object-cover" />
+          ) : (
+            <label
+              htmlFor="photoInput"
+              className="absolute inset-0 flex items-center justify-center text-sm text-gray-500"
+            >
+              + Upload
+            </label>
+          )}
           <input
             type="file"
             id="photoInput"
             accept="image/*"
             className="hidden"
+            onChange={handleImageUpload}
           />
         </div>
 
@@ -106,7 +123,7 @@ const AddCandidate = () => {
             />
           </p>
         </div>
-        <div className="bg-white shadow rounded-lg p-4 w-[290px] mb-5">
+        <div className="bg-white shadow rounded-lg p-4 w-[350px] mb-5">
           {/* Offer and Joining Dates */}
           <div className="text-sm text-gray-800">
             <div className="flex mb-2 gap-2">
@@ -188,30 +205,30 @@ const AddCandidate = () => {
           <h3 className="text-lg font-semibold text-gray-800">
             Engagement Preference
           </h3>
-          <div className=" relative flex flex-wrap w-[60vw] gap-4 mt-4">
+          <div className=" relative flex flex-wrap w-[60vw] gap-0 mt-1">
             {skills.map((skill, index) => (
-              <div key={skill.id} className="flex items-center gap-2">
+              <div key={skill.id} className="flex items-center gap-1">
                 <input
                   type="text"
                   value={skill.value}
                   onChange={(e) => handleSkillChange(skill.id, e.target.value)}
                   placeholder={`Skill ${index + 1}`}
-                  className="border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="border border-gray-300 rounded p-2 mt-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
                 <div
                   onClick={() => removeSkillField(skill.id)}
-                  className=" text-white rounded px-2 py-1 "
+                  className=" text-white rounded px-2 py-1 cursor-pointer"
                 >
-                  <MdDelete className="text-slate-700" size={40}></MdDelete>
+                  <MdDelete className="text-slate-700" size={20}></MdDelete>
 
                 </div>
               </div>
             ))}
             <div
               onClick={addSkillField}
-              className=" bg-white rounded flex items-center justify-center"
+              className=" bg-white rounded flex items-center justify-center cursor-pointer"
             >
-              <FaPlus size={35}></FaPlus>
+              <FaPlus size={20}></FaPlus>
 
             </div>
           </div>
@@ -219,7 +236,7 @@ const AddCandidate = () => {
           <div className="flex justify-end items-end">
 
             <button className="px-4 py-2 bg-[#652D96] text-white rounded-3xl hover:bg-purple-800">
-              Start Engagement
+              Add Candidate
             </button>
 
           </div>

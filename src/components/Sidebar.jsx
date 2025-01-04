@@ -16,7 +16,7 @@ import { TbFileStack, TbFlagBolt, TbUserCheck } from "react-icons/tb"
 
 const Sidebar = () => {
   return (
-    <div className="bg-[#652D96] text-white w-[280px] flex flex-col justify-between">
+    <div className="bg-[#652D96] text-white w-[280px] h-[730px] flex flex-col justify-between">
 
       <nav className="pb-24">
 

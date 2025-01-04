@@ -80,7 +80,7 @@ function CandidateList() {
         </div>
 
         <div className="p-4 w-full mt-4">
-          <div className="max-h-[590px] overflow-y-auto">
+          <div className="max-h-[500px] overflow-y-auto">
             <table className="w-full table-auto border-collapse rounded-md text-sm">
               {/* Table Header */}
               <thead>

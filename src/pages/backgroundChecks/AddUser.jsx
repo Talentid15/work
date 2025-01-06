@@ -23,15 +23,52 @@ const AddUser = () => {
     },
   ]);
 
-  const addUser = (user) => {
-    setUsers((prevUsers) => [...prevUsers, { id: Date.now(), ...user }]);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+
+  const handleDelete = (userId) => {
+    setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+  };
+
+  const handleEdit = (user) => {
+    setSelectedUser(user);
+  };
+
+  const handleFormSubmit = (formData) => {
+    console.log("Saved data:", formData);
+
+    // Update users list (if necessary)
+    // setUsers((prevUsers) => {
+    //   const existingIndex = prevUsers.findIndex((u) => u.staffId === formData.staffId);
+    //   if (existingIndex !== -1) {
+    //     const updatedUsers = [...prevUsers];
+    //     updatedUsers[existingIndex] = formData;
+    //     return updatedUsers;
+    //   }
+    //   return [...prevUsers, formData];
+    // });
+    if (selectedUser) {
+      // Update the user
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === selectedUser.id ? { ...formData, id: user.id } : user
+        )
+      );
+    } else {
+      // Add new user
+      setUsers((prevUsers) => [
+        ...prevUsers,
+        { ...formData, id: new Date().getTime() },
+      ]);
+    } 
+    setSelectedUser(null); // Clear the form after editing
   };
 
   return (
     <div className="flex w-full flex-col">
       <div className="flex flex-2 gap-x-8 flex-row">
-        <InviteForm onSubmit={addUser}/>
-        <SearchUser users={users}/>
+      <InviteForm user={selectedUser} onSave={handleFormSubmit} />
+      <SearchUser users={users} onDelete={handleDelete} onEdit={handleEdit} />
       </div>
       <AdditionalDetails />
     </div>

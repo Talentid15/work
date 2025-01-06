@@ -1,25 +1,34 @@
 // components/ProfileCard.js
 import React, { useState } from "react";
 import { BsUpload } from "react-icons/bs";
-import { MdOutlineRemoveRedEye } from "react-icons/md";
-import { MdOutlineLocalPhone } from "react-icons/md";
-import { MdOutlineMail } from "react-icons/md";
-import { MdOutlineLocationOn } from "react-icons/md";
+import {
+  MdOutlineRemoveRedEye,
+  MdOutlineLocalPhone,
+  MdOutlineMail,
+  MdOutlineLocationOn,
+  MdDelete,
+} from "react-icons/md";
 import { IoIosArrowBack } from "react-icons/io";
-
+import { FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-import { MdDelete } from "react-icons/md";
-import { FaPlus } from "react-icons/fa";
-
-
-
 const AddCandidate = () => {
-
   const navigate = useNavigate();
 
   const [skills, setSkills] = useState([{ id: Date.now(), value: "" }]);
   const [imagePreview, setImagePreview] = useState(null);
+  const [candidateDetails, setCandidateDetails] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    offerDate: "",
+    joiningDate: "",
+    status: "",
+    experience: "",
+    educationDegree: "",
+    educationCollege: "",
+  });
 
   // Add a new skill input fieldW
   const addSkillField = () => {
@@ -29,9 +38,7 @@ const AddCandidate = () => {
   // Handle skill input value change
   const handleSkillChange = (id, value) => {
     setSkills((prevSkills) =>
-      prevSkills.map((skill) =>
-        skill.id === id ? { ...skill, value } : skill
-      )
+      prevSkills.map((skill) => (skill.id === id ? { ...skill, value } : skill))
     );
   };
 
@@ -51,26 +58,57 @@ const AddCandidate = () => {
     }
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCandidateDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: value,
+    }));
+  };
+
+  const handleAddCandidate = () => {
+    const candidateData = {
+      ...candidateDetails,
+      skills: skills.map((skill) => skill.value),
+      imagePreview,
+    };
+    console.log("Candidate Details:", candidateData);
+    setCandidateDetails({
+      name: "",
+      phone: "",
+      email: "",
+      address: "",
+      offerDate: "",
+      joiningDate: "",
+      status: "",
+      experience: "",
+      educationDegree: "",
+      educationCollege: "",
+    });
+    setSkills([{ id: Date.now(), value: "" }]);
+    setImagePreview(null);
+  };
+
   return (
     <div className="bg-[#EEEEEE] rounded flex flex-col shadow mt-6 p-4 w-full mx-auto">
-
-      <div className="flex gap-2 justify-start items-center cursor-pointer" onClick={() => {
-
-        navigate(-1);
-
-      }}>
-
+      <div
+        className="flex gap-2 justify-start items-center cursor-pointer"
+        onClick={() => {
+          navigate(-1);
+        }}
+      >
         <IoIosArrowBack size={30}></IoIosArrowBack>
         <h1 className="text-slate-700 text-2xl font-semibold">Profile</h1>
-
       </div>
 
       <div className="flex items-center space-x-6">
-
-
         <div className="w-24 h-24 bg-gray-300 rounded-full relative overflow-hidden flex items-center justify-center cursor-pointer">
-        {imagePreview ? (
-            <img src={imagePreview} alt="Uploaded Preview" className="w-full h-full object-cover" />
+          {imagePreview ? (
+            <img
+              src={imagePreview}
+              alt="Uploaded Preview"
+              className="w-full h-full object-cover"
+            />
           ) : (
             <label
               htmlFor="photoInput"
@@ -92,7 +130,10 @@ const AddCandidate = () => {
           <h2 className="text-2xl font-bold text-[#818181]">
             <input
               type="text"
+              name="name"
               placeholder="Enter the name"
+              value={candidateDetails.name}
+              onChange={handleInputChange}
               className="bg-transparent outline-none text-[#818181] w-full"
             />
           </h2>
@@ -102,7 +143,10 @@ const AddCandidate = () => {
             <MdOutlineLocalPhone className="text-black mt-1" size={25} />
             <input
               type="text"
+              name="phone"
               placeholder="Phone number"
+              value={candidateDetails.phone}
+              onChange={handleInputChange}
               className="bg-transparent outline-none text-[#818181] w-full"
             />
           </p>
@@ -110,7 +154,10 @@ const AddCandidate = () => {
             <MdOutlineMail className="text-black mt-1" size={25} />
             <input
               type="text"
+              name="email"
               placeholder="Email address"
+              value={candidateDetails.email}
+              onChange={handleInputChange}
               className="bg-transparent outline-none text-[#818181] w-full"
             />
           </p>
@@ -118,7 +165,10 @@ const AddCandidate = () => {
             <MdOutlineLocationOn className="text-black mt-1" size={25} />
             <input
               type="text"
+              name="address"
               placeholder="Address"
+              value={candidateDetails.address}
+              onChange={handleInputChange}
               className="bg-transparent outline-none text-[#818181] w-full"
             />
           </p>
@@ -130,6 +180,9 @@ const AddCandidate = () => {
               <span className="font-bold">Offer Date :</span>
               <input
                 type="text"
+                name="offerDate"
+                value={candidateDetails.offerDate}
+                onChange={handleInputChange}
                 className="bg-transparent outline-none text-gray-600"
                 placeholder="Enter the date"
               />
@@ -140,6 +193,9 @@ const AddCandidate = () => {
               <span className="font-bold">Joining Date :</span>
               <input
                 type="text"
+                name="joiningDate"
+                value={candidateDetails.joiningDate}
+                onChange={handleInputChange}
                 className="bg-transparent outline-none text-gray-600"
                 placeholder="Enter the date"
               />
@@ -150,6 +206,9 @@ const AddCandidate = () => {
               <span className="font-bold">Status :</span>
               <input
                 type="text"
+                name="status"
+                value={candidateDetails.status}
+                onChange={handleInputChange}
                 className="bg-transparent outline-none text-gray-600"
                 placeholder="Enter status"
               />
@@ -173,6 +232,9 @@ const AddCandidate = () => {
             </h3>
             <input
               type="text"
+              name="experience"
+              value={candidateDetails.experience}
+              onChange={handleInputChange}
               className="w-[300px] focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder="About their work experience..."
             />
@@ -191,11 +253,17 @@ const AddCandidate = () => {
             </h3>
             <input
               type="text"
+              name="educationDegree"
+              value={candidateDetails.educationDegree}
+              onChange={handleInputChange}
               className="w-full mt-2 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder="Degree Eg: BA, BBA, BE, BTECH..."
             />
             <input
               type="text"
+              name="educationCollege"
+              value={candidateDetails.educationCollege}
+              onChange={handleInputChange}
               className="w-full mt-2 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder="College..."
             />
@@ -220,7 +288,6 @@ const AddCandidate = () => {
                   className=" text-white rounded px-2 py-1 cursor-pointer"
                 >
                   <MdDelete className="text-slate-700" size={20}></MdDelete>
-
                 </div>
               </div>
             ))}
@@ -229,20 +296,17 @@ const AddCandidate = () => {
               className=" bg-white rounded flex items-center justify-center cursor-pointer"
             >
               <FaPlus size={20}></FaPlus>
-
             </div>
           </div>
 
           <div className="flex justify-end items-end">
-
-            <button className="px-4 py-2 bg-[#652D96] text-white rounded-3xl hover:bg-purple-800">
+            <button onClick={handleAddCandidate} className="px-4 py-2 bg-[#652D96] text-white rounded-3xl hover:bg-purple-800">
               Add Candidate
             </button>
-
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiX } from "react-icons/fi";
 import Flag from "react-world-flags";
 
@@ -15,29 +15,48 @@ const countryCodes = [
   { code: "BR", dialCode: "+55" }, // Brazil
 ];
 
-const InviteForm = ({onSubmit}) => {
+const InviteForm = ({ selectedUser, onSave }) => {
   const [selectedCountry, setSelectedCountry] = useState(countryCodes[0]);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    code: selectedCountry.dialCode,
     phone: "",
     staffId: "",
     joiningDate: "",
   });
 
+  useEffect(() => {
+    if (selectedUser) {
+      setFormData({ ...selectedUser, code: selectedCountry.dialCode });
+    }
+  }, [selectedUser, selectedCountry.dialCode]);
+
+
   const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [id]: value }));
+    const { name, value } = e.target; // Use the name attribute to update formData
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCountryChange = (e) => {
+    const selected = countryCodes.find((c) => c.code === e.target.value);
+    setSelectedCountry(selected);
+    setFormData((prev) => ({ ...prev, code: selected.dialCode }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const phone = `${selectedCountry.dialCode}-${formData.phone}`;
-    onSubmit({ ...formData, phone });
     console.log(formData);
-    setFormData({ name: "", email: "", phone: "", staffId: "", joiningDate: "" });
-  }
-
+    onSave(formData); // Save the updated details
+    setFormData({
+      name: "",
+      email: "",
+      code: selectedCountry.dialCode,
+      phone: "",
+      staffId: "",
+      joiningDate: "",
+    }); 
+  };
 
   return (
     <div className="bg-white border border-gray-300 rounded-lg p-6 w-full h-full max-w-md">
@@ -50,6 +69,7 @@ const InviteForm = ({onSubmit}) => {
         <h4 className="text-l font-medium text-black-700">
           Enter Candidate Details
         </h4>
+        {/* Email */}
         <div className="relative w-full">
           <label
             htmlFor="email"
@@ -60,11 +80,14 @@ const InviteForm = ({onSubmit}) => {
           <input
             type="email"
             id="email"
+            name="email"
+            value={formData.email}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none"
           />
         </div>
 
+        {/* Name */}
         <div className="relative w-full">
           <label
             htmlFor="name"
@@ -73,23 +96,25 @@ const InviteForm = ({onSubmit}) => {
             Name
           </label>
           <input
-            type="name"
+            type="text"
             id="name"
+            name="name"
+            value={formData.name}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none"
           />
         </div>
 
+        {/* Mobile */}
         <div className="flex gap-2">
           <div className="flex items-center border border-gray-300 rounded-md p-2 h-12">
-            <div className="relative w-full">
+          <div className="relative w-full">
               <label
                 htmlFor="code"
                 className="absolute -top-4 left-3 bg-white px-1 text-sm text-gray-500"
               >
                 Code
               </label>
-
               <div className="flex items-center">
                 <Flag
                   code={selectedCountry.code}
@@ -98,11 +123,7 @@ const InviteForm = ({onSubmit}) => {
                 <select
                   className="focus:outline-none text-sm w-full p-2 h-full"
                   value={selectedCountry.code}
-                  onChange={(e) =>
-                    setSelectedCountry(
-                      countryCodes.find((c) => c.code === e.target.value)
-                    )
-                  }
+                  onChange={handleCountryChange}
                 >
                   {countryCodes.map((country) => (
                     <option key={country.code} value={country.code}>
@@ -115,19 +136,23 @@ const InviteForm = ({onSubmit}) => {
           </div>
           <div className="relative w-full">
             <label
-              htmlFor="mobile"
+              htmlFor="phone"
               className="absolute -top-3 left-3 bg-white px-2 text-sm text-gray-500"
             >
               Mobile
             </label>
             <input
-              type="phone"
-              id="mobile"
+              type="text"
+              id="phone"
+              name="phone"
+              value={formData.phone}
               onChange={handleChange}
               className="w-full h-12 border border-gray-300 rounded-md p-2 text-sm focus:outline-none"
             />
           </div>
         </div>
+
+        {/* Staff ID */}
         <div className="relative w-full">
           <label
             htmlFor="staffId"
@@ -137,38 +162,51 @@ const InviteForm = ({onSubmit}) => {
           </label>
           <input
             type="text"
-            id="stafId"
+            id="staffId"
+            name="staffId"
+            value={formData.staffId}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none"
           />
         </div>
+
+        {/* Joining Date */}
         <div className="relative w-[50%]">
           <label
-            htmlFor="date"
+            htmlFor="joiningDate"
             className="absolute -top-3 left-3 bg-white px-2 text-sm text-gray-500"
           >
             Joining Date
           </label>
           <input
             type="date"
-            id="date"
+            id="joiningDate"
+            name="joiningDate"
+            value={formData.joiningDate}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none"
           />
         </div>
+
+        {/* Additional Details */}
         <div className="flex justify-between items-center">
           <input
             placeholder="Additional Details"
-            onchange={handleChange}
-            className="w-60 placeholder-black rounded-md p-2  h-12 focus:outline-none focus:ring-2 focus:ring-purple-600"
-          ></input>
+            name="additionalDetails"
+            value={formData.additionalDetails || ""}
+            onChange={handleChange}
+            className="w-60 placeholder-black rounded-md p-2 h-12 focus:outline-none focus:ring-2 focus:ring-purple-600"
+          />
           <button className="text-sm font-medium hover:underline ml-4">
             + Add Tags
           </button>
         </div>
         <hr className="text-gray-200 w-full" />
         <div className="text-right">
-          <button className="bg-[#652D96] text-white py-2 px-6 rounded-lg text-sm">
+          <button
+            type="submit"
+            className="bg-[#652D96] text-white py-2 px-6 rounded-lg text-sm"
+          >
             Add to invite list
           </button>
         </div>

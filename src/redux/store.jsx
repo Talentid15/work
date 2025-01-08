@@ -1,4 +1,5 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import UserSlice, { checkExpiry } from "./UserSlice";
 import {
   persistReducer,
   persistStore,
@@ -10,7 +11,6 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import UserSlice from "./UserSlice"; // Import your slice
 
 // Persist configuration
 const persistConfig = {
@@ -27,6 +27,15 @@ const rootReducer = combineReducers({
 // Create persisted reducer
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
+// Middleware to check for expired data
+const expiryMiddleware = (store) => (next) => (action) => {
+  const state = store.getState();
+  if (state.user && state.user.createdAt) {
+    store.dispatch(checkExpiry());
+  }
+  return next(action);
+};
+
 // Configure and create the Redux store
 export const store = configureStore({
   reducer: persistedReducer,
@@ -35,13 +44,11 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }),
+    }).concat(expiryMiddleware), // Add the expiry middleware here
 });
 
 // Create the persistor
-export const persistor = persistStore(store); // This should be exported
+export const persistor = persistStore(store);
 
 // Export the store as default
 export default store;
-
-

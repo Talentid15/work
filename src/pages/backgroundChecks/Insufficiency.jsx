@@ -7,3 +7,5 @@ const Insufficiency = () => {
 }
 
 export default Insufficiency;
+
+

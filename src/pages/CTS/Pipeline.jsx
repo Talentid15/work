@@ -8,7 +8,13 @@ import { HiOutlineUsers } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { FaFileCircleQuestion } from "react-icons/fa6";
 
+import { useNavigate } from "react-router-dom";
+
 function Pipeline({ user }) {
+
+  const navigate = useNavigate();
+
+
   // const { pipeline, setPipeline } = useContext(MyContext);
   // const [appliedRound, setAppliedRound] = useState(-1);
 
@@ -85,7 +91,11 @@ function Pipeline({ user }) {
 
       <div className="bg-[#EDEDED] rounded-3xl border border-gray-300 mx-4">
         <div className="mt-8 ml-8">
-          <button className="flex border border-gray-300 font-bold rounded-full bg-white p-2 gap-2">
+          <button className="flex border border-gray-300 font-bold rounded-full bg-white p-2 gap-2" onClick={()=>{
+
+            navigate(-1);
+            
+          }}>
             <IoChevronBack className="text-gray-400 mt-1" />
             Jainayak's Profile
           </button>

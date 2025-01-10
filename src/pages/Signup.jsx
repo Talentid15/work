@@ -1,214 +1,218 @@
-import React, { useState, useRef, useEffect } from "react";
-import loginImage from "../assets/loginImage.png";
-import logo from "../assets/logo.png";
-import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import backgroundImage2 from "../assets/rb_3790.png";
+import InputField from "../components/InputField";
 
-function Signup() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const SignUpForm = () => {
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    company: "",
+    role: "",
+    password: "",
+    termsAccepted: false,
+  });
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
+  const validateForm = () => {
+    const newErrors = {};
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleClickOutside = (event) => {
-    if (modalRef.current && !modalRef.current.contains(event.target)) {
-      closeModal();
+    // Full Name Validation
+    if (!formData.fullName) {
+      newErrors.fullName = "Full Name is required.";
     }
-  };
 
-  useEffect(() => {
-    if (isModalOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+    // Email Validation
+    if (!formData.email) {
+      newErrors.email = "Email is required.";
+    } else if (
+      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(org|net)$/.test(formData.email)
+    ) {
+      newErrors.email = "Only company emails are allowed.";
+    }
+
+    // Phone Number Validation
+    if (!formData.phone) {
+      newErrors.phone = "Phone number is required.";
+    } else if (!/^\d{10}$/.test(formData.phone)) {
+      newErrors.phone = "Phone number must be 10 digits.";
+    }
+
+    // Password Validation
+    if (!formData.password) {
+      newErrors.password = "Password is required.";
     } else {
-      document.removeEventListener("mousedown", handleClickOutside);
+      const passwordStrengthRegex =
+        /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      if (!passwordStrengthRegex.test(formData.password)) {
+        newErrors.password =
+          "Password must be at least 8 characters long, contain one uppercase letter, one number, and one special character.";
+      }
     }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isModalOpen]);
+
+    // Terms and Conditions Check
+    if (!formData.termsAccepted) {
+      newErrors.termsAccepted = "You must accept the terms and conditions.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      try {
+        console.log(formData);
+        const response = await axios.post(
+          "http://localhost:5000/api/auth/signup",
+          formData,
+          { withCredentials: true }
+        );
+
+        if (response.status === 200) {
+          alert("Form submitted successfully!");
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        alert("An error occurred while submitting the form. Please try again.");
+      }
+    }
+  };
 
   return (
-    <>
-      <div className="flex justify-center items-center h-screen bg-[#652D96]">
-        <div className="bg-white flex w-[1000px] h-[700px] rounded-lg shadow-lg overflow-hidden">
-          {/* Left Half - Login Details */}
-          <div className="w-1/2 px-10 flex flex-col justify-center">
-            <img src={logo} alt="logo" className="w-1/2 mb-6" />
-            <h2 className="text-2xl font-bold text-[#652D96] mb-6">Sign Up</h2>
-            <form>
-              <div className="mb-4">
-                <label
-                  htmlFor="username"
-                  className="block text-sm text-black-600 mb-2"
-                >
-                  Username
-                </label>
-                <input
-                  type="text"
-                  id="username"
-                  placeholder="Enter your full name"
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#652D96]"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="email"
-                  className="block text-sm text-black-600 mb-2"
-                >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  placeholder="Enter your email address"
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#652D96]"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="phone"
-                  className="block text-sm text-black-600 mb-2"
-                >
-                  Phone number
-                </label>
-                <input
-                  type="number"
-                  id="phone"
-                  placeholder="Enter your phone number"
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#652D96]"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="company"
-                  className="block text-sm text-black-600 mb-2"
-                >
-                  Company
-                </label>
-                <div className="flex flex-row gap-4">
-                  <input
-                    type="text"
-                    id="company"
-                    placeholder="Company name"
-                    className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#652D96]"
-                    required
-                  />
-                  <select
-                    id="company"
-                    className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#652D96]"
-                    required
-                  >
-                    <option value="" disabled selected>
-                      Select
-                    </option>
-                    <option value="hr">Corporate HR</option>
-                    <option value="designer">Designer</option>
-                    <option value="developer">Developer</option>
-                    <option value="tester">Tester</option>
-                  </select>
-                </div>
-              </div>
-              <div className="mb-6 relative">
-                <label
-                  htmlFor="password"
-                  className="block text-sm text-black-600 mb-2"
-                >
-                  Password
-                </label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  placeholder="Password"
-                  className="w-full border border-gray-300 rounded-lg p-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#652D96]"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={togglePasswordVisibility}
-                  className="absolute top-2/3 right-3 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                >
-                  {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
-                </button>
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-[#652D96] text-white py-2 rounded-lg hover:bg-[#4a2171] transition-colors"
-              >
-                Sign up
-              </button>
-              <p className="text-[#8080808C] ml-20 py-4">
-                Already have an account?{" "}
-                <Link to="/login">
-                  
-                <span className="text-[#465685] underline cursor-pointer">
-                  Login
-                </span>
-                </Link>
-              </p>
-            </form>
-          </div>
-          {/* Right Half - Image */}
-          <div className="w-1/2 bg-[#F5EBFF] flex items-center justify-center">
-            <img src={loginImage} alt="Login Illustration" className="w-2/3" />
-          </div>
+    <div className="flex flex-col md:flex-row h-screen">
+      {/* Left Section */}
+      <div className="flex-1 bg-gradient-to-b from-purple-900 via-purple-700 to-purple-400 text-white flex flex-col justify-center items-center rounded-b-2xl md:rounded-r-3xl md:rounded-b-none p-6">
+        <img
+          src={backgroundImage2}
+          alt="Decorative Image"
+          className="w-[80%] md:w-[70%] mb-6"
+        />
+        <div className="text-center">
+          <h2 className="text-xl md:text-2xl font-bold mb-2">Existing user?</h2>
+          <p className="mb-4 md:mb-6 text-sm md:text-base">
+            Takes a few moments to connect back
+          </p>
+          <button className="bg-gray-200 transition-all hover:scale-105 text-gray-800 px-6 py-2 text-sm md:text-xl rounded-full font-semibold">
+            <a href="/login">Log in</a>
+          </button>
         </div>
       </div>
 
-      {/*Modal for forget password */}
+      {/* Right Section */}
+      <div className="flex-1 bg-white p-6 md:p-10 flex flex-col justify-center rounded-t-2xl md:rounded-l-2xl md:rounded-t-none">
+        <h2 className="text-purple-700 text-center text-3xl md:text-5xl font-bold mb-6">
+          Sign Up
+        </h2>
+        <p className="text-center px-6 md:px-20 mb-4 text-sm md:text-base">
+          Let's get started. <br></br>Are you ready to be a part of something new?
+        </p>
+        <form onSubmit={handleSubmit} className="space-y-4 md:px-24">
+          <InputField
+            type="text"
+            name="fullname"
+            placeholder="Enter your Full Name"
+            value={formData.fullName}
+            onChange={handleChange}
+            error={errors.fullName}
+          />
 
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white w-[400px] p-8 rounded-lg text-center">
-            <h2 className="text-xl font-bold mb-4 text-black">
-              Forgot Password
-            </h2>
-            <label
-              htmlFor="modal-username"
-              className="block text-sm mb-2 text-[#656565]"
-            >
-              Enter your email address to reset your password
-            </label>
-            <input
+          <InputField
+            type="email"
+            name="email"
+            placeholder="Enter your Email"
+            value={formData.email}
+            onChange={handleChange}
+            error={errors.email}
+          />
+
+          <InputField
+            type="tel"
+            name="phone"
+            placeholder="Enter your Phone"
+            value={formData.phone}
+            onChange={handleChange}
+            error={errors.phone}
+          />
+
+          <div className="flex flex-col md:flex-row md:space-x-4">
+            <InputField
               type="text"
-              id="modal-username"
-              placeholder="username@mail.com"
-              className="w-full border border-gray-300 rounded-lg p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#652D96] mt-2"
+              name="company"
+              placeholder="Company "
+              value={formData.company}
+              onChange={handleChange}
             />
-            <div className="w-full">
-              <button
-                className="bg-[#652D96] w-full text-white px-4 py-2 mt-2 rounded-lg"
-                onClick={() => {
-                  alert("Password reset link sent!");
-                  closeModal();
-                }}
-              >
-                Reset Password
-              </button>
-              <div className="mt-5 ">
-                <p className="text-[#656565]">
-                  we will send you an email with the intructions to rest your
-                  password
-                </p>
-              </div>
-            </div>
+            <select
+              name="role"
+              className="w-full mt-3 md:mt-0 border-2 border-purple-300 rounded-lg p-3 focus:outline-none focus:border-purple-500 shadow-lg"
+              value={formData.role}
+              onChange={handleChange}
+            >
+              <option value="">Select Role</option>
+              <option value="Corporate HR">Corporate HR</option>
+              <option value="Manager">Manager</option>
+              <option value="Employee">Employee</option>
+            </select>
           </div>
-        </div>
-      )}
-    </>
-  );
-}
 
-export default Signup;
+          <InputField
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            value={formData.password}
+            onChange={handleChange}
+            error={errors.password}
+          />
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              name="termsAccepted"
+              className="mr-2"
+              checked={formData.termsAccepted}
+              onChange={handleChange}
+            />
+            <label className="text-gray-600 text-sm">
+              I have read and accept the{" "}
+              <a href="#" className="text-purple-600 underline">
+                Terms & Conditions
+              </a>{" "}
+              and{" "}
+              <a href="#" className="text-purple-600 underline">
+                Privacy Policy
+              </a>
+            </label>
+          </div>
+          {errors.termsAccepted && (
+            <p className="text-red-500 text-sm">{errors.termsAccepted}</p>
+          )}
+
+          <div className="flex items-center justify-center">
+            <button
+              type="submit"
+              className="w-full md:w-[60%] bg-purple-600 text-white p-3 rounded-lg hover:scale-105 transition-all font-semibold hover:bg-purple-700"
+            >
+              Create Account
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default SignUpForm;

@@ -1,163 +1,174 @@
-import React, { useState, useRef, useEffect } from "react";
-import loginImage from "../assets/loginImage.png";
+import React, { useState } from "react";
+import { IoArrowForwardSharp } from "react-icons/io5";
+import backgroundImage from "../assets/5548971.jpg";
+import backgroundImage2 from "../assets/rb_24598.png";
 import logo from "../assets/logo.png";
-import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import InputField from "../components/InputField";
+import ForgotPasswordCard from "../components/ForgotPasswordCard";
 
-function Login() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const modalRef = useRef(null); // Add this ref
+const LoginForm = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+
+  const handleForgotPasswordClick = () => {
+    setShowForgotPassword(true);
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
+  const handleCloseForgotPassword = () => {
+    setShowForgotPassword(false);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
-  const handleClickOutside = (event) => {
-    if (modalRef.current && !modalRef.current.contains(event.target)) {
-      closeModal();
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.email) {
+      newErrors.email = "Email is required.";
+    } else if (
+      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(org|net)$/.test(formData.email)
+    ) {
+      newErrors.email = "Only company emails are allowed.";
+    }
+    if (!formData.password) {
+      newErrors.password = "Password is required.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      try {
+        const response = await fetch("http://localhost:5000/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem("token", data.token);
+          window.location.href = "/";
+        } else {
+          alert(data.error);
+        }
+      } catch (error) {
+        console.error("Error logging in:", error);
+        alert("Something went wrong.");
+      }
     }
   };
-
-  useEffect(() => {
-    if (isModalOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isModalOpen]);
 
   return (
-    <>
-      <div className="flex justify-center items-center h-screen bg-[#652D96]">
-        <div className="bg-white flex w-[1000px] h-[600px] rounded-lg shadow-lg overflow-hidden">
-          {/* Left Half - Login Details */}
-          <div className="w-1/2 p-8 flex flex-col justify-center">
-            <img src={logo} alt="logo" className="w-1/2 mb-12" />
-            <h2 className="text-2xl font-bold text-[#652D96] mb-6">Login</h2>
-            <form>
-              <div className="mb-4">
-                <label
-                  htmlFor="username"
-                  className="block text-sm text-black-600 mb-2"
-                >
-                  Email
-                </label>
-                <input
-                  type="text"
-                  id="username"
-                  placeholder="username@mail.com"
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#652D96]"
-                  required
-                />
-              </div>
-              <div className="mb-6 relative">
-                <label
-                  htmlFor="password"
-                  className="block text-sm text-black-600 mb-2"
-                >
-                  Password
-                </label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  placeholder="Password"
-                  className="w-full border border-gray-300 rounded-lg p-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#652D96]"
-                  required
-                />
+    <div className="flex flex-col lg:flex-row h-screen">
+      {/* Left Section */}
+      <div
+        className={`w-[full] lg:w-[45%] bg-white p-6   transition-transform duration-300 ${
+          showForgotPassword ? "blur-sm" : ""
+        }`}
+      >
+        <div className="flex  flex-col justify-center items-center gap-14 p-6 sm:p-10 lg:rounded-l-3xl">
+          <div className=" w-full   p-6 flex justify-start items-start">
+            <img src={logo} alt="Logo" className="w-[60%] sm:w-[40%] h-auto" />
+          </div>
+          <div >
+            <h2 className="text-purple-700 text-center text-2xl sm:text-4xl font-bold mb-4">
+              Login
+            </h2>
+            <p className="text-center text-sm sm:text-base mb-4 px-4 sm:px-20">
+              Ready to dive back in? Enter your credentials to continue.
+            </p>
+            <form onSubmit={handleSubmit} className="space-y-4 px-4 sm:px-10">
+              <InputField
+                type="email"
+                name="email"
+                placeholder="Enter your Email"
+                value={formData.email}
+                onChange={handleChange}
+                error={errors.email}
+              />
+              <InputField
+                type="password"
+                name="password"
+                placeholder="Enter your Password"
+                value={formData.password}
+                onChange={handleChange}
+                error={errors.password}
+              />
+              <p
+                className=" text-sm text-purple-500 text-center mt-4 ml-72 cursor-pointer hover:underline lg:ml-80"
+                onClick={handleForgotPasswordClick}
+              >
+                Forgot Password?
+              </p>
+              <div className="flex items-center justify-center">
                 <button
-                  type="button"
-                  onClick={togglePasswordVisibility}
-                  className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  type="submit"
+                  className="w-[75%] sm:w-[40%] transition-all bg-purple-600 text-white p-3 rounded-lg hover:scale-105 font-semibold hover:bg-purple-700 flex items-center justify-center space-x-2"
                 >
-                  {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
+                  <p>Login</p>
+                  <IoArrowForwardSharp size={20} />
                 </button>
-                <p
-                  className="text-[#465685] text-sm mt-2 cursor-pointer"
-                  onClick={openModal}
-                >
-                  Forgot Password?
+              </div>
+              <div className="text-center">
+                <p className="text-gray-600">
+                  Don't have an account?{" "}
+                  <a
+                    href="/signup"
+                    className="text-purple-600 font-semibold hover:underline"
+                  >
+                    Create one
+                  </a>
                 </p>
               </div>
-              <button
-                type="submit"
-                className="w-full bg-[#652D96] text-white py-2 rounded-lg hover:bg-[#4a2171] transition-colors"
-              >
-                Login
-              </button>
-              <p className="text-[#8080808C] ml-12 py-4">
-                Don't have an account yet?{" "}
-                <Link
-                  to="/signup"
-                  className="text-[#465685] underline cursor-pointer"
-                >
-                  Sign up for free
-                </Link>
-              </p>
             </form>
-          </div>
-          {/* Right Half - Image */}
-          <div className="w-1/2 bg-[#F5EBFF] flex items-center justify-center">
-            <img src={loginImage} alt="Login Illustration" className="w-2/3" />
           </div>
         </div>
       </div>
 
-      {/* Modal for forget password */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div
-            ref={modalRef} // Attach ref to the modal container
-            className="bg-white w-[400px] p-8 rounded-lg text-center"
-          >
-            <h2 className="text-xl font-bold mb-4 text-black">
-              Forgot Password
-            </h2>
-            <label
-              htmlFor="modal-username"
-              className="block text-sm mb-2 text-[#656565]"
-            >
-              Enter your email address to reset your password
-            </label>
-            <input
-              type="text"
-              id="modal-username"
-              placeholder="username@gmail.com"
-              className="w-full border border-gray-300 rounded-lg p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#652D96] mt-2"
-            />
-            <div className="w-full">
-              <button
-                className="bg-[#652D96] w-full font-semibold text-white px-4 py-2 mt-2 rounded-lg"
-                onClick={() => {
-                  alert("Password reset link sent!");
-                  closeModal();
-                }}
-              >
-                Reset password
-              </button>
-              <div className="mt-5 ">
-                <p className="text-[#656565] font-normal">
-                  We will send you an email with the instructions to reset your
-                  password
-                </p>
-              </div>
-            </div>
-          </div>
+      {/* Forgot Password Card */}
+      {showForgotPassword && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center">
+          <ForgotPasswordCard onClose={handleCloseForgotPassword} />
         </div>
       )}
-    </>
-  );
-}
 
-export default Login;
+      {/* Right Section */}
+      <div
+  className="hidden lg:flex flex-1 bg-center bg-white rounded-3xl lg:rounded-3xl m-3 bg-cover text-white flex-col justify-center items-center p-6 sm:p-10"
+  style={{ backgroundImage: `url(${backgroundImage})` }}
+>
+  <h1 className="text-2xl sm:text-5xl font-bold mb-4 text-center">
+    Welcome Back!
+  </h1>
+  <p className="w-full sm:w-[80%] text-sm sm:text-base text-center">
+    The best way to predict the future is to create it – starting with hiring exceptional talent.
+  </p>
+  <img
+    src={backgroundImage2}
+    alt="Decorative"
+    className="w-[70%] sm:w-[60%] h-auto mt-4"
+  />
+</div>
+                                                        
+    </div>
+  );
+};
+
+export default LoginForm;

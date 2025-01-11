@@ -8,8 +8,12 @@ const ForgotPasswordCard = ({ onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/api/forgot-password", { email });
+      const response = await axios.post("http://localhost:4000/api/auth/forgotPasswordEmail", { email });
       setMessage(response.data.message);
+
+      console.log("res ka data ",response.data);
+
+      
     } catch (error) {
       setMessage("Something went wrong. Please try again.");
     }

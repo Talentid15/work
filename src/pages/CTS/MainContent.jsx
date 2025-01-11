@@ -8,11 +8,19 @@ import PopUps from "../../components/PopUps";
 
 import StatusCard from "./StatusCard";
 
+import { useSelector } from "react-redux";
+
+import NotFoundPage from "../../components/common/NotFoundPage";
+
 
 const MainContent = () => {
   const [showPopups, setShowPopups] = useState(false);
 
   const handleClosePopup = () => setShowPopups(false);
+
+  const userPipeLineData = useSelector((state) => state.user.pipelineData);
+
+  console.log("user pipeline data ", userPipeLineData);
 
   const [email, setEmail] = useState('');
 
@@ -77,43 +85,21 @@ const MainContent = () => {
 
       <div className="flex items-center justify-center border-2 border-[#c7c6c6] bg-[#E7E7E7] rounded-3xl p-6 max-w-[790px] mx-auto scroll-auto">
         <div className="flex flex-wrap justify-around gap-4 h-[18rem]  overflow-y-auto">
-          <StatusCard
-            company="Google"
-            status="Final Round"
-            statusColor="text-green-600"
-            iconColor="#3DBF28"
-          />
-          <StatusCard
-            company="Microsoft"
-            status="Final Round"
-            statusColor="text-green-600"
-            iconColor="#3DBF28"
-          />
-          <StatusCard
-            company="TalentID"
-            status="Screening"
-            statusColor="text-red-500"
-            iconColor="#FF3F3F"
-          />
-          <StatusCard
-            company="Adobe"
-            status="Final Round"
-            statusColor="text-green-600"
-            iconColor="#3DBF28"
-          />
 
-          <StatusCard
-            company="TalentID"
-            status="Screening"
-            statusColor="text-red-500"
-            iconColor="#FF3F3F"
-          />
-          <StatusCard
-            company="Adobe"
-            status="Final Round"
-            statusColor="text-green-600"
-            iconColor="#3DBF28"
-          />
+          {
+
+            userPipeLineData.appliedCompanies && userPipeLineData.appliedCompanies.map((data) => (
+
+              <StatusCard
+                company={data.companyName}
+                status={data.currentStatus}
+                statusColor={data.statusColor}
+                iconColor={data.iconColor}
+              />
+
+            ))
+
+          }
 
         </div>
       </div>
@@ -123,3 +109,8 @@ const MainContent = () => {
 };
 
 export default MainContent;
+
+
+
+
+

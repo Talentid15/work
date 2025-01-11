@@ -10,10 +10,14 @@ import { FaFileCircleQuestion } from "react-icons/fa6";
 
 import { useNavigate } from "react-router-dom";
 
+import { useSelector } from "react-redux";
+
 function Pipeline({ user }) {
 
   const navigate = useNavigate();
 
+  const userPipeLineData = useSelector((state) => state.user.pipelineData);
+  
 
   // const { pipeline, setPipeline } = useContext(MyContext);
   // const [appliedRound, setAppliedRound] = useState(-1);

@@ -18,6 +18,8 @@ import ProfileUpdate from "./pages/offerIntelligence/ProfileUpdate";
 import AddCandidate from "./components/offerIntelligence/AddCandidate";
 import ExtractDataFromPdf from "./pages/ExtractDataFromPdf";
 
+import ForgotPassword from "./pages/ForgotPasswordPage";
+
 function App() {
   return (
     <>
@@ -26,10 +28,12 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
+          <Route path="/auth/forgot-password/:id" element={<ForgotPassword></ForgotPassword>}></Route>
+
           <Route path="/" element={<CandidateTracking />} >
             <Route index element={<MainContent />} />
             <Route path="history" element={<SearchHistory />} />
-            <Route path="pipeline" element={<Pipeline />} />
+            <Route path="pipeline/:userId" element={<Pipeline />} />
 
             <Route path="/extractInfo" element={<ExtractDataFromPdf></ExtractDataFromPdf>}></Route>
 

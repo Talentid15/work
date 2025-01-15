@@ -8,11 +8,19 @@ import PopUps from "../../components/PopUps";
 
 import StatusCard from "./StatusCard";
 
+import { useSelector } from "react-redux";
+
+import NotFoundPage from "../../components/common/NotFoundPage";
+
 
 const MainContent = () => {
   const [showPopups, setShowPopups] = useState(false);
 
   const handleClosePopup = () => setShowPopups(false);
+
+  const userPipeLineData = useSelector((state) => state.user.pipelineData);
+
+  console.log("user pipeline data ", userPipeLineData);
 
   const [email, setEmail] = useState('');
 
@@ -122,3 +130,8 @@ const MainContent = () => {
 };
 
 export default MainContent;
+
+
+
+
+

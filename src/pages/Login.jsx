@@ -5,14 +5,32 @@ import backgroundImage2 from "../assets/rb_24598.png";
 import logo from "../assets/logo.png";
 import InputField from "../components/InputField";
 import ForgotPasswordCard from "../components/ForgotPasswordCard";
+import axios from "axios";
+
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+
+import {useDispatch} from "react-redux";
+
+import { useSelector } from "react-redux";
+
+import { setData } from "../redux/UserSlice";
+
 
 const LoginForm = () => {
+
+
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+
+  const navigate = useNavigate();
+
 
   const handleForgotPasswordClick = () => {
     setShowForgotPassword(true);
@@ -36,11 +54,28 @@ const LoginForm = () => {
     const newErrors = {};
     if (!formData.email) {
       newErrors.email = "Email is required.";
-    } else if (
-      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(org|net)$/.test(formData.email)
-    ) {
-      newErrors.email = "Only company emails are allowed.";
     }
+
+    // Email Validation
+
+    // const genericDomains = [
+    //   'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'protonmail.com',
+    //   'yandex.com', 'gmx.com', 'zoho.com', 'mail.com', 'inbox.com', 'live.com', 'msn.com', 'qq.com',
+    //   'naver.com', 'web.de', 'mail.ru', 'tutanota.com', 'pm.me', 'bk.ru', 'rambler.ru', 'rocketmail.com',
+    //   'ymail.com', 'excite.com', 'lycos.com', 'rediffmail.com', 'hushmail.com', 'fastmail.com', 'bellsouth.net',
+    //   'verizon.net', 'att.net', 'comcast.net', 'sbcglobal.net', 'charter.net', 'shaw.ca', 'cox.net',
+    //   'earthlink.net', 'frontier.com', 'juno.com', 'netzero.net', 'aim.com', 'optonline.net', 'me.com', 'mac.com'
+    // ];
+
+    // const emailDomain = formData.email.split('@')[1];
+
+    // if (genericDomains.includes(emailDomain)) {
+
+    //   newErrors.email = 'Please enter a company email address.';
+
+
+    // }
+
     if (!formData.password) {
       newErrors.password = "Password is required.";
     }
@@ -52,25 +87,22 @@ const LoginForm = () => {
     e.preventDefault();
     if (validateForm()) {
       try {
-        const response = await fetch("http://localhost:5000/api/auth/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        });
+        const response = await axios.post("http://localhost:4000/api/auth/login",formData);
 
-        const data = await response.json();
+        console.log("res ka data ",response.data);
 
-        if (response.ok) {
-          localStorage.setItem("token", data.token);
-          window.location.href = "/";
-        } else {
-          alert(data.error);
-        }
+        dispatch(setData(response.data));
+
+
+        toast.success("Logged in successfully!");
+
+        navigate("/");
+        
       } catch (error) {
         console.error("Error logging in:", error);
-        alert("Something went wrong.");
+        
+        toast.error(error.message);
+
       }
     }
   };
@@ -79,9 +111,8 @@ const LoginForm = () => {
     <div className="flex flex-col lg:flex-row h-screen">
       {/* Left Section */}
       <div
-        className={`w-[full] lg:w-[45%] bg-white p-6   transition-transform duration-300 ${
-          showForgotPassword ? "blur-sm" : ""
-        }`}
+        className={`w-[full] lg:w-[45%] bg-white p-6   transition-transform duration-300 ${showForgotPassword ? "blur-sm" : ""
+          }`}
       >
         <div className="flex  flex-col justify-center items-center gap-14 p-6 sm:p-10 lg:rounded-l-3xl">
           <div className=" w-full   p-6 flex justify-start items-start">
@@ -151,22 +182,22 @@ const LoginForm = () => {
 
       {/* Right Section */}
       <div
-  className="hidden lg:flex flex-1 bg-center bg-white rounded-3xl lg:rounded-3xl m-3 bg-cover text-white flex-col justify-center items-center p-6 sm:p-10"
-  style={{ backgroundImage: `url(${backgroundImage})` }}
->
-  <h1 className="text-2xl sm:text-5xl font-bold mb-4 text-center">
-    Welcome Back!
-  </h1>
-  <p className="w-full sm:w-[80%] text-sm sm:text-base text-center">
-    The best way to predict the future is to create it – starting with hiring exceptional talent.
-  </p>
-  <img
-    src={backgroundImage2}
-    alt="Decorative"
-    className="w-[70%] sm:w-[60%] h-auto mt-4"
-  />
-</div>
-                                                        
+        className="hidden lg:flex flex-1 bg-center bg-white rounded-3xl lg:rounded-3xl m-3 bg-cover text-white flex-col justify-center items-center p-6 sm:p-10"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
+      >
+        <h1 className="text-2xl sm:text-5xl font-bold mb-4 text-center">
+          Welcome Back!
+        </h1>
+        <p className="w-full sm:w-[80%] text-sm sm:text-base text-center">
+          The best way to predict the future is to create it – starting with hiring exceptional talent.
+        </p>
+        <img
+          src={backgroundImage2}
+          alt="Decorative"
+          className="w-[70%] sm:w-[60%] h-auto mt-4"
+        />
+      </div>
+
     </div>
   );
 };

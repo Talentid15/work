@@ -5,8 +5,10 @@ import backgroundImage2 from "../assets/rb_3790.png";
 import InputField from "../components/InputField";
 
 const SignUpForm = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
-    fullName: "",
+    fullname: "",
     email: "",
     phone: "",
     company: "",
@@ -15,8 +17,10 @@ const SignUpForm = () => {
     termsAccepted: false,
   });
 
+
   const [errors, setErrors] = useState({});
 
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -25,43 +29,57 @@ const SignUpForm = () => {
     });
   };
 
+
+  // Validate form fields
   const validateForm = () => {
     const newErrors = {};
 
     // Full Name Validation
-    if (!formData.fullName) {
+    if (!formData.fullname.trim()) {
       newErrors.fullName = "Full Name is required.";
     }
 
     // Email Validation
-    if (!formData.email) {
-      newErrors.email = "Email is required.";
-    } else if (
-      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(org|net)$/.test(formData.email)
-    ) {
-      newErrors.email = "Only company emails are allowed.";
+
+    const genericDomains = [
+      'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'protonmail.com',
+      'yandex.com', 'gmx.com', 'zoho.com', 'mail.com', 'inbox.com', 'live.com', 'msn.com', 'qq.com',
+      'naver.com', 'web.de', 'mail.ru', 'tutanota.com', 'pm.me', 'bk.ru', 'rambler.ru', 'rocketmail.com',
+      'ymail.com', 'excite.com', 'lycos.com', 'rediffmail.com', 'hushmail.com', 'fastmail.com', 'bellsouth.net',
+      'verizon.net', 'att.net', 'comcast.net', 'sbcglobal.net', 'charter.net', 'shaw.ca', 'cox.net',
+      'earthlink.net', 'frontier.com', 'juno.com', 'netzero.net', 'aim.com', 'optonline.net', 'me.com', 'mac.com'
+    ];
+
+    const emailDomain = formData.email.split('@')[1];
+
+    if (genericDomains.includes(emailDomain)) {
+
+      newErrors.email = 'Please enter a company email address.';
+
+
     }
 
-    // Phone Number Validation
-    if (!formData.phone) {
+
+    // Phone Validation
+    if (!formData.phone.trim()) {
       newErrors.phone = "Phone number is required.";
     } else if (!/^\d{10}$/.test(formData.phone)) {
-      newErrors.phone = "Phone number must be 10 digits.";
+      newErrors.phone = "Phone number must be exactly 10 digits.";
     }
 
     // Password Validation
-    if (!formData.password) {
+    if (!formData.password.trim()) {
       newErrors.password = "Password is required.";
-    } else {
-      const passwordStrengthRegex =
-        /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-      if (!passwordStrengthRegex.test(formData.password)) {
-        newErrors.password =
-          "Password must be at least 8 characters long, contain one uppercase letter, one number, and one special character.";
-      }
+    } else if (
+      !/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+        formData.password
+      )
+    ) {
+      newErrors.password =
+        "Password must be at least 8 characters, include one uppercase letter, one number, and one special character.";
     }
 
-    // Terms and Conditions Check
+    // Terms and Conditions Validation
     if (!formData.termsAccepted) {
       newErrors.termsAccepted = "You must accept the terms and conditions.";
     }
@@ -70,24 +88,24 @@ const SignUpForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (validateForm()) {
       try {
-        console.log(formData);
         const response = await axios.post(
-          "http://localhost:5000/api/auth/signup",
+          "http://localhost:4000/api/auth/signup",
           formData,
-          { withCredentials: true }
+          // { withCredentials: true }
         );
 
         if (response.status === 200) {
-          alert("Form submitted successfully!");
           navigate("/");
         }
       } catch (error) {
-        console.error("Error submitting form:", error);
-        alert("An error occurred while submitting the form. Please try again.");
+        console.error("Error during signup:", error);
+
       }
     }
   };
@@ -118,7 +136,8 @@ const SignUpForm = () => {
           Sign Up
         </h2>
         <p className="text-center px-6 md:px-20 mb-4 text-sm md:text-base">
-          Let's get started. <br></br>Are you ready to be a part of something new?
+          Let's get started. <br />
+          Are you ready to be a part of something new?
         </p>
         <form onSubmit={handleSubmit} className="space-y-4 md:px-24">
           <InputField
@@ -152,7 +171,7 @@ const SignUpForm = () => {
             <InputField
               type="text"
               name="company"
-              placeholder="Company "
+              placeholder="Enter your Company"
               value={formData.company}
               onChange={handleChange}
             />

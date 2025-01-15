@@ -2,6 +2,9 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     data: null,
+    additionalDetails: null,
+    userHistoryData: null,
+    pipelineData: null,
     loading: false,
     error: null,
     loggedIn: false, // Indicates if the user is logged in
@@ -13,11 +16,43 @@ const userSlice = createSlice({
     initialState,
     reducers: {
         setData: (state, action) => {
-            const { data, expiryTime } = action.payload;
-            state.data = data;
-            state.loggedIn = true;
-            state.expiryTimestamp = Date.now() + expiryTime; // Set expiry timestamp
+
+            console.log("data is ", action.payload);
+
+            state.additionalDetails = action.payload.additionalDetails;
+
+            state.userHistoryData = action.payload.searchHistory;
+
+            var newData = {};
+
+            Object.keys(action.payload).forEach((val) => {
+
+
+                if (val != "additionalDetails" && val != "searchHistory") {
+
+                    console.log("val is ", val);
+                    newData[val] = action.payload[val];
+                }
+            })
+
+            console.log("data at useSLice is", newData);
+            state.data = newData;;
+            state.expiryTimestamp = Date.now(); // Set expiry timestamp
         },
+
+        setPipelineData: (state, action) => {
+
+            state.pipelineData = action.payload;
+
+
+        },
+
+        clearPipelineData: (state,action) =>{
+
+            state.pipelineData = null;
+
+        },
+
         setCredits: (state, action) => {
             if (state.data) {
                 // Update credits only if user data is available
@@ -46,6 +81,6 @@ const userSlice = createSlice({
     },
 });
 
-export const { setData, setCredits, logout, checkExpiry } = userSlice.actions;
+export const { setData, setCredits, logout, checkExpiry,setPipelineData,clearPipelineData } = userSlice.actions;
 
 export default userSlice.reducer;

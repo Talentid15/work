@@ -26,6 +26,9 @@ export default {
           "0%": { transform: "translateY(-1rem)", opacity: "0" },
           "100%": { transform: "translateY(0)", opacity: "1" },
         },
+        variants: {
+          scrollbar: ['hidden'], // Enable hidden scrollbar variant
+        },
       },
     },
   },

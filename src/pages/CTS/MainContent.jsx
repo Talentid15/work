@@ -20,22 +20,22 @@ const MainContent = () => {
 
 
   return (
-    <div className="flex-1 p-5 bg-[#F4F4F4] relative">
-      <header className="w-auto max-w-[350px] ml-auto flex justify-end items-center bg-white rounded-full p-2">
-        <div className="flex items-center">
-          <button className="flex items-center px-3 py-2 bg-[#74449E] text-white font-semibold rounded-full hover:bg-[#5a2889] space-x-3 transition duration-200">
-            <HiOutlineUsers className="h-5 w-5" />
-            <span>Track Candidate</span>
-          </button>
-
-          <Link to="history">
-            <button className="flex items-center px-5 py-2 bg-white text-gray-800 rounded-full hover:bg-gray-100 space-x-3 transition duration-200">
-              <FaFileCircleQuestion className="h-5 w-5" />
-              <span>History</span>
-            </button>
-          </Link>
-        </div>
-      </header>
+    <div className="flex-1 p-5 bg-white relative">
+      <header className="flex justify-center gap-28 items-center bg-white rounded-2xl p-2 mb-4 ">
+              <Link to="/">
+                <button className="flex items-center px-3 py-2 w-[120%] bg-[#74449E]  font-semibold rounded-lg text-white hover:bg-[#5a2889] space-x-2 transition duration-200">
+                  <HiOutlineUsers className="h-5 w-5" />
+                  <span>Track Candidate</span>
+                </button>
+              </Link>
+      
+              <Link to="/history">
+                <button className="flex w-[160%] items-center px-5 py-2 bg-white text-gray-800 border border-purple-500 rounded-lg hover:bg-gray-100 space-x-3 transition duration-200">
+                  <FaFileCircleQuestion className="h-5 w-5" />
+                  <span >History</span>
+                </button>
+              </Link>
+            </header>
 
       <div className="flex flex-col justify-center items-center p-4">
         <h1 className="text-4xl font-bold text-gray-900 text-center mb-8">
@@ -55,7 +55,7 @@ const MainContent = () => {
 
           <button
             onClick={() => setShowPopups(true)}
-            className="px-6 py-3 bg-[#803CD8] text-white font-medium rounded-full shadow-custom-purple hover:shadow-xl transition duration-200"
+            className="px-6 py-3 bg-[#803CD8] text-white font-medium rounded-full  hover:shadow-2xl  hover:scale-105 transition duration-200"
           >
             Check Status
           </button>
@@ -75,48 +75,47 @@ const MainContent = () => {
       )}
 
 
-      <div className="flex items-center justify-center border-2 border-[#c7c6c6] bg-[#E7E7E7] rounded-3xl p-6 max-w-[790px] mx-auto scroll-auto">
-        <div className="flex flex-wrap justify-around gap-4 h-[18rem]  overflow-y-auto">
-          <StatusCard
-            company="Google"
-            status="Final Round"
-            statusColor="text-green-600"
-            iconColor="#3DBF28"
-          />
-          <StatusCard
-            company="Microsoft"
-            status="Final Round"
-            statusColor="text-green-600"
-            iconColor="#3DBF28"
-          />
-          <StatusCard
-            company="TalentID"
-            status="Screening"
-            statusColor="text-red-500"
-            iconColor="#FF3F3F"
-          />
-          <StatusCard
-            company="Adobe"
-            status="Final Round"
-            statusColor="text-green-600"
-            iconColor="#3DBF28"
-          />
+<div className="flex items-center justify-center border-2 scrollbar-hidden border-[#c7c6c6] bg-[#E7E7E7] rounded-3xl p-6 max-w-[790px] mx-auto">
+  <div className="flex flex-wrap justify-around gap-4 h-[18rem] overflow-y-auto  no-scrollbar">
+    <StatusCard
+      company="Google"
+      status="Final Round"
+      statusColor="text-green-600"
+      iconColor="#3DBF28"
+    />
+    <StatusCard
+      company="Microsoft"
+      status="Final Round"
+      statusColor="text-green-600"
+      iconColor="#3DBF28"
+    />
+    <StatusCard
+      company="TalentID"
+      status="Screening"
+      statusColor="text-red-500"
+      iconColor="#FF3F3F"
+    />
+    <StatusCard
+      company="Adobe"
+      status="Final Round"
+      statusColor="text-green-600"
+      iconColor="#3DBF28"
+    />
+    <StatusCard
+      company="TalentID"
+      status="Screening"
+      statusColor="text-red-500"
+      iconColor="#FF3F3F"
+    />
+    <StatusCard
+      company="Adobe"
+      status="Final Round"
+      statusColor="text-green-600"
+      iconColor="#3DBF28"
+    />
+  </div>
+</div>
 
-          <StatusCard
-            company="TalentID"
-            status="Screening"
-            statusColor="text-red-500"
-            iconColor="#FF3F3F"
-          />
-          <StatusCard
-            company="Adobe"
-            status="Final Round"
-            statusColor="text-green-600"
-            iconColor="#3DBF28"
-          />
-
-        </div>
-      </div>
 
     </div>
   );

@@ -45,7 +45,7 @@ const SearchHistory = () => {
   ];
 
   return (
-    <div className="relative h-full overflow-hidden p-6 md:p-8 flex flex-col bg-gray-50 ml-8">
+    <div className="relative h-full overflow-hidden p-6 md:p-8 flex flex-col bg-white ">
       {/* Header */}
       <div className="w-full relative flex flex-col md:flex-row align-start justify-between pb-5 border-b border-gray-300 mb-6">
         <div className="flex items-center mb-4 md:mb-0">
@@ -61,7 +61,7 @@ const SearchHistory = () => {
 
         <div className="flex justify-end items-center gap-4">
           <Link to="/">
-            <button className="flex items-center px-4 py-2 bg-white font-semibold rounded-full text-gray-800 hover:bg-gray-100 space-x-3 transition duration-200 shadow-md">
+            <button className="flex items-center px-4 py-2 bg-white font-semibold border-purple-600 rounded-full text-gray-800 hover:bg-gray-100 space-x-3 transition duration-200 shadow-md">
               <HiOutlineUsers className="h-5 w-5" />
               <span>Track Candidate</span>
             </button>
@@ -96,7 +96,7 @@ const SearchHistory = () => {
                 <td className="p-4 text-sm text-gray-600">{candidate.email}</td>
                 <td className="p-4 text-sm text-gray-600">{candidate.lastSearched}</td>
                 <td className="p-4">
-                  <button className="text-sm text-white bg-purple-600 rounded-full px-4 py-1 font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 transition duration-200">
+                  <button className="text-sm text-white bg-purple-600 rounded-full px-5 py-2 font-medium hover:bg-purple-200  hover:text-black focus:ring-2 focus:ring-purple-500 transition duration-200">
                     View more
                   </button>
                 </td>

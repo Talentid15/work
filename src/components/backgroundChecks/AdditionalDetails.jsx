@@ -1,25 +1,45 @@
-import React from 'react'
+import React from 'react';
 import { LuMailPlus } from "react-icons/lu";
 
 const AdditionalDetails = () => {
   return (
-    <div className="flex items-center justify-between bg-white p-6 w-full mt-4 gap-4">
-      <div>
-        <input className="me-2" type="checkbox" />Send reminder
+    <div className="bg-white p-6 w-full mt-4 rounded-lg shadow-md">
+      {/* Responsive Flexbox */}
+      <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-4 md:gap-6">
+        
+        {/* Send Reminder Checkbox */}
+        <div className="flex items-center">
+          <input className="mr-2" type="checkbox" id="reminder" />
+          <label htmlFor="reminder" className="text-sm md:text-base">Send Reminder</label>
+        </div>
+
+        {/* Date Input */}
+        <input 
+          className="border border-[#0000003D] rounded p-2 w-full md:w-auto text-sm md:text-base" 
+          type="date" 
+        />
+
+        {/* Select Packages Dropdown */}
+        <div className="border border-[#0000003D] rounded p-2 w-full md:w-auto">
+          <label htmlFor="packages" className="block text-sm md:text-base mb-1">
+            Select Packages / Checks:
+          </label>
+          <select name="packages" id="packages" className="w-full p-1 border border-gray-300 rounded">
+            <option value="">Choose an option</option>
+            <option value="package1">Package 1</option>
+            <option value="package2">Package 2</option>
+          </select>
+        </div>
+
+        {/* Send Invite Button */}
+        <button className="bg-[#652D96] text-white py-2 px-6 rounded-lg text-sm md:text-base flex items-center w-full md:w-auto justify-center">
+          <LuMailPlus className="mr-2 text-lg" />
+          Send Invite    
+        </button>
+
       </div>
-      <input className="border-[#0000003D] border rounded p-2" type="date" />
-    <div className="border-[#0000003D] border rounder p-2">
-      <label for="packages">Select Packages / Checks:</label>      
-      <select name="packages" id="packages" />
     </div>
-      
-      
-      <button className="bg-[#652D96] text-white py-2 px-8 rounded-lg text-sm flex">
-        <i className='mr-2 font-bold text-xl'><LuMailPlus /></i>
-        Send invite    
-      </button>
-    </div>
-  )
+  );
 }
 
-export default AdditionalDetails
+export default AdditionalDetails;

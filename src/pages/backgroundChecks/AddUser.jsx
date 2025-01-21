@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import InviteForm from "../../components/backgroundChecks/InviteForm";
 import SearchUser from "../../components/backgroundChecks/SearchUser";
 import AdditionalDetails from "../../components/backgroundChecks/AdditionalDetails";
@@ -25,7 +25,6 @@ const AddUser = () => {
 
   const [selectedUser, setSelectedUser] = useState(null);
 
-
   const handleDelete = (userId) => {
     setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
   };
@@ -37,42 +36,33 @@ const AddUser = () => {
   const handleFormSubmit = (formData) => {
     console.log("Saved data:", formData);
 
-    // Update users list (if necessary)
-    // setUsers((prevUsers) => {
-    //   const existingIndex = prevUsers.findIndex((u) => u.staffId === formData.staffId);
-    //   if (existingIndex !== -1) {
-    //     const updatedUsers = [...prevUsers];
-    //     updatedUsers[existingIndex] = formData;
-    //     return updatedUsers;
-    //   }
-    //   return [...prevUsers, formData];
-    // });
     if (selectedUser) {
-      // Update the user
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user.id === selectedUser.id ? { ...formData, id: user.id } : user
         )
       );
     } else {
-      // Add new user
       setUsers((prevUsers) => [
         ...prevUsers,
         { ...formData, id: new Date().getTime() },
       ]);
-    } 
-    setSelectedUser(null); // Clear the form after editing
+    }
+    setSelectedUser(null);
   };
 
   return (
-    <div className="flex w-full flex-col">
-      <div className="flex flex-2 gap-x-8 flex-row">
-      <InviteForm user={selectedUser} onSave={handleFormSubmit} />
-      <SearchUser users={users} onDelete={handleDelete} onEdit={handleEdit} />
+    <div className="w-full max-h-[80vh] overflow-auto p-4  rounded-lg shadow-lg no-scrollbar">
+      {/* Responsive Flexbox for Form and User List */}
+      <div className="flex flex-col md:flex-row gap-6">
+        <InviteForm user={selectedUser} onSave={handleFormSubmit} />
+        <SearchUser users={users} onDelete={handleDelete} onEdit={handleEdit} />
       </div>
+
+      {/* Additional Details Section */}
       <AdditionalDetails />
     </div>
-  )
-}
+  );
+};
 
-export default AddUser
+export default AddUser;

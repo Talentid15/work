@@ -90,7 +90,8 @@ const AddCandidate = () => {
   };
 
   return (
-    <div className="bg-[#EEEEEE] rounded flex flex-col shadow mt-6 p-4 w-full mx-auto">
+    <div className="no-scrollbar bg-[#EEEEEE] rounded flex flex-col shadow p-4 w-full mx-auto h-screen sm:max-h-[600px] overflow-y-auto">
+
       <div
         className="flex gap-2 justify-start items-center cursor-pointer"
         onClick={() => {
@@ -101,8 +102,8 @@ const AddCandidate = () => {
         <h1 className="text-slate-700 text-2xl font-semibold">Profile</h1>
       </div>
 
-      <div className="flex items-center space-x-6">
-        <div className="w-24 h-24 bg-gray-300 rounded-full relative overflow-hidden flex items-center justify-center cursor-pointer">
+      <div className=" flex flex-col sm:flex-row items-center sm:space-x-6">
+        <div className="w-24 h-24 bg-gray-300 rounded-full relative overflow-hidden flex items-center justify-center cursor-pointer mb-4 sm:mb-0">
           {imagePreview ? (
             <img
               src={imagePreview}
@@ -126,7 +127,7 @@ const AddCandidate = () => {
           />
         </div>
 
-        <div className="flex-grow">
+        <div className="flex-grow mb-6">
           <h2 className="text-2xl font-bold text-[#818181]">
             <input
               type="text"
@@ -173,7 +174,8 @@ const AddCandidate = () => {
             />
           </p>
         </div>
-        <div className="bg-white shadow rounded-lg p-4 w-[350px] mb-5">
+
+        <div className="bg-white shadow rounded-lg p-4 w-full sm:w-[350px] mb-5">
           {/* Offer and Joining Dates */}
           <div className="text-sm text-gray-800">
             <div className="flex mb-2 gap-2">
@@ -224,9 +226,10 @@ const AddCandidate = () => {
           </button>
         </div>
       </div>
-      <div className="bg-white rounded-lg shadow-md p-6 w-full mx-auto">
-        <div className="flex justify-between">
-          <div>
+
+      <div className="bg-white rounded-lg shadow-md p-6 w-full h-auto mx-auto">
+        <div className="flex flex-wrap justify-between gap-4">
+          <div className="flex flex-col w-full sm:w-auto">
             <h3 className="text-lg font-semibold text-gray-800">
               Experience summary
             </h3>
@@ -235,17 +238,18 @@ const AddCandidate = () => {
               name="experience"
               value={candidateDetails.experience}
               onChange={handleInputChange}
-              className="w-[300px] focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full sm:w-[300px] focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder="About their work experience..."
             />
           </div>
-          <button className="h-[40px] px-2 py-2 bg-[#EEEEEE] rounded hover:bg-gray-300 flex">
+          <button className="h-[40px] px-2 py-2 bg-[#EEEEEE] rounded hover:bg-gray-300 flex w-full sm:w-auto">
             <i className="mt-1 mr-2">
               <BsUpload />
             </i>
             Upload resume
           </button>
         </div>
+
         <div className="mt-8 space-y-4">
           <div>
             <h3 className="text-lg font-semibold text-gray-800">
@@ -269,38 +273,45 @@ const AddCandidate = () => {
             />
           </div>
         </div>
+
         <div className="mt-8">
           <h3 className="text-lg font-semibold text-gray-800">
             Engagement Preference
           </h3>
-          <div className=" relative flex flex-wrap w-[60vw] gap-0 mt-1">
+          <div className="relative flex flex-wrap w-full gap-4 mt-1">
             {skills.map((skill, index) => (
-              <div key={skill.id} className="flex items-center gap-1">
+              <div
+                key={skill.id}
+                className="flex items-center gap-2 w-full sm:w-auto"
+              >
                 <input
                   type="text"
                   value={skill.value}
                   onChange={(e) => handleSkillChange(skill.id, e.target.value)}
                   placeholder={`Skill ${index + 1}`}
-                  className="border border-gray-300 rounded p-2 mt-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="border border-gray-300 rounded p-2 mt-3 focus:outline-none focus:ring-2 focus:ring-purple-500 w-full sm:w-[200px]"
                 />
                 <div
                   onClick={() => removeSkillField(skill.id)}
-                  className=" text-white rounded px-2 py-1 cursor-pointer"
+                  className="text-white rounded px-2 py-1 cursor-pointer"
                 >
-                  <MdDelete className="text-slate-700" size={20}></MdDelete>
+                  <MdDelete className="text-slate-700" size={20} />
                 </div>
               </div>
             ))}
             <div
               onClick={addSkillField}
-              className=" bg-white rounded flex items-center justify-center cursor-pointer"
+              className="bg-white rounded flex items-center justify-center cursor-pointer w-full sm:w-auto"
             >
-              <FaPlus size={20}></FaPlus>
+              <FaPlus size={20} />
             </div>
           </div>
 
-          <div className="flex justify-end items-end">
-            <button onClick={handleAddCandidate} className="px-4 py-2 bg-[#652D96] text-white rounded-3xl hover:bg-purple-800">
+          <div className="flex justify-end items-end mt-4">
+            <button
+              onClick={handleAddCandidate}
+              className="px-4 py-2 bg-[#652D96] text-white rounded-3xl hover:bg-purple-800"
+            >
               Add Candidate
             </button>
           </div>

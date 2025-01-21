@@ -6,7 +6,7 @@ const SearchHistoryTable = ({ users, onDelete, onEdit }) => {
   return (
     <>
       <div className="w-full h-[590px] overflow-y-auto border border-gray-300 rounded-lg">
-        <table className="w-full border-collapse text-sm">
+      <table className="w-full border-collapse text-sm hidden sm:block md:table">
           <thead>
             <tr className="bg-white text-left text-black-600 font-medium text-base font-sans">
               <th className="p-5 w-[40%]">User Details</th>
@@ -14,7 +14,7 @@ const SearchHistoryTable = ({ users, onDelete, onEdit }) => {
               <th className="p-5 w-[20%]">Actions</th>
             </tr>
           </thead>
-          <tbody className="overflow-y-auto max-h-[200px]">
+          <tbody className="">
             {users.map((user) => (
               <tr key={user.id}>
                 {/* User Details */}
@@ -26,7 +26,7 @@ const SearchHistoryTable = ({ users, onDelete, onEdit }) => {
                   <span className="text-[#7C7C7C] text-sm">
                     {user.code} - {user.phone}
                   </span>
-                  <span className="w-[50%] mt-5 bg-[#3DBF284F] text-black-600 w-full text-xs font-semibold py-1 p-2 rounded-md">
+                  <span className="w-[50%] mt-5 bg-[#3DBF284F] text-black-600 text-xs font-semibold py-1 p-2 rounded-md">
                     Staff ID: {user.staffId}
                   </span>
                 </td>
@@ -57,6 +57,46 @@ const SearchHistoryTable = ({ users, onDelete, onEdit }) => {
             ))}
           </tbody>
         </table>
+        <div className="block md:hidden space-y-4 p-3">
+        {users.map((user) => (
+          <div
+            key={user.id}
+            className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm"
+          >
+            <div className="flex flex-col space-y-1">
+              <span className="font-bold text-lg text-gray-800">{user.name}</span>
+              <span className="text-[#7C7C7C] text-sm">{user.email}</span>
+              <span className="text-[#7C7C7C] text-sm">
+                {user.code} - {user.phone}
+              </span>
+              <span className="mt-2 bg-[#3DBF284F] text-black-600 text-xs font-semibold py-1 px-2 rounded-md w-fit">
+                Staff ID: {user.staffId}
+              </span>
+            </div>
+
+            <div className="mt-3 text-[#838383] font-semibold text-sm">
+              <span>Joining Date: {user.joiningDate}</span>
+            </div>
+
+            <div className="mt-4 flex items-center justify-start gap-4">
+              <button
+                className="text-black-500 hover:text-purple-600"
+                aria-label="Edit"
+                onClick={() => onEdit(user)}
+              >
+                <FaRegEdit size={18} />
+              </button>
+              <button
+                className="text-black-500 hover:text-red-600"
+                aria-label="Delete"
+                onClick={() => onDelete(user.id)}
+              >
+                <RiDeleteBin6Line size={20} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
       </div>
     </>
   );

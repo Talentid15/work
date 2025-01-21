@@ -91,8 +91,8 @@ function PopUps({ setshowPopUps, showPopUps,emailSearch ,setSearchedResponseData
 
       }
 
-      <div className="fixed inset-0 left-[20%] flex items-center justify-center z-50 backdrop-blur-sm bg-black/30">
-        <div className="bg-white p-8 rounded-xl shadow-xl max-w-md w-full">
+      <div className="fixed inset-0  flex items-center justify-center z-50 backdrop-blur-sm bg-black/30">
+        <div className="bg-white m-8 p-8 rounded-xl shadow-xl max-w-md w-full">
           <p className="text-base font-semibold mb-4 text-center">For Checking the status of Candidate,You need to burn one credit</p>
 
           <div className='flex gap-5  justify-center items-centertext-xs font-semibold'>

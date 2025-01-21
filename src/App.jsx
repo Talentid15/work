@@ -19,6 +19,7 @@ import AddCandidate from "./components/offerIntelligence/AddCandidate";
 import ExtractDataFromPdf from "./pages/ExtractDataFromPdf";
 
 import ForgotPassword from "./pages/ForgotPasswordPage";
+import OfferPunch from "./pages/CTS/OfferPunch";
 
 function App() {
   return (
@@ -31,9 +32,11 @@ function App() {
           <Route path="/auth/forgot-password/:id" element={<ForgotPassword></ForgotPassword>}></Route>
 
           <Route path="/" element={<CandidateTracking />} >
+          
             <Route index element={<MainContent />} />
             <Route path="history" element={<SearchHistory />} />
             <Route path="pipeline/:userId" element={<Pipeline />} />
+            <Route path="offer-punch" element={<OfferPunch />} />
 
             <Route path="/extractInfo" element={<ExtractDataFromPdf></ExtractDataFromPdf>}></Route>
 

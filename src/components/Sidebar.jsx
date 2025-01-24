@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink,Link } from "react-router-dom";
 import { MdOutlineSettings } from "react-icons/md";
 import { GiBackwardTime } from "react-icons/gi";
 import { TbFileStack, TbFlagBolt, TbUserCheck } from "react-icons/tb";
@@ -118,7 +118,7 @@ const Sidebar = () => {
               )}
             </div>
 
-            <NavLink
+            {/* <NavLink
               to="/backgroundchecks"
               className={({ isActive }) =>
                 isActive
@@ -128,7 +128,7 @@ const Sidebar = () => {
             >
               <TbUserCheck className="h-6 w-6" />
               <span className="text-sm font-medium">Background Checks</span>
-            </NavLink>
+            </NavLink> */}
             <NavLink
               to="/offerIntelligence"
               className={({ isActive }) =>
@@ -151,7 +151,7 @@ const Sidebar = () => {
               <TbFileStack className="h-6 w-6" />
               <span className="text-sm font-medium">Onboarding</span>
             </NavLink>
-            <NavLink
+            {/* <NavLink
               to="/assetManagement"
               className={({ isActive }) =>
                 isActive
@@ -174,7 +174,7 @@ const Sidebar = () => {
               <span className="text-sm font-medium">
                 Performance Management
               </span>
-            </NavLink>
+            </NavLink> */}
             <NavLink
               to="/offboarding"
               className={({ isActive }) =>
@@ -190,16 +190,24 @@ const Sidebar = () => {
         </div>
 
         {/* Footer Buttons */}
-        <div className="px-4 pb-4 space-y-4 mt-6 mb-24">
-          <button className="w-full flex items-center space-x-4 px-4 py-3 bg-transparent border border-white text-white rounded-full hover:bg-purple-300 hover:border-purple-500 hover:text-black transition-all duration-200">
-            <GiBackwardTime className="h-5 w-5" />
-            <span className="text-sm font-medium">Support</span>
-          </button>
+        <div className=" px-4 pb-4 space-y-4 mt-28 ">
+ {/* Support Button */}
+ <Link 
+        to="/support" 
+        className="w-full flex items-center space-x-4 px-4 py-3 bg-transparent border border-white text-white rounded-full hover:bg-purple-300 hover:border-purple-500 hover:text-black transition-all duration-200"
+      >
+        <GiBackwardTime className="h-5 w-5" />
+        <span className="text-sm font-medium">Support</span>
+      </Link>
 
-          <button className="w-full flex items-center space-x-4 px-4 py-3 bg-white text-purple-700 rounded-full hover:bg-gray-100 transition-all duration-200">
-            <MdOutlineSettings className="h-5 w-5" />
-            <span className="text-sm font-medium">Settings</span>
-          </button>
+      {/* Settings Button */}
+      <Link 
+        to="/settings" 
+        className="w-full flex items-center space-x-4 px-4 py-3 bg-white text-purple-700 rounded-full hover:bg-gray-100 transition-all duration-200"
+      >
+        <MdOutlineSettings className="h-5 w-5" />
+        <span className="text-sm font-medium">Settings</span>
+      </Link>
         </div>
       </div>
 

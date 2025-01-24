@@ -31,7 +31,7 @@ function Index() {
         {/* Main Content */}
         <div
           className={`flex-1 overflow-auto p-4 transition-all duration-300 ${
-            isSidebarOpen ? "ml-64 " : "ml-0 mt-8 "
+            isSidebarOpen ? "ml-64 " : "ml-0 mt-8 lg:mt-0 "
           }`}
         >
           <Outlet />

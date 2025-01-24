@@ -20,6 +20,12 @@ import ExtractDataFromPdf from "./pages/ExtractDataFromPdf";
 
 import ForgotPassword from "./pages/ForgotPasswordPage";
 import OfferPunch from "./pages/CTS/OfferPunch";
+import Settings from "./pages/settings/Settings";
+import Profiles from "./pages/settings/Profiles";
+import Users from "./pages/settings/Users";
+import Integerations from "./pages/settings/Integerations";
+import Subscriptions from "./pages/settings/Subscriptions";
+import Notifications from "./pages/settings/Notifications";
 
 function App() {
   return (
@@ -47,6 +53,15 @@ function App() {
               <Route path='insufficiency' element={<Insufficiency />} />
               <Route path='adduser' element={<AddUser />} />
             </Route>
+
+            <Route path="settings" element={<Settings />} >
+              <Route index  element={<Profiles />} />
+              <Route path='integration' element={<Integerations />} />
+              <Route path='user' element={<Users />} />
+              <Route path='subscription' element={<Subscriptions />} />
+              <Route path='notification' element={<Notifications />} />
+            </Route>
+
             <Route path="offerIntelligence" element={<OfferIntelligence />} >
               <Route index element={<CandidateList />} />
               <Route path='profile' element={<Profile />} />

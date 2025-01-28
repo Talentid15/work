@@ -9,14 +9,18 @@ import PopUps from "../../components/PopUps";
 import StatusCard from "./StatusCard";
 import NotFoundPage from "../../components/common/NotFoundPage";
 
+import { useContext } from "react";
+
+import { PipelineContext } from "../../context/PipelineContext";
+
 const MainContent = () => {
   const [showPopups, setShowPopups] = useState(false);
   const [email, setEmail] = useState("");
-  const [searchedResponseData, setSearchedResponseData] = useState(null);
+  const { searchedResponseData,setSearchedResponseData,pipelineData,
+    setPipelineData,} = useContext(PipelineContext);
+
   const [isError, setError] = useState("");
   const [active, setActive] = useState("People");
-
-  const userPipeLineData = useSelector((state) => state.user.pipelineData);
 
   const handleClosePopup = () => setShowPopups(false);
 

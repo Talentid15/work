@@ -4,6 +4,8 @@ import { BsUpload } from "react-icons/bs";
 
 import Loader from "../Loader";
 
+import { dateDifference } from "../../utils";
+
 import {
   MdOutlineRemoveRedEye,
   MdOutlineLocalPhone,
@@ -36,6 +38,7 @@ const AddCandidate = () => {
     experience: "",
     educationDegree: "",
     educationCollege: "",
+    resumeLink:""
   });
 
   // Add a new skill input fieldW
@@ -68,6 +71,28 @@ const AddCandidate = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    console.log(name);
+
+    if(name ==="joiningDate" && candidateDetails.offerDate === ""){
+
+      toast.error("Offer Date is required");
+
+      return ;
+    }
+
+    if(name == "joiningDate" && candidateDetails.offerDate !=""){
+
+        if(dateDifference(candidateDetails.offerDate,value)<0){
+
+          toast.error("Joining Date should be greater than Offer Date");
+
+          return ;
+
+        }
+      
+    }
+
     setCandidateDetails((prevDetails) => ({
       ...prevDetails,
       [name]: value,
@@ -80,7 +105,57 @@ const AddCandidate = () => {
       skills: skills.map((skill) => skill.value),
       imagePreview,
     };
+
+    // offer date and joining date muts be provide 
+
+    if(candidateData.name === ""){
+
+      toast.error("Name is required");
+      
+      return;
+
+    }
+    
+    if(candidateData.phone === ""){
+
+      toast.error("Phone is required");
+      
+      return;
+    }
+
+    if(candidateData.email === ""){
+
+      toast.error("Email is required");
+      
+      return;
+
+    }
+
+    if(candidateData.joiningDate ==""){
+
+      toast.error("Joining Date is required");
+
+      return;
+    }
+
+    if(candidateData.offerDate ==""){
+
+      toast.error("Offer Date is required");
+      
+      return;
+    }
+
+    if(candidateData.skills.length < 3){
+
+      toast.error("atleast provide three skills ");
+      
+      return;
+
+    }
+
     console.log("Candidate Details:", candidateData);
+
+
     setCandidateDetails({
       name: "",
       phone: "",
@@ -108,8 +183,8 @@ const AddCandidate = () => {
       const formData = new FormData();
       formData.append("resume", e.target.files[0]);
 
-      let token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6IjY3OGZlM2MyYTBmYWE0N2QyODBkMDA0MiIsImlhdCI6MTczNzQ4MzI3N30.PQbaxodYV-J5vmMcNXXf0tsCN23GcdXXYl96NDeYt0Y";
+      // let token =
+      //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6IjY3OGZlM2MyYTBmYWE0N2QyODBkMDA0MiIsImlhdCI6MTczNzQ4MzI3N30.PQbaxodYV-J5vmMcNXXf0tsCN23GcdXXYl96NDeYt0Y";
 
       const response = await axios.post(
         "http://localhost:3001/upload",
@@ -117,7 +192,7 @@ const AddCandidate = () => {
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
+            // Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -133,6 +208,8 @@ const AddCandidate = () => {
         name: response.data.response.Name,
         email: response.data.response.Email[0],
         phone: response.data.response.Phone,
+        resumeLink:response.data.response.Uploaded_File_URL || "",
+        
       });
 
       let SkillsArray = response.data.response.Skills;
@@ -253,7 +330,7 @@ const AddCandidate = () => {
               <div className="flex mb-2 gap-2">
                 <span className="font-bold">Offer Date :</span>
                 <input
-                  type="text"
+                  type="date"
                   name="offerDate"
                   value={candidateDetails.offerDate}
                   onChange={handleInputChange}
@@ -266,7 +343,7 @@ const AddCandidate = () => {
               <div className="flex mb-2 gap-2">
                 <span className="font-bold">Joining Date :</span>
                 <input
-                  type="text"
+                  type="date"
                   name="joiningDate"
                   value={candidateDetails.joiningDate}
                   onChange={handleInputChange}
@@ -323,7 +400,7 @@ const AddCandidate = () => {
             </div>
           </div>
 
-          <div className="mt-8 space-y-4">
+          {/* <div className="mt-8 space-y-4">
             <div>
               <h3 className="text-lg font-semibold text-gray-800">
                 Education summary
@@ -345,7 +422,7 @@ const AddCandidate = () => {
                 placeholder="College..."
               />
             </div>
-          </div>
+          </div> */}
 
           <div className="mt-8">
             <h3 className="text-lg font-semibold text-gray-800">

@@ -61,3 +61,22 @@ export function isValidEmail(text) {
   return emailPattern.test(text);
 }
 
+export function dateDifference(date1, date2) {
+  // Convert the input dates to Date objects if they aren't already
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+
+  // Calculate the difference in milliseconds
+  const diffInMilliseconds = d2 - d1;
+
+  
+
+  // Convert the milliseconds to days
+  const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
+
+  console.log("diff in days ",diffInDays);
+
+  return diffInDays;
+}
+
+

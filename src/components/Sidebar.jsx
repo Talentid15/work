@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink,Link } from "react-router-dom";
 import { MdOutlineSettings } from "react-icons/md";
 import { GiBackwardTime } from "react-icons/gi";
 import { TbFileStack, TbFlagBolt, TbUserCheck } from "react-icons/tb";
@@ -10,18 +10,9 @@ import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { FaChevronDown } from "react-icons/fa";
 import { FaChartLine } from "react-icons/fa"; // Icon for Candidate Tracking
 
-import { useDispatch } from "react-redux";
-
-import { logout } from "../redux/UserSlice";
-
-import { useNavigate } from "react-router-dom";
-
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCandidateTrackingOpen, setIsCandidateTrackingOpen] = useState(false);
-
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -47,8 +38,9 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full sm:w-[70%]  lg:w-90   bg-gradient-to-b from-[#74449D] to-[#4B2775] text-white shadow-lg transform transition-transform duration-300 z-40 ${isOpen ? "translate-x-0" : "-translate-x-full"
-          } md:relative md:translate-x-0 lg:w-80  `}
+        className={`fixed top-0 left-0 h-full sm:w-[70%]  lg:w-90   bg-gradient-to-b from-[#74449D] to-[#4B2775] text-white shadow-lg transform transition-transform duration-300 z-40 ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } md:relative md:translate-x-0 lg:w-80  `}
       >
         {/* Header */}
         <div>
@@ -66,9 +58,9 @@ const Sidebar = () => {
                   : "flex items-center space-x-4 px-4 py-3 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95  transition-all duration-200"
               }
             >
-              <TbFlagBolt className="h-6 w-6" />
-              <span className="text-sm font-medium">Dashboard</span>
-            </NavLink>
+                <TbFlagBolt className="h-6 w-6" />
+                <span className="text-sm font-medium">Dashboard</span>
+           </NavLink>
 
             <div>
               <NavLink
@@ -91,8 +83,9 @@ const Sidebar = () => {
                     Candidate tracking system
                   </span>
                   <FaChevronDown
-                    className={`transition-transform ${isCandidateTrackingOpen ? "rotate-180" : ""
-                      }`}
+                    className={`transition-transform ${
+                      isCandidateTrackingOpen ? "rotate-180" : ""
+                    }`}
                   />
                 </button>
               </NavLink>
@@ -100,28 +93,28 @@ const Sidebar = () => {
               {/* Sub-options for Candidate Tracking */}
               {isCandidateTrackingOpen && (
                 <div className=" w-full flex flex-col items-center ">
-                  <NavLink
-                    to="/"
-                    className={({ isActive }) =>
-                      isActive
-                        ? "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 bg-purple-300 shadow-md"
-                        : "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
-                    }
-                  >
-                    <span className="text-center">Interview</span>
-                  </NavLink>
-                  <NavLink
-                    to="/offer-punch"
-                    className={({ isActive }) =>
-                      isActive
-                        ? "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 bg-purple-300 shadow-md"
-                        : "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
-                    }
-                  >
-                    <span className="text-center">Offer Punch</span>
-                  </NavLink>
-                </div>
-
+                <NavLink
+                  to="/"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 bg-purple-300 shadow-md"
+                      : "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
+                  }
+                >
+                  <span className="text-center">Interview</span>
+                </NavLink>
+                <NavLink
+                  to="/offer-punch"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 bg-purple-300 shadow-md"
+                      : "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
+                  }
+                >
+                  <span className="text-center">Offer Punch</span>
+                </NavLink>
+              </div>
+              
               )}
             </div>
 
@@ -198,32 +191,23 @@ const Sidebar = () => {
 
         {/* Footer Buttons */}
         <div className=" px-4 pb-4 space-y-4 mt-28 ">
-          {/* Support Button */}
-          <Link
-            to="/support"
-            className="w-full flex items-center space-x-4 px-4 py-3 bg-transparent border border-white text-white rounded-full hover:bg-purple-300 hover:border-purple-500 hover:text-black transition-all duration-200"
-          >
-            <GiBackwardTime className="h-5 w-5" />
-            <span className="text-sm font-medium">Support</span>
-          </Link>
+ {/* Support Button */}
+ <Link 
+        to="/support" 
+        className="w-full flex items-center space-x-4 px-4 py-3 bg-transparent border border-white text-white rounded-full hover:bg-purple-300 hover:border-purple-500 hover:text-black transition-all duration-200"
+      >
+        <GiBackwardTime className="h-5 w-5" />
+        <span className="text-sm font-medium">Support</span>
+      </Link>
 
-          {/* Settings Button */}
-          <Link
-            to="/settings"
-            className="w-full flex items-center space-x-4 px-4 py-3 bg-white text-purple-700 rounded-full hover:bg-gray-100 transition-all duration-200"
-          >
-            <MdOutlineSettings className="h-5 w-5" />
-            <span className="text-sm font-medium">Settings</span>
-          </Link>
-
-          <div className="text-black" onClick={() => {
-
-            dispatch(logout());
-            navigate("/login");
-
-          }}
-          >logout</div>
-
+      {/* Settings Button */}
+      <Link 
+        to="/settings" 
+        className="w-full flex items-center space-x-4 px-4 py-3 bg-white text-purple-700 rounded-full hover:bg-gray-100 transition-all duration-200"
+      >
+        <MdOutlineSettings className="h-5 w-5" />
+        <span className="text-sm font-medium">Settings</span>
+      </Link>
         </div>
       </div>
 

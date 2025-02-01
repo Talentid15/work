@@ -27,11 +27,17 @@ import Integerations from "./pages/settings/Integerations";
 import Subscriptions from "./pages/settings/Subscriptions";
 import Notifications from "./pages/settings/Notifications";
 
+import DashBoard from "./pages/DashBoard/DashBoard";
+import Onboarding from "./pages/onboarding/Onboarding";
+import Offered from "./pages/onboarding/Offered";
+import OnboardPlan from "./pages/onboarding/OnboardPlan";
+import OnboardMaretial from "./pages/onboarding/OnboardMaretial";
+
 function App() {
   return (
     <>
 
-    
+
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -40,16 +46,15 @@ function App() {
           <Route path="/auth/forgot-password/:id" element={<ForgotPassword></ForgotPassword>}></Route>
 
           <Route path="/" element={<CandidateTracking />} >
-          
+
             <Route index element={<MainContent />} />
             <Route path="history" element={<SearchHistory />} />
             <Route path="pipeline/:userId" element={<Pipeline />} />
             <Route path="offer-punch" element={<OfferPunch />} />
-         
 
             <Route index path="/dashboard" element={<DashBoard />} />
-          <Route path="/extractInfo" element={<ExtractDataFromPdf/>}/>
-             
+            <Route path="/extractInfo" element={<ExtractDataFromPdf />} />
+
 
             {/* <Route path="/login" element={<PublicRoute><Login /></PublicRoute>}/>
           <Route path="/signup" element={<PublicRoute><SignUp/></PublicRoute>} /> */}

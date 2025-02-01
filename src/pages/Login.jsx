@@ -84,11 +84,7 @@ const LoginForm = () => {
     e.preventDefault();
     if (validateForm()) {
       try {
-<<<<<<< HEAD
-        const response = await axios.post(
-          "http://localhost:4000/api/auth/login",
-          formData
-=======
+
         const response = await axios.post("http://localhost:4000/api/auth/login",formData,
           
           {
@@ -96,7 +92,6 @@ const LoginForm = () => {
             withCredentials:true,
             
           }
->>>>>>> e3384aa739c6b16d758ab4f352a5f15ee7bedcef
         );
 
         console.log("res ka data ", response.data);
@@ -203,7 +198,7 @@ const LoginForm = () => {
       {/* Right Section */}
       <div
         className="hidden lg:flex flex-1 bg-center bg-white rounded-3xl lg:rounded-3xl m-3 bg-cover text-white flex-col justify-center items-center p-6 sm:p-10"
-        style={{ backgroundImage: `url(${backgroundImage})` }}
+        // style={{ backgroundImage: url(${backgroundImage}) }}
       >
         <h1 className="text-2xl sm:text-5xl font-bold mb-4 text-center">
           Welcome Back!

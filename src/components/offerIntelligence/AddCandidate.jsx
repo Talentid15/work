@@ -236,7 +236,7 @@ const AddCandidate = () => {
 
 
   return (
-<<<<<<< HEAD
+
     <div className="no-scrollbar bg-[#EEEEEE] rounded flex flex-col shadow p-4 w-full mx-auto h-screen sm:max-h-[600px] overflow-y-auto">
       <div
         className="flex gap-2 justify-start items-center cursor-pointer"
@@ -247,9 +247,7 @@ const AddCandidate = () => {
         <IoIosArrowBack size={30}></IoIosArrowBack>
         <h1 className="text-slate-700 text-2xl font-semibold">Profile</h1>
       </div>
-=======
 
->>>>>>> e3384aa739c6b16d758ab4f352a5f15ee7bedcef
 
     loading ? <Loader></Loader>
       : <div className="no-scrollbar bg-[#EEEEEE] rounded flex flex-col shadow p-4 w-full mx-auto h-screen sm:max-h-[600px] overflow-y-auto">
@@ -480,6 +478,7 @@ const AddCandidate = () => {
             </div>
           </div>
         </div>
+      </div>
       </div>
   );
 };

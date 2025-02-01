@@ -15,7 +15,7 @@ import { useDispatch } from 'react-redux';
 import { isValidEmail } from '../utils';
 
 
-function PopUps({ setshowPopUps, showPopUps, emailSearch, setSearchedResponseData,setError }) {
+function PopUps({ setshowPopUps, showPopUps, emailSearch, setSearchedResponseData, setError }) {
 
   const dispatch = useDispatch();
 
@@ -72,6 +72,10 @@ function PopUps({ setshowPopUps, showPopUps, emailSearch, setSearchedResponseDat
 
         email: emailSearch,
         userId: data._id
+
+      }, {
+
+        withCredentials: true,
 
       });
 

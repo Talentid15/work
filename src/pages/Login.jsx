@@ -87,7 +87,14 @@ const LoginForm = () => {
     e.preventDefault();
     if (validateForm()) {
       try {
-        const response = await axios.post("http://localhost:4000/api/auth/login",formData);
+        const response = await axios.post("http://localhost:4000/api/auth/login",formData,
+          
+          {
+
+            withCredentials:true,
+            
+          }
+        );
 
         console.log("res ka data ",response.data);
 

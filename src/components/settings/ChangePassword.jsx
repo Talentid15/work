@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { MdEmail } from "react-icons/md";
 
+import toast from "react-hot-toast";
+
 const ChangePassword = ({ onClose }) => {
   const [formData, setFormData] = useState({
     currentpass: "",

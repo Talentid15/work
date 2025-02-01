@@ -26,19 +26,73 @@ import Users from "./pages/settings/Users";
 import Integerations from "./pages/settings/Integerations";
 import Subscriptions from "./pages/settings/Subscriptions";
 import Notifications from "./pages/settings/Notifications";
+import EmailVerificationPage from "./pages/EmailVerificationPage";
+import VerificationPage from "./pages/VerificationPage";
+
+import PublicRoute from "./pages/PublicRoutes";
+
+import ProtectedRoute from "./pages/ProtectedRoute";
 
 function App() {
   return (
     <>
       <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
 
-          <Route path="/auth/forgot-password/:id" element={<ForgotPassword></ForgotPassword>}></Route>
+          <Route path="/login" element={<PublicRoute> <Login /></PublicRoute>} />
+          <Route path="/signup" element={
 
-          <Route path="/" element={<CandidateTracking />} >
-          
+            <PublicRoute>
+
+              <Signup />
+
+            </PublicRoute>
+
+          }
+
+          />
+
+          <Route path="/auth/forgot-password/:id" element={
+
+            <PublicRoute>
+
+              <ForgotPassword></ForgotPassword>
+
+            </PublicRoute>
+
+
+          }></Route>
+
+          <Route path="/verify-email/:token" element={
+
+            <PublicRoute>
+
+              <EmailVerificationPage></EmailVerificationPage>
+
+            </PublicRoute>
+
+          }></Route>
+
+          <Route path="/verification-page" element={
+
+            <PublicRoute>
+
+              <VerificationPage></VerificationPage>
+
+            </PublicRoute>
+
+          }></Route>
+
+          <Route path="/" element={
+
+            <ProtectedRoute>
+
+              <CandidateTracking />
+
+            </ProtectedRoute>
+
+          } >
+
             <Route index element={<MainContent />} />
             <Route path="history" element={<SearchHistory />} />
             <Route path="pipeline/:userId" element={<Pipeline />} />
@@ -55,7 +109,7 @@ function App() {
             </Route>
 
             <Route path="settings" element={<Settings />} >
-              <Route index  element={<Profiles />} />
+              <Route index element={<Profiles />} />
               <Route path='integration' element={<Integerations />} />
               <Route path='user' element={<Users />} />
               <Route path='subscription' element={<Subscriptions />} />

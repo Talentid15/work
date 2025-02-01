@@ -36,8 +36,10 @@ const userSlice = createSlice({
             })
 
             console.log("data at useSLice is", newData);
-            state.data = newData;;
+            state.data = newData;
             state.expiryTimestamp = Date.now(); // Set expiry timestamp
+
+            state.loggedIn = true;
         },
 
         // setPipelineData: (state, action) => {

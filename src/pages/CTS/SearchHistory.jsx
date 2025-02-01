@@ -11,10 +11,6 @@ import { formateDate } from "../../utils";
 
 import { useDispatch } from "react-redux";
 
-// import { setPipelineData } from "../../redux/UserSlice";
-
-
-
 const SearchHistory = () => {
 
   const navigate = useNavigate();

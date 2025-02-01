@@ -7,3 +7,4 @@ const Offered = () => {
 }
 
 export default Offered
+

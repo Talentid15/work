@@ -3,20 +3,30 @@ import axios from "axios";
 import { FaRegEdit } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import ChangePassword from "../../components/settings/ChangePassword"; // Import ChangePassword modal
+import { useSelector } from "react-redux";
 
 const Profiles = () => {
+
+  const { additionalDetails, data } = useSelector((state) => state.user);
+
+  console.log("additional information ", additionalDetails);
+
+  let user = data;
+
   const [formData, setFormData] = useState({
-    email: "",
-    mobileNumber: "",
-    company: "",
-    website: "",
-    state: "",
-    bio: "",
-    role: "",
-    employees: "",
+    email: user.email || "",
+    mobileNumber: user.phone || "",
+    company: user.company || "",
+    website: user.website || "",
+    state: additionalDetails.state || "",
+    bio: additionalDetails.bio || "",
+    role: user.role || "",
+    employees: additionalDetails.noOfEmployees || "",
+
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -77,17 +87,17 @@ const Profiles = () => {
           {/* Left Section: Profile Image & Info */}
           <div className="flex flex-col sm:flex-row items-center space-x-4">
             <img
-              src="https://via.placeholder.com/50"
+              src={user.userImage}
               alt="Profile"
               className="w-12 h-12 rounded-full border-2 border-purple-400"
             />
             <div className="text-center sm:text-left">
               <div className="flex items-center border-b pb-1 sm:space-x-24">
-                <h2 className="text-xl font-semibold">Jai Nayak</h2>
+                <h2 className="text-xl font-semibold">{user.fullname}</h2>
                 <FaRegEdit className="text-gray-500 cursor-pointer" />
               </div>
               <p className="text-sm text-gray-600 flex items-center justify-center sm:justify-start mt-2">
-                <MdEmail className="mr-1" /> Jai@talentid.app
+                <MdEmail className="mr-1" /> {user.email}
               </p>
             </div>
           </div>

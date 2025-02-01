@@ -5,6 +5,7 @@ const initialState = {
     additionalDetails: null,
     userHistoryData: null,
     // pipelineData: null,
+    tokenExpiry:"",
     loading: false,
     error: null,
     loggedIn: false, // Indicates if the user is logged in
@@ -22,6 +23,7 @@ const userSlice = createSlice({
             state.additionalDetails = action.payload.additionalDetails;
 
             state.userHistoryData = action.payload.searchHistory;
+            state.tokenExpiry = action.payload.tokenExpiry; // Store expiry time
 
             var newData = {};
 
@@ -79,6 +81,7 @@ const userSlice = createSlice({
             state.loggedIn = false;
             state.data = null;
             state.expiryTimestamp = null;
+            state.tokenExpiry = "";
         },
     },
 });

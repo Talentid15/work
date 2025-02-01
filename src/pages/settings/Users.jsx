@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import AddUserModal from "/src/components/settings/AddUserModal.jsx"; // Import the modal
+import { FaPencilAlt } from "react-icons/fa";
 
 const UserManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -95,8 +96,8 @@ const UserManagement = () => {
                 </td>
                 <td className="p-3">{user.date}</td>
                 <td className="p-3 flex items-center space-x-2">
-                  <button className="bg-gray-300 px-3 py-1 rounded-full">Edit</button>
-                  <button onClick={() => handleDelete(user.id)} className="text-red-600">🗑</button>
+                  <button className="bg-white px-3 py-1 rounded-full"><FaPencilAlt /></button>
+                  <button onClick={() => handleDelete(user.id)} className="text-red-600 text-xl">🗑</button>
                 </td>
               </tr>
             ))}

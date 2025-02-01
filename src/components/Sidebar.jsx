@@ -49,7 +49,7 @@ const Sidebar = () => {
           </h1>
 
           {/* Navigation */}
-          <nav className="mt-4 space-y-3 sm:space-y-0 sm:mt-1 ">
+          <nav className="mt-4 space-y-3 sm:space-y-0 sm:mt-[1px] ">
             <NavLink
               to="/dashboard"
               className={({ isActive }) =>

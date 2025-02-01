@@ -91,7 +91,6 @@ const AddCandidate = () => {
 
   return (
     <div className="no-scrollbar bg-[#EEEEEE] rounded flex flex-col shadow p-4 w-full mx-auto h-screen sm:max-h-[600px] overflow-y-auto">
-
       <div
         className="flex gap-2 justify-start items-center cursor-pointer"
         onClick={() => {

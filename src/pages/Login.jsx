@@ -6,20 +6,17 @@ import logo from "../assets/logo.png";
 import InputField from "../components/InputField";
 import ForgotPasswordCard from "../components/ForgotPasswordCard";
 import axios from "axios";
-
+import ReCAPTCHA from "react-google-recaptcha";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import {useDispatch} from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { useSelector } from "react-redux";
 
 import { setData } from "../redux/UserSlice";
 
-
 const LoginForm = () => {
-
-
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
@@ -27,10 +24,11 @@ const LoginForm = () => {
     password: "",
   });
 
+  const [captchaValue, setCaptchaValue] = useState(null);
+
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const navigate = useNavigate();
-
 
   const handleForgotPasswordClick = () => {
     setShowForgotPassword(true);
@@ -73,7 +71,6 @@ const LoginForm = () => {
 
     //   newErrors.email = 'Please enter a company email address.';
 
-
     // }
 
     if (!formData.password) {
@@ -87,38 +84,44 @@ const LoginForm = () => {
     e.preventDefault();
     if (validateForm()) {
       try {
-        const response = await axios.post("http://localhost:4000/api/auth/login",formData);
+        const response = await axios.post(
+          "http://localhost:4000/api/auth/login",
+          formData
+        );
 
-        console.log("res ka data ",response.data);
+        console.log("res ka data ", response.data);
 
         dispatch(setData(response.data));
-
 
         toast.success("Logged in successfully!");
 
         navigate("/");
-        
       } catch (error) {
         console.error("Error logging in:", error);
-        
-        toast.error(error.message);
 
+        toast.error(error.message);
       }
     }
+    if (!captchaValue) {
+      alert("Please complete the CAPTCHA!");
+      return;
+    }
+
   };
 
   return (
     <div className="flex flex-col lg:flex-row h-screen">
       {/* Left Section */}
       <div
-        className={`w-[full] lg:w-[45%] bg-white p-6   transition-transform duration-300 ${showForgotPassword ? "blur-sm" : ""
-          }`}
+        className={`w-[full] lg:w-[45%] bg-white p-6   transition-transform duration-300 ${
+          showForgotPassword ? "blur-sm" : ""
+        }`}
       >
-        <div className="flex  flex-col justify-center items-center gap-14 p-6 sm:p-10 lg:rounded-l-3xl">
+        <div className="flex  flex-col justify-center items-center gap-10 p-6 sm:p-10 lg:rounded-l-3xl">
           <div className=" w-full   p-6 flex justify-start items-start">
             <img src={logo} alt="Logo" className="w-[60%] sm:w-[40%] h-auto" />
           </div>
-          <div >
+          <div>
             <h2 className="text-purple-700 text-center text-2xl sm:text-4xl font-bold mb-4">
               Login
             </h2>
@@ -142,12 +145,19 @@ const LoginForm = () => {
                 onChange={handleChange}
                 error={errors.password}
               />
+              <div className="flex items-center space-y-2 gap-12">
+              <ReCAPTCHA
+                sitekey={import.meta.env.VITE_GOOGLE_CAPTCHA}// Replace with your Google reCAPTCHA site key
+                onChange={(value) => setCaptchaValue(value)}
+              />
               <p
-                className=" text-sm text-purple-500 text-center mt-4 ml-72 cursor-pointer hover:underline lg:ml-80"
+                className=" text-sm text-purple-500 text-center cursor-pointer hover:underline "
                 onClick={handleForgotPasswordClick}
               >
                 Forgot Password?
               </p>
+              </div>
+
               <div className="flex items-center justify-center">
                 <button
                   type="submit"
@@ -189,7 +199,8 @@ const LoginForm = () => {
           Welcome Back!
         </h1>
         <p className="w-full sm:w-[80%] text-sm sm:text-base text-center">
-          The best way to predict the future is to create it – starting with hiring exceptional talent.
+          The best way to predict the future is to create it – starting with
+          hiring exceptional talent.
         </p>
         <img
           src={backgroundImage2}
@@ -197,7 +208,6 @@ const LoginForm = () => {
           className="w-[70%] sm:w-[60%] h-auto mt-4"
         />
       </div>
-
     </div>
   );
 };

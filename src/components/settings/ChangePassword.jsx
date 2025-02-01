@@ -38,7 +38,7 @@ const ChangePassword = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 top-16 flex items-center justify-center bg-black bg-opacity-50 px-4">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="w-full max-w-[600px] min-h-[70vh] bg-white shadow-xl rounded-2xl p-6">
         {/* Title */}
         <h2 className="text-xl font-semibold text-gray-900 border-b pb-3 mb-6 text-center sm:text-left">

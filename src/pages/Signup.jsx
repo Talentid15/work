@@ -4,8 +4,13 @@ import { useNavigate } from "react-router-dom";
 import backgroundImage2 from "../assets/rb_3790.png";
 import InputField from "../components/InputField";
 
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
+
 const SignUpForm = () => {
   const navigate = useNavigate();
+
+  const {setSignedUp} = useContext(UserContext);
 
   const [formData, setFormData] = useState({
     fullname: "",
@@ -42,7 +47,7 @@ const SignUpForm = () => {
     // Email Validation
 
     const genericDomains = [
-      'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'protonmail.com',
+       'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'protonmail.com',
       'yandex.com', 'gmx.com', 'zoho.com', 'mail.com', 'inbox.com', 'live.com', 'msn.com', 'qq.com',
       'naver.com', 'web.de', 'mail.ru', 'tutanota.com', 'pm.me', 'bk.ru', 'rambler.ru', 'rocketmail.com',
       'ymail.com', 'excite.com', 'lycos.com', 'rediffmail.com', 'hushmail.com', 'fastmail.com', 'bellsouth.net',
@@ -101,9 +106,15 @@ const SignUpForm = () => {
         );
 
         if (response.status === 200) {
-          navigate("/");
+
+          setSignedUp(true);
+
+          navigate("/verification-page");
+
         }
       } catch (error) {
+
+        setSignedUp(false);
         console.error("Error during signup:", error);
 
       }

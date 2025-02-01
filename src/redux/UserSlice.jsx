@@ -4,7 +4,7 @@ const initialState = {
     data: null,
     additionalDetails: null,
     userHistoryData: null,
-    pipelineData: null,
+    // pipelineData: null,
     loading: false,
     error: null,
     loggedIn: false, // Indicates if the user is logged in
@@ -36,22 +36,24 @@ const userSlice = createSlice({
             })
 
             console.log("data at useSLice is", newData);
-            state.data = newData;;
+            state.data = newData;
             state.expiryTimestamp = Date.now(); // Set expiry timestamp
+
+            state.loggedIn = true;
         },
 
-        setPipelineData: (state, action) => {
+        // setPipelineData: (state, action) => {
 
-            state.pipelineData = action.payload;
+        //     state.pipelineData = action.payload;
 
 
-        },
+        // },
 
-        clearPipelineData: (state,action) =>{
+        // clearPipelineData: (state,action) =>{
 
-            state.pipelineData = null;
+        //     state.pipelineData = null;
 
-        },
+        // },
 
         setCredits: (state, action) => {
             if (state.data) {
@@ -81,6 +83,6 @@ const userSlice = createSlice({
     },
 });
 
-export const { setData, setCredits, logout, checkExpiry,setPipelineData,clearPipelineData } = userSlice.actions;
+export const { setData, setCredits, logout, checkExpiry} = userSlice.actions;
 
 export default userSlice.reducer;

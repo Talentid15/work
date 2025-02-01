@@ -26,26 +26,21 @@ import Users from "./pages/settings/Users";
 import Integerations from "./pages/settings/Integerations";
 import Subscriptions from "./pages/settings/Subscriptions";
 import Notifications from "./pages/settings/Notifications";
-import Offered from "./pages/onboarding/Offered";
-import Onboarding from "./pages/onboarding/Onboarding";
-import OnboardMaretial from "./pages/onboarding/OnboardMaretial";
-import OnboardPlan from "./pages/onboarding/OnboardPlan";
-import DashBoard from "./pages/DashBoard/DashBoard";
 
 function App() {
   return (
     <>
+
+    
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
-          
-
           <Route path="/auth/forgot-password/:id" element={<ForgotPassword></ForgotPassword>}></Route>
 
-          
           <Route path="/" element={<CandidateTracking />} >
+          
             <Route index element={<MainContent />} />
             <Route path="history" element={<SearchHistory />} />
             <Route path="pipeline/:userId" element={<Pipeline />} />
@@ -71,7 +66,7 @@ function App() {
             </Route>
 
             <Route path="settings" element={<Settings />} >
-              <Route index  element={<Profiles />} />
+              <Route index element={<Profiles />} />
               <Route path='integration' element={<Integerations />} />
               <Route path='user' element={<Users />} />
               <Route path='subscription' element={<Subscriptions />} />

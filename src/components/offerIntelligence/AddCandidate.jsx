@@ -478,7 +478,7 @@ const AddCandidate = () => {
             </div>
           </div>
         </div>
-      </div>
+        </div>
       </div>
   );
 };

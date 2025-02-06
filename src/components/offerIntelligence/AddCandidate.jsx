@@ -38,7 +38,7 @@ const AddCandidate = () => {
     experience: "",
     educationDegree: "",
     educationCollege: "",
-    resumeLink:""
+    resumeLink: ""
   });
 
   // Add a new skill input fieldW
@@ -74,23 +74,23 @@ const AddCandidate = () => {
 
     console.log(name);
 
-    if(name ==="joiningDate" && candidateDetails.offerDate === ""){
+    if (name === "joiningDate" && candidateDetails.offerDate === "") {
 
       toast.error("Offer Date is required");
 
-      return ;
+      return;
     }
 
-    if(name == "joiningDate" && candidateDetails.offerDate !=""){
+    if (name == "joiningDate" && candidateDetails.offerDate != "") {
 
-        if(dateDifference(candidateDetails.offerDate,value)<0){
+      if (dateDifference(candidateDetails.offerDate, value) < 0) {
 
-          toast.error("Joining Date should be greater than Offer Date");
+        toast.error("Joining Date should be greater than Offer Date");
 
-          return ;
+        return;
 
-        }
-      
+      }
+
     }
 
     setCandidateDetails((prevDetails) => ({
@@ -108,47 +108,47 @@ const AddCandidate = () => {
 
     // offer date and joining date muts be provide 
 
-    if(candidateData.name === ""){
+    if (candidateData.name === "") {
 
       toast.error("Name is required");
-      
+
       return;
 
     }
-    
-    if(candidateData.phone === ""){
+
+    if (candidateData.phone === "") {
 
       toast.error("Phone is required");
-      
+
       return;
     }
 
-    if(candidateData.email === ""){
+    if (candidateData.email === "") {
 
       toast.error("Email is required");
-      
+
       return;
 
     }
 
-    if(candidateData.joiningDate ==""){
+    if (candidateData.joiningDate == "") {
 
       toast.error("Joining Date is required");
 
       return;
     }
 
-    if(candidateData.offerDate ==""){
+    if (candidateData.offerDate == "") {
 
       toast.error("Offer Date is required");
-      
+
       return;
     }
 
-    if(candidateData.skills.length < 3){
+    if (candidateData.skills.length < 3) {
 
       toast.error("atleast provide three skills ");
-      
+
       return;
 
     }
@@ -208,8 +208,8 @@ const AddCandidate = () => {
         name: response.data.response.Name,
         email: response.data.response.Email[0],
         phone: response.data.response.Phone,
-        resumeLink:response.data.response.Uploaded_File_URL || "",
-        
+        resumeLink: response.data.response.Uploaded_File_URL || "",
+
       });
 
       let SkillsArray = response.data.response.Skills;
@@ -229,13 +229,14 @@ const AddCandidate = () => {
     finally {
 
       setLoading(false);
-      
+
     }
 
   }
 
 
   return (
+
 
     <div className="no-scrollbar bg-[#EEEEEE] rounded flex flex-col shadow p-4 w-full mx-auto h-screen sm:max-h-[600px] overflow-y-auto">
       <div
@@ -250,6 +251,10 @@ const AddCandidate = () => {
 
 
     loading ? <Loader></Loader>
+
+
+      loading ? <Loader></Loader>
+
       : <div className="no-scrollbar bg-[#EEEEEE] rounded flex flex-col shadow p-4 w-full mx-auto h-screen sm:max-h-[600px] overflow-y-auto">
 
         <div
@@ -480,7 +485,7 @@ const AddCandidate = () => {
         </div>
         </div>
       </div>
-  );
+      );
 };
 
-export default AddCandidate;
+      export default AddCandidate;

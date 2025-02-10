@@ -14,6 +14,8 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCandidateTrackingOpen, setIsCandidateTrackingOpen] = useState(false);
 
+  const [selectedNav, setSelectedNav] = useState("Candidate Tracking");
+
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
@@ -39,24 +41,25 @@ const Sidebar = () => {
       {/* Sidebar */}
       <div
         className={`fixed top-0 left-0 h-full sm:w-[70%]  lg:w-90   bg-gradient-to-b from-[#74449D] to-[#4B2775] text-white shadow-lg transform transition-transform duration-300 z-40 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } md:relative md:translate-x-0 lg:w-80  `}
+          isOpen ? "translate-x-0" : "-translate-x-full "
+        } md:relative md:translate-x-0 lg:w-80   `}
       >
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-center py-4 lg:border-b border-purple-400 mt-1">
-            Candidate Tracker
-          </h1>
+        <div >
+        <h1 className="text-2xl font-bold text-center py-4 lg:border-b border-purple-400 mt-1">
+        {selectedNav}
+        </h1>
 
           {/* Navigation */}
-          <nav className="mt-4 space-y-3 sm:space-y-0 sm:mt-[1px] ">
+          <nav className="mt-4 space-y-3 sm:space-y-0 sm:mt-[1px]  ">
             <NavLink
               to="/dashboard"
               className={({ isActive }) =>
                 isActive
-                  ? "flex items-center space-x-4 px-4 py-3 bg-purple-400  shadow-md "
-                  : "flex items-center space-x-4 px-4 py-3 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95  transition-all duration-200"
+                  ? "flex items-center space-x-4 px-4 py-6 bg-purple-400  shadow-md "
+                  : "flex items-center space-x-4 px-4 py-6 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95  transition-all duration-200"
               }
+              onClick={() => setSelectedNav("Dashboard")}
             >
                 <TbFlagBolt className="h-6 w-6" />
                 <span className="text-sm font-medium">Dashboard</span>
@@ -65,12 +68,16 @@ const Sidebar = () => {
             <div>
               <NavLink
                 to="/"
-                onClick={toggleCandidateTracking}
+                onClick={() => {
+                  toggleCandidateTracking(); // Call your first function
+                  setSelectedNav("Candidate Tracker"); // Call your second function
+                }}
                 className={({ isActive }) =>
                   isActive
-                    ? "flex items-center space-x-4 pl-4 py-3 bg-purple-400 shadow-md"
-                    : "flex items-center space-x-4 pl-4 py-3 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
+                    ? "flex items-center space-x-4 pl-4 py-6 bg-purple-400 shadow-md"
+                    : "flex items-center space-x-4 pl-4 py-6 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
                 }
+                
               >
                 <button
                   className="w-full flex items-center justify-center font-semibold "
@@ -130,17 +137,31 @@ const Sidebar = () => {
               <span className="text-sm font-medium">Background Checks</span>
             </NavLink> */}
             <NavLink
+              to="/joboffers"
+              className={({ isActive }) =>
+                isActive
+                  ? "flex items-center space-x-4 px-4 py-6 bg-purple-400  shadow-md"
+                  : "flex items-center space-x-4 px-4 py-6 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95  transition-all duration-200"
+              }
+              onClick={() => setSelectedNav("Job Offers")}
+            >
+              <PiMagnifyingGlassFill className="h-6 w-6" />
+              <span className="text-sm font-medium">Job Offers</span>
+            </NavLink>
+
+            <NavLink
               to="/offerIntelligence"
               className={({ isActive }) =>
                 isActive
-                  ? "flex items-center space-x-4 px-4 py-3 bg-purple-400  shadow-md"
-                  : "flex items-center space-x-4 px-4 py-3 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95  transition-all duration-200"
+                  ? "flex items-center space-x-4 px-4 py-6 bg-purple-400  shadow-md"
+                  : "flex items-center space-x-4 px-4 py-6 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95  transition-all duration-200"
               }
+              onClick={() => setSelectedNav("Offer Intelligence")}
             >
               <PiMagnifyingGlassFill className="h-6 w-6" />
-              <span className="text-sm font-medium">Offer Lens</span>
+              <span className="text-sm font-medium">Offer Intelligence</span>
             </NavLink>
-            <NavLink
+            {/* <NavLink
               to="/onboarding"
               className={({ isActive }) =>
                 isActive
@@ -150,7 +171,7 @@ const Sidebar = () => {
             >
               <TbFileStack className="h-6 w-6" />
               <span className="text-sm font-medium">Onboarding</span>
-            </NavLink>
+            </NavLink> */}
             {/* <NavLink
               to="/assetManagement"
               className={({ isActive }) =>
@@ -175,7 +196,7 @@ const Sidebar = () => {
                 Performance Management
               </span>
             </NavLink> */}
-            <NavLink
+            {/* <NavLink
               to="/offboarding"
               className={({ isActive }) =>
                 isActive
@@ -185,14 +206,14 @@ const Sidebar = () => {
             >
               <TbFileStack className="h-6 w-6" />
               <span className="text-sm font-medium">Offboarding</span>
-            </NavLink>
+            </NavLink> */}
           </nav>
         </div>
 
         {/* Footer Buttons */}
         <div className=" px-4 pb-4 space-y-4 mt-28 ">
  {/* Support Button */}
- <Link 
+    <Link 
         to="/support" 
         className="w-full flex items-center space-x-4 px-4 py-3 bg-transparent border border-white text-white rounded-full hover:bg-purple-300 hover:border-purple-500 hover:text-black transition-all duration-200"
       >

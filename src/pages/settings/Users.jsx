@@ -81,7 +81,7 @@ const UserManagement = () => {
             <tr className="border-b ">
               <th className="p-3 text-left">Name</th>
               <th className="p-3 text-left">Email</th>
-              <th className="p-3 text-left">User Role</th>
+              <th className="p-3 text-left">Status</th>
               <th className="p-3 text-left">Date Added</th>
               <th className="p-3 text-left">Actions</th>
             </tr>

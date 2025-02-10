@@ -32,6 +32,8 @@ import Onboarding from "./pages/onboarding/Onboarding";
 import Offered from "./pages/onboarding/Offered";
 import OnboardPlan from "./pages/onboarding/OnboardPlan";
 import OnboardMaretial from "./pages/onboarding/OnboardMaretial";
+import Release_Offer from "./pages/ReleaseOffer/Release_Offer";
+import Job_Offer from "./pages/JobOffer/Job_Offer";
 
 function App() {
   return (
@@ -53,6 +55,8 @@ function App() {
             <Route path="offer-punch" element={<OfferPunch />} />
 
             <Route index path="/dashboard" element={<DashBoard />} />
+            <Route index path="/joboffers" element={<Job_Offer />} />
+            <Route index path="/release-offer" element={<Release_Offer />} />
             <Route path="/extractInfo" element={<ExtractDataFromPdf />} />
 
 

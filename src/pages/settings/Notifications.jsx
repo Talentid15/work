@@ -6,12 +6,7 @@ const Notifications = () => {
         { id: 2, type: "Added as a Hiring Manager", description: "Receive a notification when you get added to a position as the hiring manager", enabled: true },
         { id: 3, type: "Added a new team member", description: "Receive a notification when you get added to a position as the hiring manager", enabled: true },
         { id: 4, type: "Added a new team member", description: "Receive a notification when you get added to a position as the hiring manager", enabled: true },
-        { id: 4, type: "Added a new team member", description: "Receive a notification when you get added to a position as the hiring manager", enabled: true },
-        { id: 4, type: "Added a new team member", description: "Receive a notification when you get added to a position as the hiring manager", enabled: true },
-        { id: 4, type: "Added a new team member", description: "Receive a notification when you get added to a position as the hiring manager", enabled: true },
-        { id: 4, type: "Added a new team member", description: "Receive a notification when you get added to a position as the hiring manager", enabled: true },
-        { id: 4, type: "Added a new team member", description: "Receive a notification when you get added to a position as the hiring manager", enabled: true },
-        { id: 4, type: "Added a new team member", description: "Receive a notification when you get added to a position as the hiring manager", enabled: true },
+    
       ]);
 
       const toggleNotification = (id) => {
@@ -22,11 +17,11 @@ const Notifications = () => {
         );
       };
   return (
-    <div className="min-h-[90vh] flex items-start justify-start flex-col bg-white px-4">
-      <div className="flex  justify-start items-start cursor-pointer mt-10 ">
+    <div className="min-h-[90vh] flex items-start justify-start flex-col bg-white px-8 w-full">
+      <div className="flex  justify-start items-start cursor-pointer mt-5 ">
         <h1 className="text-black text-2xl  font-semibold ">Notification Settings</h1>
       </div>
-      <div className="bg-white shadow-2xl rounded-2xl p-4 w-full max-w-4xl mt-10 h-96 overflow-y-auto no-scrollbar">
+      <div className="bg-white shadow-2xl rounded-2xl p-4 w-full max-w-[66rem] mt-10 h-96 overflow-y-auto no-scrollbar">
   <div className="overflow-x-auto">
     <table className="min-w-full bg-white rounded-lg">
       <thead>

@@ -14,16 +14,16 @@ const Profiles = () => {
   let user = data;
 
   const [formData, setFormData] = useState({
-    email: user.email || "",
-    mobileNumber: user.phone || "",
-    company: user.company || "",
-    website: user.website || "",
-    state: additionalDetails.state || "",
-    bio: additionalDetails.bio || "",
-    role: user.role || "",
-    employees: additionalDetails.noOfEmployees || "",
+    email: user?.email || "",
+    mobileNumber: user?.phone || "",
+    company: user?.company || "",
+    website: user?.website || "",
+    state: additionalDetails?.state || "",
+    bio: additionalDetails?.bio || "",
+    role: user?.role || "",
+    employees: additionalDetails?.noOfEmployees || "", 
+});
 
-  });
 
   const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
 

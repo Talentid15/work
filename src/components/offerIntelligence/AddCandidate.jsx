@@ -237,7 +237,24 @@ const AddCandidate = () => {
 
   return (
 
+
+    <div className="no-scrollbar bg-[#EEEEEE] rounded flex flex-col shadow p-4 w-full mx-auto h-screen sm:max-h-[600px] overflow-y-auto">
+      <div
+        className="flex gap-2 justify-start items-center cursor-pointer"
+        onClick={() => {
+          navigate(-1);
+        }}
+      >
+        <IoIosArrowBack size={30}></IoIosArrowBack>
+        <h1 className="text-slate-700 text-2xl font-semibold">Profile</h1>
+      </div>
+
+
+    loading ? <Loader></Loader>
+
+
       loading ? <Loader></Loader>
+
       : <div className="no-scrollbar bg-[#EEEEEE] rounded flex flex-col shadow p-4 w-full mx-auto h-screen sm:max-h-[600px] overflow-y-auto">
 
         <div
@@ -465,6 +482,7 @@ const AddCandidate = () => {
               </button>
             </div>
           </div>
+        </div>
         </div>
       </div>
       );

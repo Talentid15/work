@@ -11,7 +11,7 @@ function Index() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-screen bg-white ">
       {/* Header */}
       <div className="fixed top-0 z-50 w-full">
         <Header />

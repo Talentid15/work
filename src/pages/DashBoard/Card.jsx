@@ -2,9 +2,9 @@ import { FaCircle } from "react-icons/fa6";
 
 const Card = ({ title, value, statusColor, iconColor }) => {
   return (
-    <div className="flex items-center justify-center p-6 py-8 bg-white border-purple-600  rounded-3xl shadow-lg hover:shadow-xl transition duration-300 border-2  w-[250px] h-[150px] group">
+    <div className="flex items-center justify-center p-6 py-8 bg-[#652D96] text-[#38FF9F] border-blue-900  rounded-3xl shadow-lg hover:shadow-xl transition duration-300 border-2  w-[250px] h-[150px] group">
       <div className="text-center w-[250px] h-[100px]">
-        <h2 className="text-lg font-semibold text-gray-800 text-center">
+        <h2 className="text-lg font-semibold text-[#38FF9F] text-center">
           {title}
         </h2>
 
@@ -13,10 +13,10 @@ const Card = ({ title, value, statusColor, iconColor }) => {
             className={`mt-1 text-lg  font-medium ${statusColor} flex items-center justify-center animate-slide-down`}
           >
             <FaCircle
-              className="h-4 w-4 shadow-custom-green rounded-full border-none "
-              style={{ color: iconColor }}
+              className="h-4 w-4 shadow-custom-green rounded-full border-none text-white "
+              
             />
-            <span className="mr-2 m-2">{value}</span>
+            <span className="mr-2 m-2 text-white">{value}</span>
           </p>
         </div>
 

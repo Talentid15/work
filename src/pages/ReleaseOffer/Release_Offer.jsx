@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
+<<<<<<< HEAD
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 
@@ -12,6 +13,11 @@ const ReleaseOffer = () => {
 
   console.log("data is ", data);
 
+=======
+import { useState } from "react";
+
+const Release_Offer = () => {
+>>>>>>> fdb4eb641070ef048d98bf015721e63aceb9cc7d
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     jobTitle: "",

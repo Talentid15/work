@@ -51,7 +51,7 @@ const OfferPunch = () => {
         <div className="w-[100%] bg-gray-400 h-[1px] mb-12 z-100"></div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 ">
-          <div className="w-[100%] md:col-span-2 space-y-8">
+          <div className="w-[90%] md:col-span-2 space-y-8">
             {/* Full Name */}
             <div className="relative w-full">
               <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">
@@ -101,9 +101,14 @@ const OfferPunch = () => {
             </div>
 
             {/* Location */}
-            <div className="relative w-full">
+            
+          </div>
+
+          {/* Right Side: Status Dropdown */}
+          <div className="w-[90%] md:col-span-2 space-y-8 ">
+          <div className="relative w-full">
               <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">
-                Location
+                Job Title
               </label>
 
               <input
@@ -148,10 +153,6 @@ const OfferPunch = () => {
                 />
               </div>
             </div>
-          </div>
-
-          {/* Right Side: Status Dropdown */}
-          <div className="w-[70%] md:col-span-2 space-y-4 ml-24 ">
             <div className="relative w-full">
             <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">
                   Status

@@ -56,10 +56,10 @@ const AddUserModal = ({ isOpen, onClose, onSave, formData, handleChange }) => {
               <input type="radio" name="role" value="Administrator" checked={formData.role === "Administrator"} onChange={handleChange} />
               <span>Administrator <span className="text-gray-500 text-sm">No access to billing</span></span>
             </label>
-            <label className="flex items-center space-x-2">
+            {/* <label className="flex items-center space-x-2">
               <input type="radio" name="role" value="Custom" checked={formData.role === "Custom"} onChange={handleChange} />
               <span>Custom <span className="text-gray-500 text-sm">Permission in selected functions</span></span>
-            </label>
+            </label> */}
           </div>
         </div>
 

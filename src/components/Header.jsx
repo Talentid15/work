@@ -4,14 +4,27 @@ import { MdOutlineCurrencyExchange } from "react-icons/md";
 import { GiRingingBell } from "react-icons/gi";
 import { ImInfo } from 'react-icons/im';
 import logo from '../assets/logo.png';
-// Replace with actual image path
+
+import { useSelector } from 'react-redux';
+
+import { useNavigate } from 'react-router-dom';
+
+import { logout } from '../redux/UserSlice';
+
+import { useDispatch } from 'react-redux';
 
 const Header = () => {
-  // State to manage dropdown visibility
+
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
+
+  const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+
+  const user = useSelector((state) => state.user.data);
 
   // Toggle notification dropdown
   const toggleNotifications = () => {
@@ -87,21 +100,35 @@ const Header = () => {
                 <FaTimes className="text-gray-600 cursor-pointer hover:text-red-500" onClick={() => setShowProfile(false)} />
               </div>
               <div className="p-4 text-center">
-                <img src='' alt="User" className="w-16 h-16 rounded-full mx-auto" />
-                <p className="text-gray-800 font-semibold mt-2">John Doe</p>
-                <p className="text-gray-500 text-sm">johndoe@example.com</p>
+                <img src={user.userImage} alt="User" className="w-16 h-16 rounded-full mx-auto" />
+                <p className="text-gray-800 font-semibold mt-2">{user.fullname}</p>
+                <p className="text-gray-500 text-sm">{user.email}</p>
               </div>
-              <ul className="space-y-2 p-2">
-                <li className="flex items-center text-gray-600 border-b hover:bg-gray-100 p-2 cursor-pointer">
+              <ul className="space-y-2 p-2" >
+                <li className="flex items-center text-gray-600 border-b hover:bg-gray-100 p-2 cursor-pointer" onClick={() => {
+
+                  navigate("/settings");
+
+                }}>
                   <FaUserCircle className="mr-2" /> My Profile
                 </li>
                 <li className="flex items-center text-gray-600 border-b hover:bg-gray-100 p-2 cursor-pointer">
                   <FaCog className="mr-2" /> Settings
                 </li>
-                <li className="flex items-center text-gray-600 border-b hover:bg-gray-100 p-2 cursor-pointer">
+                <li className="flex items-center text-gray-600 border-b hover:bg-gray-100 p-2 cursor-pointer" onClick={() => {
+
+                  navigate("/settings/subscription");
+
+                }}>
                   <MdOutlineCurrencyExchange className='mr-2' /> Subscription
                 </li>
-                <li className="flex items-center text-gray-600 hover:bg-gray-100 p-2 cursor-pointer">
+                <li className="flex items-center text-gray-600 hover:bg-gray-100 p-2 cursor-pointer" onClick={()=>{
+
+                  dispatch(logout());
+
+                  navigate("/login");
+
+                }}>
                   <FaSignOutAlt className="mr-2 text-red-500" /> Logout
                 </li>
               </ul>

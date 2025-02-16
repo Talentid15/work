@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
 
+import { useNavigate } from "react-router-dom";
+
+
 const OfferPunch = () => {
+
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",

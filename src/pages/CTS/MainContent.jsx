@@ -67,7 +67,7 @@ const MainContent = () => {
       {/* Search Section */}
       <div className="flex flex-col justify-center items-center p-4">
         <h1 className="text-2xl md:text-4xl font-bold text-gray-900 text-center mb-10 mt-5">
-          Track Candidate Status
+          Search Candidate Pipeline
         </h1>
 
         <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 w-full max-w-xl">

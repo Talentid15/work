@@ -17,7 +17,7 @@ const DashBoard = () => {
   // console.log("user is ",user.fullname)
   const navigate = useNavigate();
   return (
-    <div className="h-[600px] overflow-auto bg-white p-5 no-scrollbar">
+    <div className="h-[700px] overflow-auto bg-white p-5 no-scrollbar">
       <div className="p-4 bg-white rounded-lg shadow-md">
         {/* Header Section */}
         <div className="flex justify-between items-center mb-6">
@@ -29,14 +29,14 @@ const DashBoard = () => {
 
           
           <button
-        className="flex items-center gap-2 px-5 py-2 bg-purple-900 text-white rounded-full shadow-md hover:bg-gradient-to-t from-purple-300 to-purple-600 hover:text-black transition-all"
+         className="flex items-center gap-2 px-5 py-2 bg-[#633c89] text-white rounded-full shadow-md hover:bg-purple-900 hover:text-white transition-all"
         onClick={() => navigate("/offer-punch")}
       >
         <FaFileAlt />
         Offer Punch
       </button>
           <button
-        className="flex items-center gap-2 px-5 py-2 bg-purple-900 text-white rounded-full shadow-md hover:bg-gradient-to-t from-purple-300 to-purple-600 hover:text-black transition-all"
+         className="flex items-center gap-2 px-5 py-2 bg-[#5C3386] text-white rounded-full shadow-md hover:bg-purple-900 hover:text-white transition-all"
         onClick={() => navigate("/release-offer")}
       >
         <FaFileAlt />

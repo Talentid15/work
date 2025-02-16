@@ -6,9 +6,16 @@ import { TbFileStack, TbFlagBolt, TbUserCheck } from "react-icons/tb";
 import { CgPerformance } from "react-icons/cg";
 import { PiMagnifyingGlassFill } from "react-icons/pi";
 import { FaSuperpowers } from "react-icons/fa";
+import { MdDashboard } from "react-icons/md";
+import { BiEdit } from "react-icons/bi";
+import { BiBriefcase } from "react-icons/bi";
+import { BsPersonBadge } from "react-icons/bs";
+import { BiSolidCheckShield } from "react-icons/bi";
+import { SiLens } from "react-icons/si";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { FaChevronDown } from "react-icons/fa";
 import { FaChartLine } from "react-icons/fa"; // Icon for Candidate Tracking
+import { useLocation } from "react-router-dom";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,6 +30,9 @@ const Sidebar = () => {
   const toggleCandidateTracking = () => {
     setIsCandidateTrackingOpen(!isCandidateTrackingOpen);
   };
+
+const location = useLocation();
+const isOfferPunchActive = location.pathname === "/offer-punch";
 
   return (
     <div className="relative h-screen flex lg: ">
@@ -61,69 +71,68 @@ const Sidebar = () => {
               }
               onClick={() => setSelectedNav("Dashboard")}
             >
-                <TbFlagBolt className="h-6 w-6" />
+                <MdDashboard className="h-6 w-6" />
                 <span className="text-sm font-medium">Dashboard</span>
            </NavLink>
 
-            <div>
-              <NavLink
-                to="/"
-                onClick={() => {
-                  toggleCandidateTracking(); // Call your first function
-                  setSelectedNav("Candidate Tracker"); // Call your second function
-                }}
-                className={({ isActive }) =>
-                  isActive
-                    ? "flex items-center space-x-4 pl-4 py-6 bg-purple-400 shadow-md"
-                    : "flex items-center space-x-4 pl-4 py-6 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
-                }
-                
-              >
-                <button
-                  className="w-full flex items-center justify-center font-semibold "
-                  onClick={() =>
-                    setIsCandidateTrackingOpen(!isCandidateTrackingOpen)
-                  }
-                >
-                  <FaChartLine className="h-5 w-5" />
-                  <span className="text-sm font-medium mr-3 ml-3">
-                    Candidate tracking system
-                  </span>
-                  <FaChevronDown
-                    className={`transition-transform ${
-                      isCandidateTrackingOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-              </NavLink>
+           <div>
+  <NavLink
+    to="/"
+    onClick={() => {
+      toggleCandidateTracking(); // Call your first function
+      setSelectedNav("Candidate Tracker"); // Call your second function
+    }}
+    className={({ isActive }) =>
+      isActive || isOfferPunchActive
+        ? "flex items-center space-x-4 pl-4 py-6 bg-purple-400 shadow-md"
+        : "flex items-center space-x-4 pl-4 py-6 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
+    }
+  >
+    <button
+      className="w-full flex items-center justify-start font-semibold "
+      onClick={(e) => {
+        e.preventDefault(); // Prevent NavLink default behavior on button click
+        setIsCandidateTrackingOpen(!isCandidateTrackingOpen);
+      }}
+    >
+      <BiSolidCheckShield className="h-6 w-6" />
+      <span className="text-sm font-medium mr-3 ml-3">Candidate Search</span>
+      <FaChevronDown
+        className={`transition-transform ${
+          isCandidateTrackingOpen ? "rotate-180 ml-10" : "ml-10"
+        }`}
+      />
+    </button>
+  </NavLink>
 
-              {/* Sub-options for Candidate Tracking */}
-              {isCandidateTrackingOpen && (
-                <div className=" w-full flex flex-col items-center ">
-                <NavLink
-                  to="/"
-                  className={({ isActive }) =>
-                    isActive
-                      ? "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 bg-purple-300 shadow-md"
-                      : "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
-                  }
-                >
-                  <span className="text-center">Interview</span>
-                </NavLink>
-                <NavLink
-                  to="/offer-punch"
-                  className={({ isActive }) =>
-                    isActive
-                      ? "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 bg-purple-300 shadow-md"
-                      : "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
-                  }
-                >
-                  <span className="text-center">Offer Punch</span>
-                </NavLink>
-              </div>
-              
-              )}
-            </div>
+  {/* Sub-options for Candidate Tracking */}
+  {isCandidateTrackingOpen && (
+    <div className="w-full flex flex-col items-center justify-start">
+      <NavLink
+        to="/"
+        className={({ isActive }) =>
+          isActive
+            ? "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-10 bg-purple-300 shadow-md"
+            : "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-10 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
+        }
+      >
+        <BsPersonBadge className="h-5 w-5" />
+        <span className="text-center">Interview</span>
+      </NavLink>
+      <NavLink
+        to="/offer-punch"
+        className={({ isActive }) =>
+          isActive
+            ? "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 bg-purple-300 shadow-md"
+            : "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
+        }
+      >
+        <BiEdit className="h-5 w-5" />
+        <span className="text-center">Offer Punch</span>
+      </NavLink>
+    </div>
+  )}
+</div>
 
             {/* <NavLink
               to="/backgroundchecks"
@@ -145,7 +154,7 @@ const Sidebar = () => {
               }
               onClick={() => setSelectedNav("Job Offers")}
             >
-              <PiMagnifyingGlassFill className="h-6 w-6" />
+              <BiBriefcase className="h-6 w-6" />
               <span className="text-sm font-medium">Job Offers</span>
             </NavLink>
 
@@ -158,8 +167,8 @@ const Sidebar = () => {
               }
               onClick={() => setSelectedNav("Offer Intelligence")}
             >
-              <PiMagnifyingGlassFill className="h-6 w-6" />
-              <span className="text-sm font-medium">Offer Intelligence</span>
+              <SiLens className="h-5 w-5" />
+              <span className="text-sm font-medium">Offer Lens</span>
             </NavLink>
             {/* <NavLink
               to="/onboarding"

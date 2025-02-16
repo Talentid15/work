@@ -21,7 +21,7 @@ const Notifications = () => {
       <div className="flex  justify-start items-start cursor-pointer mt-5 ">
         <h1 className="text-black text-2xl  font-semibold ">Notification Settings</h1>
       </div>
-      <div className="bg-white shadow-2xl rounded-2xl p-4 w-full max-w-[66rem] mt-10 h-96 overflow-y-auto no-scrollbar">
+      <div className="bg-white shadow-2xl rounded-2xl p-4 w-full max-w-[66rem] mt-2 h-96 overflow-y-auto no-scrollbar">
   <div className="overflow-x-auto">
     <table className="min-w-full bg-white rounded-lg">
       <thead>

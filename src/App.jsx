@@ -32,8 +32,15 @@ import Onboarding from "./pages/onboarding/Onboarding";
 import Offered from "./pages/onboarding/Offered";
 import OnboardPlan from "./pages/onboarding/OnboardPlan";
 import OnboardMaretial from "./pages/onboarding/OnboardMaretial";
+
+import PublicRoute from "./pages/PublicRoutes";
+import ProtectedRoute from "./pages/ProtectedRoute";
+
+import VerificationPage from "./pages/VerificationPage";
+
 import Release_Offer from "./pages/ReleaseOffer/Release_Offer";
 import Job_Offer from "./pages/JobOffer/Job_Offer";
+
 
 function App() {
   return (
@@ -42,12 +49,40 @@ function App() {
 
       <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+          <Route path="/signup" element={
 
-          <Route path="/auth/forgot-password/:id" element={<ForgotPassword></ForgotPassword>}></Route>
+            <PublicRoute>
 
-          <Route path="/" element={<CandidateTracking />} >
+              <Signup />
+
+            </PublicRoute>
+
+          }
+
+          />
+
+          <Route path="/verification-page" element={<PublicRoute><VerificationPage></VerificationPage></PublicRoute>}></Route>
+
+          <Route path="/auth/forgot-password/:id" element={
+
+            <PublicRoute>
+
+              <ForgotPassword></ForgotPassword>
+
+            </PublicRoute>
+
+          }></Route>
+
+          <Route path="/" element={
+
+            <ProtectedRoute>
+
+              <CandidateTracking />
+
+            </ProtectedRoute>
+
+          } >
 
             <Route index element={<MainContent />} />
             <Route path="history" element={<SearchHistory />} />

@@ -34,7 +34,7 @@ import OnboardPlan from "./pages/onboarding/OnboardPlan";
 import OnboardMaretial from "./pages/onboarding/OnboardMaretial";
 
 import PublicRoute from "./pages/PublicRoutes";
-// import ProtectedRoute from "./pages/ProtectedRoute";
+import ProtectedRoute from "./pages/ProtectedRoute";
 
 import VerificationPage from "./pages/VerificationPage";
 
@@ -77,11 +77,11 @@ function App() {
 
           <Route path="/" element={
 
-            // <ProtectedRoute>
+            <ProtectedRoute>
 
               <CandidateTracking />
 
-            // </ProtectedRoute>
+            </ProtectedRoute>
 
           } >
 

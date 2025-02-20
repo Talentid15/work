@@ -35,7 +35,7 @@ const location = useLocation();
 const isOfferPunchActive = location.pathname === "/offer-punch";
 
   return (
-    <div className="relative h-screen flex lg: ">
+    <div className="relative h-screen overflow-hidden flex lg: ">
       {/* Menu Icon */}
       <button
         onClick={toggleSidebar}

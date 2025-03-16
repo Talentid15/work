@@ -1,169 +1,126 @@
 import { useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
-
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
+import toast from "react-hot-toast";
 
 const OfferPunch = () => {
-
   const navigate = useNavigate();
+  const data = useSelector((state) => state.user.data);
+
+  console.log("user data ",data);
 
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    mobileNumber: "",
-    location: "",
+    jobTitle: "",
+    candidateName: "",
+    candidateEmail: "",
+    candidatePhoneNo: "",
+    companyName: "",
     joiningDate: "",
-    offerDate: "",
-    status: "",
+    expiryDate: "",
+    offerLetter: null,
+    candidateResume: null,
+    offerLetterStatus: "",
   });
 
   const statusOptions = [
     "Offer letter released",
-    "Planning for an Offer",
-    "Hired",
     "Candidate verbal commitment",
-    "Others",
+
   ];
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const { name, value, type, files } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: type === "file" ? files[0] : value,
+    }));
+  };
+
+  const formSubmitHandler = async (e) => {
+    e.preventDefault();
+
+    if (!formData.offerLetter || !formData.candidateResume) {
+      toast.error("Please Upload Offer Letter and Candidate Resume");
+      return;
+    }
+
+    const submissionData = new FormData();
+    Object.keys(formData).forEach((key) => {
+      submissionData.append(key, formData[key]);
+    });
+
+    
+
+    try {
+      console.log("Submitting Form Data:", formData);
+      const response = await axios.post(
+        "http://localhost:4000/api/offer/create-offer-punch",
+        submissionData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("Response:", response.data);
+    } catch (error) {
+      console.error("Submission Error:", error);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-start justify-start flex-col bg-white px-4">
+    <div className="min-h-screen flex flex-col items-start justify-start bg-white px-4">
       <div
         className="flex gap-2 justify-start items-start cursor-pointer"
-        onClick={() => {
-          navigate(-1);
-        }}
+        onClick={() => navigate(-1)}
       >
-        <IoIosArrowBack size={30}></IoIosArrowBack>
+        <IoIosArrowBack size={30} />
         <h1 className="text-black text-2xl font-semibold">Offer Punch</h1>
       </div>
 
-      <div className="bg-white shadow-2xl rounded-2xl p-6 w-full max-w-4xl ml-20 mt-5">
-        {/* Title */}
-        <h2 className="text-xl font-semibold text-gray-900 border-b-slate-300 mb-8 ">
+      <form
+        className="bg-white shadow-2xl rounded-2xl p-6 w-full max-w-4xl ml-20 mt-5"
+        onSubmit={formSubmitHandler}
+      >
+        <h2 className="text-xl font-semibold text-gray-900 border-b mb-8">
           Enter Candidate Details
         </h2>
-        <div className="w-[100%] bg-gray-400 h-[1px] mb-12 z-100"></div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 ">
-          <div className="w-[90%] md:col-span-2 space-y-8">
-            {/* Full Name */}
-            <div className="relative w-full">
-              <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">
-                Full Name
-              </label>
-
-              <input
-                type="text"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                // placeholder="Enter full name"
-                className="w-full p-3 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300"
-              />
-            </div>
-
-            {/* Email Address */}
-            <div className="relative w-full">
-              <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">
-                Email Address
-              </label>
-
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                // placeholder="Enter full name"
-                className="w-full p-3 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300"
-              />
-            </div>
-
-            {/* Mobile Number */}
-            <div className="relative w-full">
-              <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">
-                Mobile Number
-              </label>
-
-              <input
-                type="tel"
-                name="mobileNumber"
-                value={formData.mobileNumber}
-                onChange={handleChange}
-                // placeholder="Enter full name"
-                className="w-full p-3 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300"
-              />
-            </div>
-
-            {/* Location */}
-            
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {/* Left Column */}
+          <div className="w-[90%] md:col-span-2 space-y-6">
+            <InputField label="Candidate Name" name="candidateName" value={formData.candidateName} onChange={handleChange} />
+            <InputField label="Candidate Email" type="email" name="candidateEmail" value={formData.candidateEmail} onChange={handleChange} />
+            <InputField label="Candidate Phone No" type="tel" name="candidatePhoneNo" value={formData.candidatePhoneNo} onChange={handleChange} />
           </div>
 
-          {/* Right Side: Status Dropdown */}
-          <div className="w-[90%] md:col-span-2 space-y-8 ">
-          <div className="relative w-full">
-              <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">
-                Job Title
-              </label>
+          {/* Right Column */}
+          <div className="w-[90%] md:col-span-2 space-y-6">
+            <InputField label="Job Title" name="jobTitle" value={formData.jobTitle} onChange={handleChange} />
+            <InputField label="Company Name" name="companyName" value={formData.companyName} onChange={handleChange} />
 
-              <input
-                type="text"
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                // placeholder="Enter full name"
-                className="w-full p-3 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300"
-              />
+            {/* Dates */}
+            <div className="grid grid-cols-2 gap-4">
+              <InputField label="Joining Date" type="date" name="joiningDate" value={formData.joiningDate} onChange={handleChange} />
+              <InputField label="Expiry Date" type="date" name="expiryDate" value={formData.expiryDate} onChange={handleChange} />
             </div>
 
-            {/* Joining Date & Offer Date */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="relative w-full">
-                <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">
-                  Joining Date
-                </label>
-
-                <input
-                  type="date"
-                  name="joiningDate"
-                  value={formData.joiningDate}
-                  onChange={handleChange}
-                  // placeholder="Enter full name"
-                  className="w-full p-3 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300"
-                />
-              </div>
-
-              <div className="relative w-full">
-                <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">
-                  Offer Date
-                </label>
-
-                <input
-                  type="date"
-                  name="offerDate"
-                  value={formData.offerDate}
-                  onChange={handleChange}
-                  // placeholder="Enter full name"
-                  className="w-full p-3 border border-gray-400 rounded-lg  focus:outline-none focus:ring-2 focus:ring-purple-400"
-                />
-              </div>
-            </div>
+            {/* Status */}
             <div className="relative w-full">
-            <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">
-                  Status
-                </label>
+              <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">
+                Status
+              </label>
               <select
-                name="status"
-                value={formData.status}
+                name="offerLetterStatus"
+                value={formData.offerLetterStatus}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-400 rounded-lg focus:ring focus:ring-purple-400"
               >
-                <option  value="" disabled>
+                <option value="" disabled>
                   Select status
                 </option>
                 {statusOptions.map((option, index) => (
@@ -176,15 +133,53 @@ const OfferPunch = () => {
           </div>
         </div>
 
+        {/* File Uploads */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <FileInput label="Offer Letter (PDF)" name="offerLetter" onChange={handleChange} />
+          <FileInput label="Resume (PDF)" name="candidateResume" onChange={handleChange} />
+        </div>
+
         {/* Submit Button */}
         <div className="mt-6 flex justify-end">
-          <button className="bg-purple-900 text-white py-2 px-16 rounded-full shadow-md hover:bg-purple-300 hover:text-black transition-all">
+          <button type="submit" className="bg-purple-900 text-white py-2 px-16 rounded-full shadow-md hover:bg-purple-300 hover:text-black transition-all">
             Submit
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };
+
+// 🔹 Reusable Input Field Component
+const InputField = ({ label, type = "text", name, value, onChange }) => (
+  <div className="relative w-full">
+    <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">
+      {label}
+    </label>
+    <input
+      type={type}
+      name={name}
+      value={value}
+      onChange={onChange}
+      className="w-full p-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-purple-300"
+    />
+  </div>
+);
+
+// 🔹 Reusable File Upload Component
+const FileInput = ({ label, name, onChange }) => (
+  <div className="relative w-full">
+    <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">
+      {label}
+    </label>
+    <input
+      type="file"
+      name={name}
+      accept=".pdf"
+      onChange={onChange}
+      className="w-full p-3 border border-gray-400 rounded-lg focus:ring-2 focus:ring-purple-400"
+    />
+  </div>
+);
 
 export default OfferPunch;

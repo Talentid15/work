@@ -1,23 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { BiSearch } from "react-icons/bi";
 import { HiOutlineUsers } from "react-icons/hi";
 import { FaFileCircleQuestion } from "react-icons/fa6";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { PipelineContext } from "../../context/PipelineContext";
 
 import PopUps from "../../components/PopUps";
 import StatusCard from "./StatusCard";
 import NotFoundPage from "../../components/common/NotFoundPage";
 
-import { useContext } from "react";
-
-import { PipelineContext } from "../../context/PipelineContext";
-
 const MainContent = () => {
   const [showPopups, setShowPopups] = useState(false);
   const [email, setEmail] = useState("");
-  const { searchedResponseData,setSearchedResponseData,pipelineData,
-    setPipelineData,} = useContext(PipelineContext);
+  const { searchedResponseData, setSearchedResponseData } = useContext(PipelineContext);
 
   const [isError, setError] = useState("");
   const [active, setActive] = useState("People");
@@ -25,7 +20,6 @@ const MainContent = () => {
   const handleClosePopup = () => setShowPopups(false);
 
   const handleSearch = () => {
-    // Simulate a search process
     setShowPopups(true);
   };
 
@@ -37,9 +31,7 @@ const MainContent = () => {
           <Link to="/">
             <button
               className={`flex items-center gap-2 px-6 py-2 font-medium text-sm rounded-full transition duration-200 ${
-                active === "People"
-                  ? "bg-[#74449E] text-white"
-                  : "text-gray-700 hover:bg-gray-100"
+                active === "People" ? "bg-[#74449E] text-white" : "text-gray-700 hover:bg-gray-100"
               }`}
               onClick={() => setActive("People")}
             >
@@ -51,9 +43,7 @@ const MainContent = () => {
           <Link to="/history">
             <button
               className={`flex items-center gap-2 px-6 py-2 font-medium text-sm rounded-full transition duration-200 ${
-                active === "history"
-                  ? "bg-[#74449E] text-white"
-                  : "text-gray-700 hover:bg-gray-100"
+                active === "history" ? "bg-[#74449E] text-white" : "text-gray-700 hover:bg-gray-100"
               }`}
               onClick={() => setActive("history")}
             >
@@ -103,27 +93,37 @@ const MainContent = () => {
         />
       )}
 
-      {/* Results Section */}
-      <div className={`flex items-center relative w-full h-full justify-center scrollbar-hidden ${searchedResponseData !== null ? "border-[#c7c6c6] border-2 bg-[#E7E7E7] rounded-3xl p-6 max-w-[790px]":"w-auto"} mx-auto mt-5`}>
-        <div className={`flex relative w-full flex-wrap justify-around gap-4 ${searchedResponseData !== null ?"h-[18rem]":"h-[18rem]"} overflow-y-auto no-scrollbar`}>
-          {searchedResponseData && isError === "" ? (
-            searchedResponseData.map((resData, index) => (
-              <StatusCard
-                key={index}
-                company={resData.companyName}
-                status={resData.currentStatus}
-                statusColor="text-green-600"
-                iconColor="#3DBF28"
-              />
-            ))
-          ) : searchedResponseData === null && isError === "not_found" ? (
-            <NotFoundPage />
-          ) : null}
+      {/* Results Section - Initially hidden, only shown after searching */}
+      {searchedResponseData !== null && (
+        <div className="flex items-center relative w-full h-full justify-center scrollbar-hidden border-[#c7c6c6] border-2 bg-[#E7E7E7] rounded-3xl p-6 max-w-[790px] mx-auto mt-5">
+          <div className="flex relative w-full flex-wrap justify-around gap-4 h-[18rem] overflow-y-auto no-scrollbar">
+            {searchedResponseData && isError === "" ? (
+              searchedResponseData.filteredAppliedCompanies.length > 0 ? (
+                searchedResponseData.filteredAppliedCompanies.map((resData, index) => (
+                  <StatusCard
+                    key={index}
+                    company={resData.companyName}
+                    status={resData.currentStatus}
+                    statusColor="text-green-600"
+                    iconColor="#3DBF28"
+                  />
+                ))
+              ) : searchedResponseData.signedOfferData > 0 ? (
+                <div className="text-xl font-semibold text-gray-800">
+                  Candidate has {searchedResponseData.signedOfferData} offer letter
+                  {searchedResponseData.signedOfferData > 1 ? "s" : ""}.
+                </div>
+              ) : (
+                <NotFoundPage />
+              )
+            ) : searchedResponseData === null && isError === "not_found" ? (
+              <NotFoundPage />
+            ) : null}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
 
 export default MainContent;
-

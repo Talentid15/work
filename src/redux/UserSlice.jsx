@@ -67,6 +67,18 @@ const userSlice = createSlice({
                 );
             }
         },
+
+        setUserHistory:(state,action)=>{
+
+            console.log("set searched user history data ",action.payload);
+
+            let newArray = state.userHistoryData;
+
+            newArray.splice(0,0,action.payload);
+
+            state.userHistoryData = newArray;
+
+        },
         checkExpiry: (state) => {
             const twoDaysInMilliseconds = 2 * 24 * 60 * 60 * 1000; // 2 days
             if (state.createdAt && Date.now() - state.createdAt > twoDaysInMilliseconds) {
@@ -86,6 +98,6 @@ const userSlice = createSlice({
     },
 });
 
-export const { setData, setCredits, logout, checkExpiry} = userSlice.actions;
+export const { setData, setCredits, logout, checkExpiry,setUserHistory} = userSlice.actions;
 
 export default userSlice.reducer;

@@ -16,13 +16,20 @@ import { useSelector } from "react-redux";
 
 import { setData } from "../redux/UserSlice";
 
+import { Turnstile } from "@marsidev/react-turnstile"
+
 const LoginForm = () => {
+
   const dispatch = useDispatch();
+
+  const siteKey = import.meta.env.VITE_SITE_KEY;
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  const [token, setToken] = useState("");
 
   const [captchaValue, setCaptchaValue] = useState(null);
 
@@ -85,12 +92,17 @@ const LoginForm = () => {
     if (validateForm()) {
       try {
 
-        const response = await axios.post("http://localhost:4000/api/auth/login",formData,
-          
+        const response = await axios.post("http://localhost:4000/api/auth/login", {
+
+          email: formData.email,
+          password: formData.password,
+          captchaValue: token
+        },
+
           {
 
-            withCredentials:true,
-            
+            withCredentials: true,
+
           }
         );
 
@@ -118,9 +130,8 @@ const LoginForm = () => {
     <div className="flex flex-col lg:flex-row h-screen">
       {/* Left Section */}
       <div
-        className={`w-[full] lg:w-[45%] bg-white p-6   transition-transform duration-300 ${
-          showForgotPassword ? "blur-sm" : ""
-        }`}
+        className={`w-[full] lg:w-[45%] bg-white p-6   transition-transform duration-300 ${showForgotPassword ? "blur-sm" : ""
+          }`}
       >
         <div className="flex  flex-col justify-center items-center gap-10 p-6 sm:p-10 lg:rounded-l-3xl">
           <div className=" w-full   p-6 flex justify-start items-start">
@@ -151,16 +162,18 @@ const LoginForm = () => {
                 error={errors.password}
               />
               <div className="flex items-center space-y-2 gap-12">
-              <ReCAPTCHA
-                sitekey={import.meta.env.VITE_GOOGLE_CAPTCHA}// Replace with your Google reCAPTCHA site key
-                onChange={(value) => setCaptchaValue(value)}
-              />
-              <p
-                className=" text-sm text-purple-500 text-center cursor-pointer hover:underline "
-                onClick={handleForgotPasswordClick}
-              >
-                Forgot Password?
-              </p>
+                <Turnstile siteKey={siteKey} onSuccess={(token) => {
+
+                  console.log(token);
+                  setToken(token);
+
+                }} />
+                <p
+                  className=" text-sm text-purple-500 text-center cursor-pointer hover:underline "
+                  onClick={handleForgotPasswordClick}
+                >
+                  Forgot Password?
+                </p>
               </div>
 
               <div className="flex items-center justify-center">
@@ -198,7 +211,7 @@ const LoginForm = () => {
       {/* Right Section */}
       <div
         className="hidden lg:flex flex-1 bg-center bg-white rounded-3xl lg:rounded-3xl m-3 bg-cover text-white flex-col justify-center items-center p-6 sm:p-10"
-        // style={{ backgroundImage: url(${backgroundImage}) }}
+      // style={{ backgroundImage: url(${backgroundImage}) }}
       >
         <h1 className="text-2xl sm:text-5xl font-bold mb-4 text-center">
           Welcome Back!

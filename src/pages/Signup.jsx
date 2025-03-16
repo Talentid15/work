@@ -6,9 +6,12 @@ import InputField from "../components/InputField";
 
 import { useContext } from "react";
 import { UserContext } from "../context/UserContext";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 const SignUpForm = () => {
   const navigate = useNavigate();
+
+  const siteKey = import.meta.env.VITE_SITE_KEY;
 
   const {setSignedUp} = useContext(UserContext);
 
@@ -20,6 +23,7 @@ const SignUpForm = () => {
     role: "",
     password: "",
     termsAccepted: false,
+    captchaValue:""
   });
 
 
@@ -230,6 +234,12 @@ const SignUpForm = () => {
           {errors.termsAccepted && (
             <p className="text-red-500 text-sm">{errors.termsAccepted}</p>
           )}
+
+          <Turnstile siteKey={siteKey} onSuccess={(token)=>{
+
+            setFormData({...formData,["captchaValue"]:token})
+
+          }}></Turnstile>
 
           <div className="flex items-center justify-center">
             <button

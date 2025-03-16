@@ -41,6 +41,8 @@ import VerificationPage from "./pages/VerificationPage";
 import Release_Offer from "./pages/ReleaseOffer/Release_Offer";
 import Job_Offer from "./pages/JobOffer/Job_Offer";
 
+import OfferDetail from "./pages/JobOffer/Job_OfferDetails";
+
 
 function App() {
   return (
@@ -93,7 +95,7 @@ function App() {
             <Route index path="/joboffers" element={<Job_Offer />} />
             <Route index path="/release-offer" element={<Release_Offer />} />
             <Route path="/extractInfo" element={<ExtractDataFromPdf />} />
-
+            <Route path="/joboffers/:id" element={<OfferDetail></OfferDetail>}></Route>
 
             {/* <Route path="/login" element={<PublicRoute><Login /></PublicRoute>}/>
           <Route path="/signup" element={<PublicRoute><SignUp/></PublicRoute>} /> */}

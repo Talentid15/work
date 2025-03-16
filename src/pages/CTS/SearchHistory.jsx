@@ -11,30 +11,32 @@ import { formateDate } from "../../utils";
 
 import { useDispatch } from "react-redux";
 
+import { useQuery } from "@tanstack/react-query";
+
+
+
 const SearchHistory = () => {
 
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
-  const historyData = useSelector((state)=>state.user.userHistoryData);
+  const historyData = useSelector((state) => state.user.userHistoryData);
 
-  console.log("user history data ",historyData);
+  console.log("user history data ", historyData);
 
-  const [userHistoryData,setUserHistoryData] = useState(null);
+  const [userHistoryData, setUserHistoryData] = useState(null);
+
+  function viewMoreHandler(data) {
+
+    console.log("view more handler data is ", data);
 
 
-  function viewMoreHandler(data){
+    console.log("data is ", data.appliedCompanies[0]._id);
 
-    console.log("view more handler data is ",data);
+    // dispatch(setPipelineData(data.appliedCompanies));
 
-      // dispatch(setPipelineData(data));
-
-      console.log("data is ",data.appliedCompanies[0]._id);
-
-      // dispatch(setPipelineData(data.appliedCompanies));
-
-      // navigate(`/pipeline/${data.appliedCompanies[0]._id}`);
+    // navigate(`/pipeline/${data.appliedCompanies[0]._id}`);
 
   }
 
@@ -44,11 +46,11 @@ const SearchHistory = () => {
       <div className="w-full relative flex flex-col md:flex-row align-start justify-between pb-5 border-b border-gray-300 mb-6">
         <div className="flex items-center mb-4 md:mb-0">
           <button className="flex items-center text-gray-800 focus:outline-none" >
-            <IoIosArrowBack className="text-2xl mr-4" onClick={()=>{
+            <IoIosArrowBack className="text-2xl mr-4" onClick={() => {
 
               navigate("/")
 
-            }}/>
+            }} />
             <span className="font-bold text-xl md:text-2xl">Search History</span>
           </button>
         </div>
@@ -90,9 +92,17 @@ const SearchHistory = () => {
                 <td className="p-4 text-sm text-gray-600">{candidate.email}</td>
                 <td className="p-4 text-sm text-gray-600">{formateDate(candidate.createdAt)}</td>
                 <td className="p-4">
-                  <button className="text-sm text-white bg-purple-600 rounded-full px-5 py-2 font-medium hover:bg-purple-200  hover:text-black focus:ring-2 focus:ring-purple-500 transition duration-200">
-                    View more
-                  </button>
+
+                  {
+
+                    candidate?.appliedCompanies == null || candidate.appliedCompanies == undefined ? (
+
+                      <p>Not Available</p>
+                    ) : (<button className="text-sm text-white bg-purple-600 rounded-full px-5 py-2 font-medium hover:bg-purple-200  hover:text-black focus:ring-2 focus:ring-purple-500 transition duration-200">
+                      View more
+                    </button>)
+                  }
+
                 </td>
               </tr>
             ))}
@@ -100,7 +110,7 @@ const SearchHistory = () => {
         </table>
       </div>
 
-    </div>
+    </div >
   );
 };
 

@@ -14,6 +14,8 @@ import { useDispatch } from 'react-redux';
 
 import { isValidEmail } from '../utils';
 
+import { setUserHistory } from '../redux/UserSlice';
+
 
 function PopUps({ setshowPopUps, showPopUps, emailSearch, setSearchedResponseData, setError }) {
 
@@ -52,15 +54,15 @@ function PopUps({ setshowPopUps, showPopUps, emailSearch, setSearchedResponseDat
 
       }
 
-      console.log("5");
+      console.log("5",data);
 
-      // if (Number(data?.credits) === 0) {
+      if (Number(data?.credits) === 0) {
 
-      //   console.log("4");
+        console.log("4");
 
-      //   toast.error("you do not have enough  credits left");
-      //   return
-      // }
+        toast.error("you do not have enough  credits left");
+        return
+      }
 
       console.log("hellow");
 
@@ -81,16 +83,39 @@ function PopUps({ setshowPopUps, showPopUps, emailSearch, setSearchedResponseDat
 
       console.log("response ka data ", response.data.data);
 
+      // if(response.data.data.filteredAppliedCompanies.length === 0 ){
+
+
+      // }
+
       toast.success("data fetched successfully");
 
       setSearchedResponseData(response.data.data);
+
+      const temp = {
+        email:emailSearch,
+        createdAt: new Date().toISOString(),
+        appliedCompanies: response.data.data.filteredAppliedCompanies,
+
+      }
+
+      dispatch(setUserHistory(temp));
+      
       setError("");
 
-      // make a call to backend to seraching the user 
 
     } catch (error) {
 
-      console.log(error);
+      console.log("erro aa gya",error);
+
+      const data = {
+        email:emailSearch,
+        createdAt: new Date().toISOString(),
+        appliedCompanies: [],
+
+      }
+
+      dispatch(setUserHistory(data));
 
       setError("not_found");
       setSearchedResponseData(null);

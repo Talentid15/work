@@ -1,5 +1,8 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import UserSlice, { checkExpiry } from "./UserSlice";
+
+import OfferSlice from "./offerSlice";
+
 import {
   persistReducer,
   persistStore,
@@ -23,6 +26,7 @@ const persistConfig = {
 // Combine reducers
 const rootReducer = combineReducers({
   user: UserSlice,
+  offer:OfferSlice
 });
 
 // Create persisted reducer

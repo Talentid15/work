@@ -40,6 +40,7 @@ import VerificationPage from "./pages/VerificationPage";
 
 import Release_Offer from "./pages/ReleaseOffer/Release_Offer";
 import Job_Offer from "./pages/JobOffer/Job_Offer";
+import CareerPage from "./pages/CarrerPage/CarrerPage";
 
 import OfferDetail from "./pages/JobOffer/Job_OfferDetails";
 
@@ -92,6 +93,7 @@ function App() {
             <Route path="offer-punch" element={<OfferPunch />} />
 
             <Route index path="/dashboard" element={<DashBoard />} />
+            <Route index path="/carrerpage" element={<CareerPage />} />
             <Route index path="/joboffers" element={<Job_Offer />} />
             <Route index path="/release-offer" element={<Release_Offer />} />
             <Route path="/extractInfo" element={<ExtractDataFromPdf />} />

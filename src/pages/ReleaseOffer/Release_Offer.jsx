@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
@@ -62,14 +62,12 @@ const Release_Offer = () => {
       toast.error("Joining Date should be within 90 days of the Expiry Date");
       return;
     }
-
-    // creating a digio req body 
   
     const offerLetterBase64 = await readFileAsBase64(form.offerLetter);
   
     const digioRequestBody = {
       file_name: `offer-letter-${form.candidateName}`,
-      file_data: offerLetterBase64, // Fixed variable
+      file_data: offerLetterBase64,
       signers: [
         {
           identifier: form.candidateEmail,

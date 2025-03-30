@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FaBell, FaUserCircle, FaCog, FaSignOutAlt, FaTimes } from 'react-icons/fa';
 import { MdOutlineCurrencyExchange } from "react-icons/md";
 import { GiRingingBell } from "react-icons/gi";

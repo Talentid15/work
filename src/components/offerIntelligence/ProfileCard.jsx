@@ -1,4 +1,3 @@
-import React from "react";
 import photo from '../../assets/photo.png'
 import { MdOutlineRemoveRedEye, MdOutlineLocalPhone, MdOutlineMail, MdOutlineLocationOn } from "react-icons/md";
 import { NavLink } from "react-router-dom";

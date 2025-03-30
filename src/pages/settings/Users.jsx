@@ -1,136 +1,199 @@
-import React, { useState } from "react";
-import AddUserModal from "/src/components/settings/AddUserModal.jsx"; // Import the modal
-import { FaPencilAlt } from "react-icons/fa";
+import { useState } from "react";
+import { FaPencilAlt, FaTrash } from "react-icons/fa";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
 const UserManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [users, setUsers] = useState([
+  const user = useSelector((state) => state.user.data);
+
+  const [teamMembers, setTeamMembers] = useState([
     {
-      id: 1,
-      name: "Jainayak N",
-      email: "jai@talentid.app",
-      role: "Admin",
-      date: "Jan 8, 2025",
+      id: "1",
+      firstName: "John",
+      lastName: "Doe",
+      workEmail: "john@example.com",
+      role: "Admin"
     },
     {
-      id: 1,
-      name: "Jainayak N",
-      email: "jai@talentid.app",
-      role: "Admin",
-      date: "Jan 8, 2025",
-    },
-    {
-      id: 1,
-      name: "Jainayak N",
-      email: "jai@talentid.app",
-      role: "Admin",
-      date: "Jan 8, 2025",
-    },
+      id: "2",
+      firstName: "Jane",
+      lastName: "Smith",
+      workEmail: "jane@example.com",
+      role: "User"
+    }
   ]);
 
-  const [formData, setFormData] = useState({
+  const [newMember, setNewMember] = useState({
     firstName: "",
     lastName: "",
-    email: "",
-    role: "Owner",
+    workEmail: "",
+    role: "User"
   });
 
-  // Handle input change
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewMember(prev => ({ ...prev, [name]: value }));
   };
 
-  // Handle adding user
-  const handleSave = () => {
-    if (!formData.firstName || !formData.lastName || !formData.email) return;
+  const handleAddMember = async () => {
+    if (!newMember.firstName || !newMember.lastName || !newMember.workEmail) {
+      alert("Please fill all fields");
+      return;
+    }
 
-    const newUser = {
-      id: users.length + 1,
-      name: `${formData.firstName} ${formData.lastName}`,
-      email: formData.email,
-      role: formData.role,
-      date: new Date().toDateString(),
-    };
+    try {
+      const response = await axios.post("/api/team/members", {
+        ...newMember,
+        createdBy: "current-user-id"
+      });
 
-    setUsers([...users, newUser]); // Add new user to table
-    setIsModalOpen(false); // Close modal
-    setFormData({ firstName: "", lastName: "", email: "", role: "Owner" }); // Reset form
+      setTeamMembers([...teamMembers, response.data]);
+      setIsModalOpen(false);
+      setNewMember({
+        firstName: "",
+        lastName: "",
+        workEmail: "",
+        role: "User"
+      });
+    } catch (error) {
+      console.error("Error adding team member:", error);
+    }
   };
 
-  // Handle user deletion
-  const handleDelete = (id) => {
-    setUsers(users.filter((user) => user.id !== id));
+  const handleDeleteMember = async (id) => {
+    try {
+      await axios.delete(`/api/team/members/${id}`);
+      setTeamMembers(teamMembers.filter(member => member.id !== id));
+    } catch (error) {
+      console.error("Error deleting team member:", error);
+    }
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto mt-10 p-4 bg-white rounded-xl shadow-lg">
-      {/* Add Users Button */}
-      <div className="flex justify-end items-end mb-4">
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-gray-200 hover:bg-gray-300 text-black font-medium px-4 py-2 rounded-full"
-        >
-          Add users +
-        </button>
+    <div className="w-full max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Team Management</h2>
+
+        {user.role === "Admin" && (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2 rounded-lg"
+          >
+            Add Team Member +
+          </button>
+        )}
       </div>
 
-      {/* Table for large screens */}
-      <div className="overflow-x-auto hidden md:block">
+      {/* Team Members Table */}
+      <div className="overflow-x-auto">
         <table className="w-full bg-white rounded-lg">
-          <thead>
-            <tr className="border-b ">
-              <th className="p-3 text-left">Name</th>
-              <th className="p-3 text-left">Email</th>
-              <th className="p-3 text-left">Status</th>
-              <th className="p-3 text-left">Date Added</th>
-              <th className="p-3 text-left">Actions</th>
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="p-3 text-left">First Name</th>
+              <th className="p-3 text-left">Last Name</th>
+              <th className="p-3 text-left">Work Email</th>
+              <th className="p-3 text-left">Role</th>
+              {user.role === "Admin" && <th className="p-3 text-left">Actions</th>}
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
-              <tr key={user.id} className="border-b">
-                <td className="p-3">{user.name}</td>
-                <td className="p-3">{user.email}</td>
+            {teamMembers.map((member) => (
+              <tr key={member.id} className="border-b hover:bg-gray-50">
+                <td className="p-3">{member.firstName}</td>
+                <td className="p-3">{member.lastName}</td>
+                <td className="p-3">{member.workEmail}</td>
                 <td className="p-3">
-                  <span className="px-2 py-1 bg-gray-200 rounded-full">{user.role}</span>
+                  <span className={`px-3 py-1 rounded-full text-sm ${
+                    member.role === "Admin" 
+                      ? "bg-blue-100 text-blue-800" 
+                      : "bg-gray-100 text-gray-800"
+                  }`}>
+                    {member.role}
+                  </span>
                 </td>
-                <td className="p-3">{user.date}</td>
-                <td className="p-3 flex items-center space-x-2">
-                  <button className="bg-white px-3 py-1 rounded-full"><FaPencilAlt /></button>
-                  <button onClick={() => handleDelete(user.id)} className="text-red-600 text-xl">🗑</button>
-                </td>
+                {user.role === "Admin" && (
+                  <td className="p-3">
+                    <div className="flex space-x-2">
+                      <button className="text-blue-600 hover:text-blue-800">
+                        <FaPencilAlt />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteMember(member.id)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Vertical cards for small screens */}
-      <div className="block md:hidden">
-        {users.map((user) => (
-          <div key={user.id} className="mb-4 p-4 border rounded-lg shadow-md bg-gray-50">
-            <p className="font-semibold text-lg">{user.name}</p>
-            <p className="text-gray-600">{user.email}</p>
-            <p className="text-gray-500">
-              <span className="px-2 py-1 bg-gray-200 rounded-full">{user.role}</span>
-            </p>
-            <p className="text-sm text-gray-400">{user.date}</p>
-            <div className="mt-2 flex space-x-2">
-              <button className="bg-gray-300 px-3 py-1 rounded-full">Edit</button>
-              <button onClick={() => handleDelete(user.id)} className="text-red-600">🗑</button>
+      {/* Add Member Modal */}
+      {isModalOpen && user.role === "Admin" && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-xl font-bold mb-4">Add Team Member</h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">First Name</label>
+                <input
+                  type="text"
+                  name="firstName"
+                  value={newMember.firstName}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Last Name</label>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={newMember.lastName}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Work Email</label>
+                <input
+                  type="email"
+                  name="workEmail"
+                  value={newMember.workEmail}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 border rounded-lg"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddMember}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+              >
+                Add Member
+              </button>
             </div>
           </div>
-        ))}
-      </div>
-
-      {/* Add User Modal */}
-      <AddUserModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSave}
-        formData={formData}
-        handleChange={handleChange}
-      />
+        </div>
+      )}
     </div>
   );
 };

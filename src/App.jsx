@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -14,7 +13,6 @@ import CandidateList from "./components/offerIntelligence/List";
 import Profile from "./pages/offerIntelligence/Profile";
 import Predictions from "./components/offerIntelligence/Predictions";
 import Pipeline from "./pages/CTS/Pipeline";
-import ProfileUpdate from "./pages/offerIntelligence/ProfileUpdate";
 import AddCandidate from "./components/offerIntelligence/AddCandidate";
 import ExtractDataFromPdf from "./pages/ExtractDataFromPdf";
 

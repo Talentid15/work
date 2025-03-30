@@ -1,44 +1,22 @@
-import React, { useEffect, useState } from "react";
-import ellipse from "../../assets/ellipse.png";
+
 import { HiOutlineUsers } from "react-icons/hi";
 import { FaFileCircleQuestion } from "react-icons/fa6";
 import { IoIosArrowBack } from "react-icons/io";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link , useNavigate } from "react-router-dom";
 
 import { useSelector } from "react-redux";
 
 import { formateDate } from "../../utils";
-
-import { useDispatch } from "react-redux";
-
-import { useQuery } from "@tanstack/react-query";
-
 
 
 const SearchHistory = () => {
 
   const navigate = useNavigate();
 
-  const dispatch = useDispatch();
 
   const historyData = useSelector((state) => state.user.userHistoryData);
 
   console.log("user history data ", historyData);
-
-  const [userHistoryData, setUserHistoryData] = useState(null);
-
-  function viewMoreHandler(data) {
-
-    console.log("view more handler data is ", data);
-
-
-    console.log("data is ", data.appliedCompanies[0]._id);
-
-    // dispatch(setPipelineData(data.appliedCompanies));
-
-    // navigate(`/pipeline/${data.appliedCompanies[0]._id}`);
-
-  }
 
   return (
     <div className="relative h-full overflow-hidden p-6 md:p-8 flex flex-col bg-white ">

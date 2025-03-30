@@ -57,7 +57,7 @@ export const randomStringGenerator = (length) => {
 
 
 export function isValidEmail(text) {
-  const emailPattern = /^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$/;
+  const emailPattern = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
   return emailPattern.test(text);
 }
 

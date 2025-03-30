@@ -1,11 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { NavLink,Link } from "react-router-dom";
 import { MdOutlineSettings } from "react-icons/md";
 import { GiBackwardTime } from "react-icons/gi";
-import { TbFileStack, TbFlagBolt, TbUserCheck } from "react-icons/tb";
-import { CgPerformance } from "react-icons/cg";
-import { PiMagnifyingGlassFill } from "react-icons/pi";
-import { FaSuperpowers } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
 import { BiEdit } from "react-icons/bi";
 import { BiBriefcase } from "react-icons/bi";
@@ -14,7 +10,6 @@ import { BiSolidCheckShield } from "react-icons/bi";
 import { SiLens } from "react-icons/si";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { FaChevronDown } from "react-icons/fa";
-import { FaChartLine } from "react-icons/fa"; // Icon for Candidate Tracking
 import { useLocation } from "react-router-dom";
 
 const Sidebar = () => {

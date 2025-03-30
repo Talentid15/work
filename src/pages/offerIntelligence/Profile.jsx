@@ -1,4 +1,3 @@
-import React from 'react'
 import ProfileCard from '../../components/offerIntelligence/ProfileCard'
 // import EngagementSection from '../../components/offerIntelligence/EngagementSection'
 import ExperienceSection from '../../components/offerIntelligence/ExperienceSection'

@@ -4,12 +4,11 @@ const initialState = {
     data: null,
     additionalDetails: null,
     userHistoryData: null,
-    // pipelineData: null,
-    tokenExpiry:"",
+    tokenExpiry: "",
     loading: false,
     error: null,
-    loggedIn: false, // Indicates if the user is logged in
-    expiryTimestamp: null, // To track when the data expires
+    loggedIn: false,
+    expiryTimestamp: null,
 };
 
 const userSlice = createSlice({
@@ -17,87 +16,53 @@ const userSlice = createSlice({
     initialState,
     reducers: {
         setData: (state, action) => {
-
-            console.log("data is ", action.payload);
-
-            state.additionalDetails = action.payload.additionalDetails;
-
-            state.userHistoryData = action.payload.searchHistory;
-            state.tokenExpiry = action.payload.tokenExpiry; // Store expiry time
-
-            var newData = {};
-
-            Object.keys(action.payload).forEach((val) => {
-
-
-                if (val != "additionalDetails" && val != "searchHistory") {
-
-                    console.log("val is ", val);
-                    newData[val] = action.payload[val];
-                }
-            })
-
-            console.log("data at useSLice is", newData);
-            state.data = newData;
-            state.expiryTimestamp = Date.now(); // Set expiry timestamp
-
+            // Directly assign the payload properties to state
+            state.data = { ...action.payload };
+            
+            // Extract and store nested properties
+            if (action.payload.additionalDetails) {
+                state.additionalDetails = action.payload.additionalDetails;
+                // Remove from main data object to avoid duplication
+                delete state.data.additionalDetails;
+            }
+            
+            if (action.payload.searchHistory) {
+                state.userHistoryData = action.payload.searchHistory;
+                delete state.data.searchHistory;
+            }
+            
+            state.tokenExpiry = action.payload.tokenExpiry || "";
+            state.expiryTimestamp = Date.now();
             state.loggedIn = true;
         },
 
-        // setPipelineData: (state, action) => {
-
-        //     state.pipelineData = action.payload;
-
-
-        // },
-
-        // clearPipelineData: (state,action) =>{
-
-        //     state.pipelineData = null;
-
-        // },
-
         setCredits: (state, action) => {
             if (state.data) {
-                // Update credits only if user data is available
                 state.data.credits = action.payload;
             } else {
-                console.warn(
-                    "User data not available for credit update. Fetch data first."
-                );
+                console.warn("User data not available for credit update");
             }
         },
 
-        setUserHistory:(state,action)=>{
-
-            console.log("set searched user history data ",action.payload);
-
-            let newArray = state.userHistoryData;
-
-            newArray.splice(0,0,action.payload);
-
-            state.userHistoryData = newArray;
-
+        setUserHistory: (state, action) => {
+            if (state.userHistoryData) {
+                state.userHistoryData = [action.payload, ...state.userHistoryData];
+            } else {
+                state.userHistoryData = [action.payload];
+            }
         },
+
         checkExpiry: (state) => {
-            const twoDaysInMilliseconds = 2 * 24 * 60 * 60 * 1000; // 2 days
-            if (state.createdAt && Date.now() - state.createdAt > twoDaysInMilliseconds) {
-                console.warn("Stored data is older than 2 days. Logging out.");
-                state.loggedIn = false;
-                state.data = null;
-                state.createdAt = null;
+            const twoDaysInMilliseconds = 2 * 24 * 60 * 60 * 1000;
+            if (state.expiryTimestamp && Date.now() - state.expiryTimestamp > twoDaysInMilliseconds) {
+                console.warn("Stored data expired. Logging out.");
+                return initialState;
             }
         },
-        logout: (state) => {
-            // Reset state to initial values
-            state.loggedIn = false;
-            state.data = null;
-            state.expiryTimestamp = null;
-            state.tokenExpiry = "";
-        },
+
+        logout: () => initialState,
     },
 });
 
-export const { setData, setCredits, logout, checkExpiry,setUserHistory} = userSlice.actions;
-
+export const { setData, setCredits, logout, checkExpiry, setUserHistory } = userSlice.actions;
 export default userSlice.reducer;

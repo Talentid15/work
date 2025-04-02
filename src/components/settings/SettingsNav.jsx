@@ -1,4 +1,3 @@
-import React from "react";
 import { NavLink } from "react-router-dom";
 
 const SettingsNav = () => {
@@ -19,7 +18,7 @@ const SettingsNav = () => {
               isActive ? "text-black border-b-4 border-black" : "text-gray-500"
             }`
           }
-          end={item.exact} // Only apply active styles when path exactly matches
+          end={item.exact} 
         >
           {item.name}
         </NavLink>

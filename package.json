@@ -28,6 +28,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.0.0",
     "react-step-progress-bar": "^1.0.3",
+    "react-toastify": "^11.0.5",
     "react-world-flags": "^1.6.0",
     "recharts": "^2.15.1",
     "redux-persist": "^6.0.0",

@@ -1,18 +1,15 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { IoArrowForwardSharp } from "react-icons/io5";
-import backgroundImage from "../assets/5548971.jpg";
 import backgroundImage2 from "../assets/rb_24598.png";
 import logo from "../assets/logo.png";
 import InputField from "../components/InputField";
 import ForgotPasswordCard from "../components/ForgotPasswordCard";
 import axios from "axios";
-import ReCAPTCHA from "react-google-recaptcha";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import { useDispatch } from "react-redux";
 
-import { useSelector } from "react-redux";
 
 import { setData } from "../redux/UserSlice";
 
@@ -30,8 +27,6 @@ const LoginForm = () => {
   });
 
   const [token, setToken] = useState("");
-
-  const [captchaValue, setCaptchaValue] = useState(null);
 
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
@@ -119,11 +114,6 @@ const LoginForm = () => {
         toast.error(error.message);
       }
     }
-    if (!captchaValue) {
-      alert("Please complete the CAPTCHA!");
-      return;
-    }
-
   };
 
   return (
@@ -187,7 +177,7 @@ const LoginForm = () => {
               </div>
               <div className="text-center">
                 <p className="text-gray-600">
-                  Don't have an account?{" "}
+                  Dont have an account?{" "}
                   <a
                     href="/signup"
                     className="text-purple-600 font-semibold hover:underline"

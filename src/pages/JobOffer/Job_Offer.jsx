@@ -14,14 +14,13 @@ const Job_Offer = () => {
 
   const [statusFilter, setStatusFilter] = useState("All");
 
-  // Fetch offers on component mount
   useEffect(() => {
     const fetchOffersData = async () => {
       try {
         const response = await axios.get("http://localhost:4000/api/offer/get-all-offers", {
           withCredentials: true,
         });
-        // console.log("Fetched Offers Data:", response.data);
+        console.log("Fetched Offers Data:", response.data);
         dispatch(setOfferData(response.data));
       } catch (error) {
         console.error("Error fetching offers data:", error);
@@ -30,11 +29,6 @@ const Job_Offer = () => {
 
     fetchOffersData();
   }, [dispatch]);
-
-  // const handleDelete = (id) => {
-    // dispatch(setOfferData(offersData.filter((offer) => offer._id !== id)));
-    // Note: You might want to add an API call here to actually delete from backend
-  // };
 
   const handleSendEmail = async (offerId) => {
     try {
@@ -59,17 +53,18 @@ const Job_Offer = () => {
     "Ghosted",
     "Expired",
     "Offer letter released",
-    "Retracted" // Added Retracted to status options
+    "Retracted"
   ];
 
+  // Filter out offers where showOffer is false
+  const visibleOffers = offersData?.filter(offer => offer.showOffer !== false);
   const filteredOffers =
     statusFilter === "All"
-      ? offersData
-      : offersData?.filter((offer) => offer.status === statusFilter);
+      ? visibleOffers
+      : visibleOffers?.filter((offer) => offer.status === statusFilter);
 
   return (
     <div className="w-full max-w-6xl mx-auto mt-6 p-6 bg-white rounded-xl shadow-md">
-      {/* Top Bar: Release Offer Button & Filter Dropdown */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <select
           className="px-4 py-2 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -92,7 +87,6 @@ const Job_Offer = () => {
         </button>
       </div>
 
-      {/* Offer Table for Larger Screens */}
       {filteredOffers?.length > 0 ? (
         <div className="overflow-x-auto border rounded-xl my-6 hidden md:block">
           <table className="w-full bg-white rounded-lg">
@@ -148,7 +142,6 @@ const Job_Offer = () => {
         <p className="text-center text-gray-500 mt-6">No offers available.</p>
       )}
 
-      {/* Offer Cards for Small Screens */}
       <div className="block md:hidden">
         {filteredOffers?.length > 0 ? (
           filteredOffers.map((offer) => (
@@ -186,7 +179,6 @@ const Job_Offer = () => {
         )}
       </div>
 
-      {/* Outlet for rendering OfferDetail */}
       <div className="flex flex-col justify-center items-center p-5 w-full">
         <Outlet />
       </div>

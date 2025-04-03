@@ -68,7 +68,6 @@ const Profiles = () => {
     }
   }, [token]);
 
-  // Initialize form data when profile data is available
   useEffect(() => {
     if (profileData.user) {
       setFormData({

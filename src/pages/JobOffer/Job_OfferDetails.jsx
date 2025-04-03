@@ -1,4 +1,3 @@
-// OfferDetail.jsx (Frontend)
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -10,9 +9,10 @@ const OfferDetail = () => {
   const { token } = useSelector((state) => state.user.data || {});
   const navigate = useNavigate();
   const { id } = useParams();
+  const [viewing, setViewing] = useState("resume");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showRetractConfirm, setShowRetractConfirm] = useState(false);
   const offersData = useSelector((state) => state.offer.data);
-
-  console.log("Offer data:", offersData);
 
   const offer = offersData?.find((offer) => offer._id === id);
 
@@ -21,12 +21,9 @@ const OfferDetail = () => {
   }
 
   const { candidate, jobTitle, status, offerDate, expirationDate, offerLetterLink, acceptedLetter } = offer;
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [viewing, setViewing] = useState("resume");
 
   const handleRetract = async () => {
     try {
-      console.log(id)
       const response = await axios.post(
         "http://localhost:4000/api/offer/offer/updateStatus",
         { offerId: id, status: "Retracted" },
@@ -37,16 +34,44 @@ const OfferDetail = () => {
       );
       if (response.data) {
         alert('Offer retracted successfully');
-        // Optionally refresh the page or update Redux store
-        navigate(0); // This will refresh the page
+        navigate(0);
       } else {
-        // eslint-disable-next-line no-undef
-        throw new Error(result.message || 'Failed to retract offer');
+        throw new Error('Failed to retract offer');
       }
     } catch (error) {
       console.error('Error retracting offer:', error);
       alert(`Failed to retract offer: ${error.message}`);
     }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/offer/update-show-status",
+        { offerId: id, showOffer: false },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
+      );
+      if (response.data) {
+        alert('Offer hidden successfully');
+        navigate('/joboffers');
+      } else {
+        throw new Error('Failed to hide offer');
+      }
+    } catch (error) {
+      console.error('Error hiding offer:', error);
+      alert(`Failed to hide offer: ${error.message}`);
+    }
+  };
+
+  const confirmDelete = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmRetract = () => {
+    setShowRetractConfirm(true);
   };
 
   return (
@@ -83,8 +108,7 @@ const OfferDetail = () => {
               <strong>Status:</strong>
               <span
                 className={`ml-2 px-2 py-1 rounded-full ${status === "Pending" ? "bg-yellow-200" :
-                    status === "Retracted" ? "bg-orange-200" : "bg-green-200"
-                  }`}
+                    status === "Retracted" ? "bg-orange-200" : "bg-green-200"}`}
               >
                 {status}
               </span>
@@ -99,23 +123,20 @@ const OfferDetail = () => {
 
           <div className="mt-6 flex gap-4">
             <button
-              className={`px-4 py-2 rounded-lg shadow-md transition-all ${viewing === "resume" ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-700"
-                }`}
+              className={`px-4 py-2 rounded-lg shadow-md transition-all ${viewing === "resume" ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-700"}`}
               onClick={() => setViewing("resume")}
             >
               Resume
             </button>
             <button
-              className={`px-4 py-2 rounded-lg shadow-md transition-all ${viewing === "offer" ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-700"
-                }`}
+              className={`px-4 py-2 rounded-lg shadow-md transition-all ${viewing === "offer" ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-700"}`}
               onClick={() => setViewing("offer")}
             >
               Offer Letter
             </button>
             {acceptedLetter && (
               <button
-                className={`px-4 py-2 rounded-lg shadow-md transition-all ${viewing === "accepted" ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-700"
-                  }`}
+                className={`px-4 py-2 rounded-lg shadow-md transition-all ${viewing === "accepted" ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-700"}`}
                 onClick={() => setViewing("accepted")}
               >
                 Accepted Letter
@@ -184,19 +205,76 @@ const OfferDetail = () => {
 
       <div className="mt-6 flex justify-between">
         <div className="flex gap-4">
-          <button className="px-5 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition-all">
+          <button 
+            onClick={confirmDelete}
+            className="px-5 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition-all"
+          >
             Delete Offer
           </button>
           {status === "Pending" && (
-          <button
-            onClick={handleRetract}
-            className="px-5 py-2 bg-orange-500 text-white rounded-lg shadow-md hover:bg-orange-600 transition-all"
-          >
-            Retract Offer
-          </button>
-           )}
+            <button
+              onClick={confirmRetract}
+              className="px-5 py-2 bg-orange-500 text-white rounded-lg shadow-md hover:bg-orange-600 transition-all"
+            >
+              Retract Offer
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Delete Confirmation Popup */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg font-semibold mb-4">Are you sure?</h3>
+            <p className="text-gray-600 mb-6">Do you really want to hide this offer? This action cannot be undone.</p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  handleDelete();
+                  setShowDeleteConfirm(false);
+                }}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all"
+              >
+                Yes, Hide Offer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Retract Confirmation Popup */}
+      {showRetractConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg font-semibold mb-4">Are you sure?</h3>
+            <p className="text-gray-600 mb-6">Do you really want to retract this offer? This action cannot be undone.</p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setShowRetractConfirm(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  handleRetract();
+                  setShowRetractConfirm(false);
+                }}
+                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all"
+              >
+                Yes, Retract Offer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

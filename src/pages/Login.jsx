@@ -81,41 +81,35 @@ const LoginForm = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      try {
-
-        const response = await axios.post("http://localhost:4000/api/auth/login", {
-
-          email: formData.email,
-          password: formData.password,
-          captchaValue: token
-        },
-
-          {
-
-            withCredentials: true,
-
-          }
-        );
-
-        console.log("res ka data ", response.data);
-
-        dispatch(setData(response.data));
-
-        toast.success("Logged in successfully!");
-
-        navigate("/");
-      } catch (error) {
-        console.error("Error logging in:", error);
-
-        toast.error(error.message);
-      }
+        try {
+            const response = await axios.post("http://localhost:4000/api/auth/login", {
+                email: formData.email,
+                password: formData.password,
+                captchaValue: token
+            }, {
+                withCredentials: true,
+            });
+            console.log("res ka data ", response.data);
+            if (response.status === 202) {
+                toast.error("Your documents are being verified. Please try again later.");
+                return;
+            }
+            dispatch(setData(response.data));
+            toast.success("Logged in successfully!");
+            navigate("/");
+        } catch (error) {
+            console.error("Error logging in:", error);
+                        if (error.response?.status === 202) {
+                toast.info("Your documents are being verified. Please try again later.");
+            } else {
+                toast.error(error.message || "Login failed. Please try again.");
+            }
+        }
     }
-  };
-
+};
   return (
     <div className="flex flex-col lg:flex-row h-screen">
       {/* Left Section */}

@@ -12,6 +12,7 @@ import { formateDate } from "../../utils";
 const SearchHistory = () => {
 
   const navigate = useNavigate();
+  const { inviteLinks } = useSelector((state) => state.user.data || {});
 
 
   const historyData = useSelector((state) => state.user.userHistoryData);

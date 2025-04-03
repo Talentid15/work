@@ -41,6 +41,7 @@ import Job_Offer from "./pages/JobOffer/Job_Offer";
 import CareerPage from "./pages/CarrerPage/CarrerPage";
 
 import OfferDetail from "./pages/JobOffer/Job_OfferDetails";
+import InvitePage from './pages/CTS/InvitePage';
 
 
 function App() {
@@ -86,6 +87,7 @@ function App() {
           } >
 
             <Route index element={<MainContent />} />
+            <Route path="/invite" element={<InvitePage />} />
             <Route path="history" element={<SearchHistory />} />
             <Route path="pipeline/:userId" element={<Pipeline />} />
             <Route path="offer-punch" element={<OfferPunch />} />

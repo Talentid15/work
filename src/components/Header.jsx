@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaBell, FaUserCircle, FaCog, FaSignOutAlt, FaTimes } from 'react-icons/fa';
+import { FaBell, FaUserCircle, FaSignOutAlt, FaTimes } from 'react-icons/fa';
 import { MdOutlineCurrencyExchange } from "react-icons/md";
 import { GiRingingBell } from "react-icons/gi";
 import { ImInfo } from 'react-icons/im';
@@ -111,9 +111,6 @@ const Header = () => {
 
                 }}>
                   <FaUserCircle className="mr-2" /> My Profile
-                </li>
-                <li className="flex items-center text-gray-600 border-b hover:bg-gray-100 p-2 cursor-pointer">
-                  <FaCog className="mr-2" /> Settings
                 </li>
                 <li className="flex items-center text-gray-600 border-b hover:bg-gray-100 p-2 cursor-pointer" onClick={() => {
 

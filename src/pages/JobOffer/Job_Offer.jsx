@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { MdMarkEmailUnread } from "react-icons/md";
 import { FaFileAlt } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { setOfferData } from "../../redux/offerSlice";
-
 import { formateDate } from "../../utils";
 
 const Job_Offer = () => {
@@ -15,14 +14,14 @@ const Job_Offer = () => {
 
   const [statusFilter, setStatusFilter] = useState("All");
 
+  // Fetch offers on component mount
   useEffect(() => {
     const fetchOffersData = async () => {
       try {
         const response = await axios.get("http://localhost:4000/api/offer/get-all-offers", {
           withCredentials: true,
         });
-
-        console.log("Fetched Offers Data:", response.data);
+        // console.log("Fetched Offers Data:", response.data);
         dispatch(setOfferData(response.data));
       } catch (error) {
         console.error("Error fetching offers data:", error);
@@ -30,20 +29,46 @@ const Job_Offer = () => {
     };
 
     fetchOffersData();
-  }, []);
+  }, [dispatch]);
 
-  const handleDelete = (id) => {
-    dispatch(setOfferData(offersData.filter((offer) => offer._id !== id)));
+  // const handleDelete = (id) => {
+    // dispatch(setOfferData(offersData.filter((offer) => offer._id !== id)));
+    // Note: You might want to add an API call here to actually delete from backend
+  // };
+
+  const handleSendEmail = async (offerId) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:4000/api/offer/send-offer-email/${offerId}`,
+        {},
+        { withCredentials: true }
+      );
+      alert(response.data.message);
+    } catch (error) {
+      console.error("Error sending email:", error);
+      alert("Failed to send email");
+    }
   };
 
-  const statusOptions = ["All", "Pending", "Accepted", "Declined", "OnBoarding", "Ghosted", "Expired","Offer letter released"];
+  const statusOptions = [
+    "All",
+    "Pending",
+    "Accepted",
+    "Declined",
+    "OnBoarding",
+    "Ghosted",
+    "Expired",
+    "Offer letter released",
+    "Retracted" // Added Retracted to status options
+  ];
 
-  const filteredOffers = statusFilter === "All"
-    ? offersData
-    : offersData?.filter((offer) => offer.status === statusFilter);
+  const filteredOffers =
+    statusFilter === "All"
+      ? offersData
+      : offersData?.filter((offer) => offer.status === statusFilter);
 
   return (
-    <div className="w-full max-w-6xl mx-auto mt-6 p-6 bg-white rounded-xl shadow-lg">
+    <div className="w-full max-w-6xl mx-auto mt-6 p-6 bg-white rounded-xl shadow-md">
       {/* Top Bar: Release Offer Button & Filter Dropdown */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <select
@@ -98,15 +123,15 @@ const Job_Offer = () => {
                   </td>
                   <td className="p-4">{formateDate(offer.offerDate) || "N/A"}</td>
                   <td className="p-4 flex items-center justify-center space-x-3">
-                    <button className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100">
-                      <MdMarkEmailUnread size={20} />
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(offer._id)}
-                      className="text-red-600 text-xl p-2 hover:bg-red-100 rounded-full"
-                    >
-                      🗑
-                    </button>
+                    {offer.status === "Pending" && (
+                      <button
+                        className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                        onClick={() => handleSendEmail(offer._id)}
+                        title="Send Offer Email"
+                      >
+                        <MdMarkEmailUnread size={20} />
+                      </button>
+                    )}
                     <button
                       className="text-white bg-purple-700 px-4 py-2 rounded-full text-sm hover:bg-purple-900 transition-all"
                       onClick={() => navigate(`/joboffers/${offer._id}`)}
@@ -128,21 +153,30 @@ const Job_Offer = () => {
         {filteredOffers?.length > 0 ? (
           filteredOffers.map((offer) => (
             <div key={offer._id} className="mb-5 p-5 border rounded-lg shadow-md bg-white">
-              <p className="font-semibold text-lg text-purple-800">{offer?.candidate?.name || "N/A"}</p>
+              <p className="font-semibold text-lg text-purple-800">
+                {offer?.candidate?.name || "N/A"}
+              </p>
               <p className="text-gray-600">{offer?.candidate?.email || "N/A"}</p>
               <p className="text-gray-500">
-                <span className="px-3 py-1 bg-gray-200 rounded-full text-sm">{offer.status || "Pending"}</span>
+                <span className="px-3 py-1 bg-gray-200 rounded-full text-sm">
+                  {offer.status || "Pending"}
+                </span>
               </p>
               <p className="text-sm text-gray-400">{formateDate(offer.offerDate) || "N/A"}</p>
               <div className="mt-3 flex space-x-3">
-                <button className="text-sm bg-purple-700 text-white px-4 py-1 rounded-lg hover:bg-purple-900 transition">
-                  Edit
-                </button>
-                <button 
-                  onClick={() => handleDelete(offer._id)}
-                  className="text-red-600 text-lg hover:bg-red-100 px-3 py-1 rounded-lg transition"
+                {offer.status === "Pending" && (
+                  <button
+                    className="text-sm bg-purple-700 text-white px-4 py-1 rounded-lg hover:bg-purple-900 transition"
+                    onClick={() => handleSendEmail(offer._id)}
+                  >
+                    Send Email
+                  </button>
+                )}
+                <button
+                  className="text-white bg-purple-700 px-4 py-1 rounded-lg text-sm hover:bg-purple-900 transition-all"
+                  onClick={() => navigate(`/joboffers/${offer._id}`)}
                 >
-                  🗑
+                  View More
                 </button>
               </div>
             </div>
@@ -152,6 +186,7 @@ const Job_Offer = () => {
         )}
       </div>
 
+      {/* Outlet for rendering OfferDetail */}
       <div className="flex flex-col justify-center items-center p-5 w-full">
         <Outlet />
       </div>

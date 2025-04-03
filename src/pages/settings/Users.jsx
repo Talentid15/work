@@ -10,6 +10,8 @@ const UserManagement = () => {
   const [currentMemberId, setCurrentMemberId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // State for delete confirmation popup
+  const [memberToDelete, setMemberToDelete] = useState(null); // Store the member ID to delete
   const user = useSelector((state) => state.user.data);
   const [teamMembers, setTeamMembers] = useState([]);
   const [newMember, setNewMember] = useState({
@@ -144,7 +146,7 @@ const UserManagement = () => {
     }
   };
 
-  const handleDeleteMember = async (id) => {  
+  const handleDeleteMember = async (id) => {
     setIsDeleting(true);
     try {
       const response = await axios.delete(`http://localhost:4000/api/team/${id}`, {
@@ -153,7 +155,7 @@ const UserManagement = () => {
         },
         withCredentials: true,
       });
-  
+
       if (response.status === 200) {
         setTeamMembers(teamMembers.filter((member) => member._id !== id));
         toast.success("Team member deleted successfully");
@@ -161,11 +163,17 @@ const UserManagement = () => {
     } catch (error) {
       console.error("Error deleting team member:", error);
       toast.error(error.response?.data?.message || "Failed to delete team member");
-      // Optionally refetch team members to sync with server
-      await fetchTeamMembers();
+      await fetchTeamMembers(); // Refetch to sync with server
     } finally {
       setIsDeleting(false);
+      setShowDeleteConfirm(false); // Close the popup
+      setMemberToDelete(null); // Clear the member to delete
     }
+  };
+
+  const confirmDelete = (id) => {
+    setMemberToDelete(id); // Set the member ID to delete
+    setShowDeleteConfirm(true); // Show the confirmation popup
   };
 
   const resetForm = () => {
@@ -274,7 +282,7 @@ const UserManagement = () => {
                               <FaPencilAlt />
                             </button>
                             <button
-                              onClick={() => handleDeleteMember(member._id)}
+                              onClick={() => confirmDelete(member._id)} // Show confirmation popup
                               disabled={isDeleting}
                               className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 disabled:opacity-50"
                               title="Delete"
@@ -393,6 +401,38 @@ const UserManagement = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Popup */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-sm">
+            <h3 className="text-lg font-bold text-gray-800 mb-4">
+              Confirm Deletion
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this team member? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setMemberToDelete(null);
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteMember(memberToDelete)}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50"
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
           </div>
         </div>
       )}

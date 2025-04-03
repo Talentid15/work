@@ -1,19 +1,14 @@
-import React, { useState } from "react";
+// components/SignUpForm.js
+import { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import backgroundImage2 from "../assets/rb_3790.png";
 import InputField from "../components/InputField";
-
-import { useContext } from "react";
 import { UserContext } from "../context/UserContext";
-import { Turnstile } from "@marsidev/react-turnstile";
 
 const SignUpForm = () => {
   const navigate = useNavigate();
-
-  const siteKey = import.meta.env.VITE_SITE_KEY;
-
-  const {setSignedUp} = useContext(UserContext);
+  const { setSignedUp } = useContext(UserContext);
 
   const [formData, setFormData] = useState({
     fullname: "",
@@ -23,13 +18,16 @@ const SignUpForm = () => {
     role: "",
     password: "",
     termsAccepted: false,
-    captchaValue:""
+    captchaValue: "",
   });
+  const [errors,] = useState({});
+  const [showPopup, setShowPopup] = useState(false);
+  const [file, setFile] = useState(null); // Single file
+  const [fileSelectedMessage, setFileSelectedMessage] = useState("");
+  const [userId, setUserId] = useState(null);
+  const [uploadError, setUploadError] = useState("");
 
-
-  const [errors, setErrors] = useState({});
-
-  // Handle input changes
+  // Handle input changes for signup form (unchanged)
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -38,93 +36,84 @@ const SignUpForm = () => {
     });
   };
 
-
-  // Validate form fields
-  const validateForm = () => {
-    const newErrors = {};
-
-    // Full Name Validation
-    if (!formData.fullname.trim()) {
-      newErrors.fullName = "Full Name is required.";
+  // Handle single file selection
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        setUploadError("File size exceeds 5MB limit.");
+        return;
+      }
+      setFile(selectedFile);
+      setFileSelectedMessage(`Selected: ${selectedFile.name}`);
+    } else {
+      setFile(null);
+      setFileSelectedMessage("");
     }
-
-    // Email Validation
-
-    const genericDomains = [
-       'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'protonmail.com',
-      'yandex.com', 'gmx.com', 'zoho.com', 'mail.com', 'inbox.com', 'live.com', 'msn.com', 'qq.com',
-      'naver.com', 'web.de', 'mail.ru', 'tutanota.com', 'pm.me', 'bk.ru', 'rambler.ru', 'rocketmail.com',
-      'ymail.com', 'excite.com', 'lycos.com', 'rediffmail.com', 'hushmail.com', 'fastmail.com', 'bellsouth.net',
-      'verizon.net', 'att.net', 'comcast.net', 'sbcglobal.net', 'charter.net', 'shaw.ca', 'cox.net',
-      'earthlink.net', 'frontier.com', 'juno.com', 'netzero.net', 'aim.com', 'optonline.net', 'me.com', 'mac.com'
-    ];
-
-    const emailDomain = formData.email.split('@')[1];
-
-    if (genericDomains.includes(emailDomain)) {
-
-      newErrors.email = 'Please enter a company email address.';
-
-
-    }
-
-
-    // Phone Validation
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Phone number is required.";
-    } else if (!/^\d{10}$/.test(formData.phone)) {
-      newErrors.phone = "Phone number must be exactly 10 digits.";
-    }
-
-    // Password Validation
-    if (!formData.password.trim()) {
-      newErrors.password = "Password is required.";
-    } else if (
-      !/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        formData.password
-      )
-    ) {
-      newErrors.password =
-        "Password must be at least 8 characters, include one uppercase letter, one number, and one special character.";
-    }
-
-    // Terms and Conditions Validation
-    if (!formData.termsAccepted) {
-      newErrors.termsAccepted = "You must accept the terms and conditions.";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+        try {
+      const response = await axios.post("http://localhost:4000/api/auth/signup", formData);
+      if (response.status === 200) {
+        setSignedUp(true);
+        setUserId(response.data.data.userId);
+        setShowPopup(true);
+      }
+    } catch (error) {
+      setSignedUp(false);
+      console.error("Error during signup:", error);
+    }
+  };
 
-    if (validateForm()) {
+  const handleDocumentSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!file) {
+      setUploadError("Please upload a document.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file); 
+
+    reader.onload = async () => {
+      const base64String = reader.result;
+      
       try {
         const response = await axios.post(
-          "http://localhost:4000/api/auth/signup",
-          formData,
-          // { withCredentials: true }
+          "http://localhost:4000/api/auth/upload-documents",
+          {
+            userId,
+            document: base64String,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
         );
 
         if (response.status === 200) {
-
-          setSignedUp(true);
-
-          navigate("/verification-page");
-
+          setShowPopup(false);
+          console.log("Cloudinary URL:", response.data.url);
+          navigate("/login");
         }
       } catch (error) {
-
-        setSignedUp(false);
-        console.error("Error during signup:", error);
-
+        setUploadError(
+          error.response?.data?.message || "Error uploading document."
+        );
+        console.error("Upload error:", error);
       }
-    }
-  };
+    };
 
+    reader.onerror = () => {
+      setUploadError("Error reading file.");
+      console.error("FileReader error");
+    };
+  };
+  
   return (
     <div className="flex flex-col md:flex-row h-screen">
       {/* Left Section */}
@@ -151,7 +140,7 @@ const SignUpForm = () => {
           Sign Up
         </h2>
         <p className="text-center px-6 md:px-20 mb-4 text-sm md:text-base">
-          Let's get started. <br />
+          Lets get started. <br />
           Are you ready to be a part of something new?
         </p>
         <form onSubmit={handleSubmit} className="space-y-4 md:px-24">
@@ -235,11 +224,6 @@ const SignUpForm = () => {
             <p className="text-red-500 text-sm">{errors.termsAccepted}</p>
           )}
 
-          <Turnstile siteKey={siteKey} onSuccess={(token)=>{
-
-            setFormData({...formData,["captchaValue"]:token})
-
-          }}></Turnstile>
 
           <div className="flex items-center justify-center">
             <button
@@ -251,6 +235,53 @@ const SignUpForm = () => {
           </div>
         </form>
       </div>
+
+      {/* Popup for Document Upload */}
+      {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Verification</h2>
+              <button
+                onClick={() => setShowPopup(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="mb-4">
+              Upload a copy of your company identity (e.g., Business Registration Document, CIN Document, GST Document). <br />
+              Allowed formats: png, jpg, jpeg, pdf (max 5MB).
+            </p>
+            <form onSubmit={handleDocumentSubmit}>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-4 text-center">
+                <input
+                  type="file"
+                  accept=".png,.jpg,.jpeg,.pdf"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="file-upload"
+                />
+                <label htmlFor="file-upload" className="cursor-pointer">
+                  <p className="text-gray-500">Drop your file to upload or browse</p>
+                </label>
+                {fileSelectedMessage && (
+                  <p className="text-green-500 text-sm mt-2">{fileSelectedMessage}</p>
+                )}
+              </div>
+              {uploadError && (
+                <p className="text-red-500 text-sm mb-4">{uploadError}</p>
+              )}
+              <button
+                type="submit"
+                className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition-all"
+              >
+                Submit
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

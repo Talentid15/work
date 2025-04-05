@@ -12,6 +12,7 @@ const InvitePage = () => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const { token } = useSelector((state) => state.user.data || {});
+    const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
 
     const handleInvite = async () => {
         if (!inviteEmail) {
@@ -27,7 +28,7 @@ const InvitePage = () => {
 
         try {
             const response = await axios.post(
-                "http://localhost:4000/api/users/invite",
+                `${API_URL}/api/users/invite`,
                 { email: inviteEmail },
                 { withCredentials: true },
                 {

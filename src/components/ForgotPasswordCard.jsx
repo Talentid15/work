@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import axios from "axios";
 
 const ForgotPasswordCard = ({ onClose }) => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:4000/api/auth/forgotPasswordEmail", { email });
+      const response = await axios.post(`${API_URL}/api/auth/forgotPasswordEmail`, { email });
       setMessage(response.data.message);
 
       console.log("res ka data ",response.data);

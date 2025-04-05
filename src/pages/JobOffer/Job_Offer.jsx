@@ -13,11 +13,13 @@ const Job_Offer = () => {
   const navigate = useNavigate();
 
   const [statusFilter, setStatusFilter] = useState("All");
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
+
 
   useEffect(() => {
     const fetchOffersData = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/offer/get-all-offers", {
+        const response = await axios.get(`${API_URL}/api/offer/get-all-offers`, {
           withCredentials: true,
         });
         console.log("Fetched Offers Data:", response.data);
@@ -33,7 +35,7 @@ const Job_Offer = () => {
   const handleSendEmail = async (offerId) => {
     try {
       const response = await axios.post(
-        `http://localhost:4000/api/offer/send-offer-email/${offerId}`,
+        `${API_URL}/api/offer/send-offer-email/${offerId}`,
         {},
         { withCredentials: true }
       );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 import { VscEye } from "react-icons/vsc";
 import { VscEyeClosed } from "react-icons/vsc";
 import axios from "axios";
@@ -16,10 +16,12 @@ function ForgotPassword() {
   const navigate = useNavigate();
   
   const {id} = useParams();
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
+
 
   const [loading, setLoading] = useState(false);
 
-  const backendUrl = import.meta.env.VITE_REACT_BACKEND_URL;
+  // const backendUrl = import.meta.env.VITE_REACT_BACKEND_URL;
 
   const [password, setPassword] = useState(true);
 
@@ -45,7 +47,7 @@ function ForgotPassword() {
 
       setLoading(true);
 
-      const response = await axios.post(`${backendUrl}/api/auth/forgotPassword`, {
+       await axios.post(`${API_URL}/api/auth/forgotPassword`, {
 
         password:passwordData.password,
         confirmPassword:passwordData.confirmPasswordValue,

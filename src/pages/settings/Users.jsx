@@ -20,6 +20,7 @@ const UserManagement = () => {
     workEmail: "",
     role: "User",
   });
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
 
   useEffect(() => {
     fetchTeamMembers();
@@ -28,7 +29,7 @@ const UserManagement = () => {
   const fetchTeamMembers = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:4000/api/team", {
+      const response = await axios.get(`${API_URL}/api/team`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -86,7 +87,7 @@ const UserManagement = () => {
   const handleAddMember = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/team",
+        `${API_URL}/api/team`,
         newMember,
         {
           headers: {
@@ -119,7 +120,7 @@ const UserManagement = () => {
   const handleUpdateMember = async () => {
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/team/${currentMemberId}`,
+        `${API_URL}/api/team/${currentMemberId}`,
         {
           firstName: newMember.firstName,
           lastName: newMember.lastName,
@@ -149,7 +150,7 @@ const UserManagement = () => {
   const handleDeleteMember = async (id) => {
     setIsDeleting(true);
     try {
-      const response = await axios.delete(`http://localhost:4000/api/team/${id}`, {
+      const response = await axios.delete(`${API_URL}/api/team/${id}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },

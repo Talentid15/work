@@ -34,6 +34,7 @@ const Release_Offer = () => {
     candidateResume: null,
   });
   const [errors, setErrors] = useState({}); // State to store validation errors
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
 
   const validatePhoneNumber = (phoneNo) => {
     // Basic validation: 10 digits (e.g., 1234567890)
@@ -189,7 +190,7 @@ const Release_Offer = () => {
     try {
       console.log("Form data is", form);
       const response = await axios.post(
-        "http://localhost:4000/api/offer/create-offer",
+        `${API_URL}/api/offer/create-offer`,
         formData,
         {
           headers: {

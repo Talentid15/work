@@ -15,6 +15,8 @@ const ChangePassword = ({ onClose }) => {
     newpassword: false,
     confirmpassword: false,
   });
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
+
 
   const user = useSelector((state) => state.user.data);
 
@@ -40,7 +42,7 @@ const ChangePassword = ({ onClose }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/auth/resetPassword",
+        `${API_URL}/api/auth/resetPassword`,
         {
           password: formData.currentpass,
           confirmPasswordValue: formData.newpassword,

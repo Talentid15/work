@@ -1,4 +1,3 @@
-import React from "react";
 
 const AddUserModal = ({ isOpen, onClose, onSave, formData, handleChange }) => {
   if (!isOpen) return null;

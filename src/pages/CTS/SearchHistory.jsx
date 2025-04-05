@@ -15,13 +15,14 @@ const SearchHistory = () => {
     inviteLinks: []
   });
   const [isLoading, setIsLoading] = useState(false);
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          "http://localhost:4000/api/users",
+          `${API_URL}/api/users`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

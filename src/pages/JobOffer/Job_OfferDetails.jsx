@@ -14,7 +14,8 @@ const OfferDetail = () => {
   const [showRetractConfirm, setShowRetractConfirm] = useState(false);
   const offersData = useSelector((state) => state.offer.data);
 
-  const offer = offersData?.find((offer) => offer._id === id);
+  const offer = offersData?.find((offer) => offer._id === id);   
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
 
   if (!offer) {
     return <div className="text-center mt-10 text-red-500">Offer not found.</div>;
@@ -25,7 +26,7 @@ const OfferDetail = () => {
   const handleRetract = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/offer/offer/updateStatus",
+        `${API_URL}/api/offer/offer/updateStatus`,
         { offerId: id, status: "Retracted" },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -47,7 +48,7 @@ const OfferDetail = () => {
   const handleDelete = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/offer/update-show-status",
+        `${API_URL}/api/offer/update-show-status`,
         { offerId: id, showOffer: false },
         {
           headers: { Authorization: `Bearer ${token}` },

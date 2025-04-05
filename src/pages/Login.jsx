@@ -20,6 +20,7 @@ const LoginForm = () => {
   const dispatch = useDispatch();
 
   const siteKey = import.meta.env.VITE_SITE_KEY;
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
 
   const [formData, setFormData] = useState({
     email: "",
@@ -85,7 +86,7 @@ const LoginForm = () => {
     e.preventDefault();
     if (validateForm()) {
         try {
-            const response = await axios.post("http://localhost:4000/api/auth/login", {
+            const response = await axios.post(`${API_URL}/api/auth/login`, {
                 email: formData.email,
                 password: formData.password,
                 captchaValue: token

@@ -10,6 +10,8 @@ function PopUps({ setshowPopUps, emailSearch, setSearchedResponseData, setError 
   const dispatch = useDispatch();
   const data = useSelector((state) => state.user.data);
   const [loading, setLoading] = useState(false);
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
+
 
   async function checkStatusHandler() {
     try {
@@ -33,7 +35,7 @@ function PopUps({ setshowPopUps, emailSearch, setSearchedResponseData, setError 
         return;
       }
 
-      const backendUrl = "http://localhost:4000/api/users/user-info";
+      const backendUrl = `${API_URL}/api/users/user-info`;
       const response = await axios.post(
         backendUrl,
         { email: emailSearch, userId: data?._id },

@@ -1,4 +1,3 @@
-import React from "react";
 import { AiOutlineUsergroupAdd } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -9,9 +8,12 @@ import photo from "../../assets/photo.png";
 import BackButton from "../../assets/backButton.png";
 import { Dateformatter } from "../../utils";
 
+const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
+
+
 // Fetch Candidate Data from API
 const fetchCandidateData = async () => {
-  const response = await axios.get("http://localhost:4000/api/candidate/fetchAllCandidate", {
+  const response = await axios.get(`${API_URL}/api/candidate/fetchAllCandidate`, {
     withCredentials: true,
   });
   return response.data.data; // Return the correct data structure
@@ -68,7 +70,7 @@ function CandidateList() {
             <tbody>
               {candidates &&
                 candidates.map((user) => {
-                  const offerDate = new Date(user.offerDate);
+                  // const offerDate = new Date(user.offerDate);
                   const joiningDate = new Date(user.joiningDate);
                   const today = new Date();
 

@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaUserGroup } from "react-icons/fa6";
 import { IoMdAddCircleOutline } from "react-icons/io";
-import Insufficiency from "../../assets/insufficiency.png";
 import { FaFileCircleQuestion } from "react-icons/fa6";
 
 function ButtonGroup() {

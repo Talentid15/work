@@ -45,7 +45,7 @@ const VerificationPage = () => {
 
                             () => {
 
-                                window.location.href = 'https://talentid.app/'
+                                window.location.href = 'https:www.//talentid.app/'
                                 setSignedUp(false);
                             }
                         }

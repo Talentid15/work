@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import InviteForm from "../../components/backgroundChecks/InviteForm";
 import SearchUser from "../../components/backgroundChecks/SearchUser";
 import AdditionalDetails from "../../components/backgroundChecks/AdditionalDetails";

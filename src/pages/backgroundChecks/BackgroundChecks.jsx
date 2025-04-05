@@ -1,4 +1,3 @@
-import React from "react";
 import BackButton from "../../assets/backButton.png";
 import ButtonGroup from "../../components/backgroundChecks/ButtonGroup";
 import { Outlet } from "react-router-dom";

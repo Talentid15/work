@@ -28,8 +28,9 @@ const OfferPunch = () => {
   const statusOptions = [
     "Offer letter released",
     "Candidate verbal commitment",
-
   ];
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
+
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -52,12 +53,10 @@ const OfferPunch = () => {
       submissionData.append(key, formData[key]);
     });
 
-    
-
     try {
       console.log("Submitting Form Data:", formData);
       const response = await axios.post(
-        "http://localhost:4000/api/offer/create-offer-punch",
+        `${API_URL}/api/offer/create-offer-punch`,
         submissionData,
         {
           headers: {

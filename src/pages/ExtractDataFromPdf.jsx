@@ -1,5 +1,6 @@
-import React from "react";
 // import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/webpack";
+
+import { getDocument } from "pdfjs-dist";
 
 // // Set the worker source to the latest version
 // GlobalWorkerOptions.workerSrc = "pdfjs-dist/build/pdf.worker.min.js";

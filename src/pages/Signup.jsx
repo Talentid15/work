@@ -9,6 +9,7 @@ import { UserContext } from "../context/UserContext";
 const SignUpForm = () => {
   const navigate = useNavigate();
   const { setSignedUp } = useContext(UserContext);
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
 
   const [formData, setFormData] = useState({
     fullname: "",
@@ -55,7 +56,7 @@ const SignUpForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
         try {
-      const response = await axios.post("http://localhost:4000/api/auth/signup", formData);
+      const response = await axios.post(`${API_URL}/api/auth/signup`, formData);
       if (response.status === 200) {
         setSignedUp(true);
         setUserId(response.data.data.userId);
@@ -83,7 +84,7 @@ const SignUpForm = () => {
       
       try {
         const response = await axios.post(
-          "http://localhost:4000/api/auth/upload-documents",
+          `${API_URL}/api/auth/upload-documents`,
           {
             userId,
             document: base64String,

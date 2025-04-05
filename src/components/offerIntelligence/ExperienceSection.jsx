@@ -1,4 +1,3 @@
-import React from "react";
 import { GoPlus } from "react-icons/go";
 
 const ExperienceSection = () => {
@@ -7,7 +6,7 @@ const ExperienceSection = () => {
           {/* Experience Summary */}
           <h4 className="text-xl font-bold mb-4">Experience Summary</h4>
           <p className="text-[#00000080]">
-            I'm a software engineer with over 5 years of experience building scalable web
+            Im a software engineer with over 5 years of experience building scalable web
             applications. At XYZ Tech, I led the development of an e-commerce platform cutting
             page load times by 30% and boosting user engagement by 15%. I specialize in JavaScript,
             React, and Node.js, and I enjoy collaborating with cross-functional teams to create

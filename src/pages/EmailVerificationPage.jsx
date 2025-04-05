@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Loader from '../components/Loader';
 
@@ -7,7 +7,7 @@ const EmailVerificationPage = () => {
   let { token } = useParams();
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [, setError] = useState(null);
   const [isVerified, setIsVerified] = useState(false);
 
   const backendUrl = import.meta.env.VITE_REACT_BACKEND_URL;

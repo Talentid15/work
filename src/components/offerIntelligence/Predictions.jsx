@@ -1,4 +1,3 @@
-import React from "react";
 import BackButton from "../../assets/backButton.png";
 import { AiOutlineUsergroupAdd } from "react-icons/ai";
 import BarChart from "../../assets/Bar Chart.png";

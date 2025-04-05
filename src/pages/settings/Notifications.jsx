@@ -12,6 +12,7 @@ const Notifications = () => {
       { type: "hiring_manager_added", emailEnabled: true, description: "Receive a notification when added as a hiring manager" },
     ]
   });
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
   const [notifications, setNotifications] = useState([]);
 
   // Fetch preferences
@@ -34,7 +35,7 @@ const Notifications = () => {
     const fetchNotifications = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/notifications/all/me",
+          `${API_URL}/api/notifications/all/me`,
           {
             headers: { Authorization: `Bearer ${token}` },
             withCredentials: true
@@ -72,7 +73,7 @@ const Notifications = () => {
   const updatePreferences = async (newPrefs) => {
     try {
       await axios.put(
-        "http://localhost:4000/api/notifications/preferences/me",
+        `${API_URL}/api/notifications/preferences/me`,
         newPrefs,
         {
           headers: {

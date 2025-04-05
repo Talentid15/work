@@ -16,6 +16,7 @@ const Profiles = () => {
   });
 
   const { token } = useSelector((state) => state.user.data || {});
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
 
   const [formData, setFormData] = useState({
     email: "",
@@ -39,7 +40,7 @@ const Profiles = () => {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          "http://localhost:4000/api/users",
+          `${API_URL}/api/users`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -99,7 +100,7 @@ const Profiles = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/users/update-user",
+        `${API_URL}/api/users/update-user`,
         formData,
         {
           headers: {

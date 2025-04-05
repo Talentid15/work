@@ -1,5 +1,5 @@
 // components/ProfileCard.js
-import React, { useState } from "react";
+import { useState } from "react";
 import { BsUpload } from "react-icons/bs";
 
 import Loader from "../Loader";

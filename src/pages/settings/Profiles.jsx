@@ -16,7 +16,7 @@ const Profiles = () => {
   });
 
   const { token } = useSelector((state) => state.user.data || {});
-  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
 
   const [formData, setFormData] = useState({
     email: "",
@@ -43,9 +43,9 @@ const Profiles = () => {
         const response = await axios.get(
           `${API_URL}/api/users`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            // headers: {
+            //   Authorization: `Bearer ${token}`,
+            // },
             withCredentials: true
           }
         );
@@ -121,7 +121,7 @@ const Profiles = () => {
         setTimeout(() => {
           window.location.reload();
         }, 1000);
-        
+
       } else {
         toast.error(response.data?.message || "Update failed");
       }
@@ -214,9 +214,8 @@ const Profiles = () => {
                       value={formData[input.name]}
                       onChange={handleChange}
                       readOnly={input.readOnly}
-                      className={`w-full p-3 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300 h-24 ${
-                        input.readOnly ? "bg-gray-100" : ""
-                      }`}
+                      className={`w-full p-3 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300 h-24 ${input.readOnly ? "bg-gray-100" : ""
+                        }`}
                     />
                   ) : (
                     <input
@@ -225,9 +224,8 @@ const Profiles = () => {
                       value={formData[input.name]}
                       onChange={handleChange}
                       readOnly={input.readOnly}
-                      className={`w-full p-3 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300 ${
-                        input.readOnly ? "bg-gray-100" : ""
-                      }`}
+                      className={`w-full p-3 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300 ${input.readOnly ? "bg-gray-100" : ""
+                        }`}
                     />
                   )}
                 </div>
@@ -250,9 +248,8 @@ const Profiles = () => {
                     value={formData[input.name]}
                     onChange={handleChange}
                     readOnly={input.readOnly}
-                    className={`w-full p-3 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300 ${
-                      input.readOnly ? "bg-gray-100" : ""
-                    }`}
+                    className={`w-full p-3 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300 ${input.readOnly ? "bg-gray-100" : ""
+                      }`}
                   />
                 </div>
               ))}
@@ -263,11 +260,10 @@ const Profiles = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className={`flex items-center justify-center gap-2 py-2 px-8 rounded-full shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-                isEditing 
-                  ? "bg-green-600 text-white hover:bg-green-700" 
+              className={`flex items-center justify-center gap-2 py-2 px-8 rounded-full shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed ${isEditing
+                  ? "bg-green-600 text-white hover:bg-green-700"
                   : "bg-purple-900 text-white hover:bg-purple-300 hover:text-black"
-              }`}
+                }`}
             >
               {isLoading ? (
                 "Processing..."
@@ -279,7 +275,7 @@ const Profiles = () => {
                 "Edit Profile"
               )}
             </button>
-            
+
             {isEditing && (
               <button
                 type="button"

@@ -37,7 +37,7 @@ const Notifications = () => {
         const response = await axios.get(
           `${API_URL}/api/notifications/all/me`,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            // headers: { Authorization: `Bearer ${token}` },
             withCredentials: true
           }
         );
@@ -76,10 +76,10 @@ const Notifications = () => {
         `${API_URL}/api/notifications/preferences/me`,
         newPrefs,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
+          // headers: {
+          //   Authorization: `Bearer ${token}`,
+          //   "Content-Type": "application/json"
+          // },
           withCredentials: true
         }
       );

@@ -5,13 +5,11 @@ import { FaFileCircleQuestion, FaUserPlus } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
 import { HiOutlineUsers } from "react-icons/hi";
 import { IoIosArrowBack } from "react-icons/io";
-import { useSelector } from "react-redux";
 
 const InvitePage = () => {
     const [inviteEmail, setInviteEmail] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
-    const { token } = useSelector((state) => state.user.data || {});
     const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
 
     const handleInvite = async () => {
@@ -30,12 +28,7 @@ const InvitePage = () => {
             const response = await axios.post(
                 `${API_URL}/api/users/invite`,
                 { email: inviteEmail },
-                { withCredentials: true },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
+                { withCredentials: true }
             );
             setError("");
             setInviteEmail("");

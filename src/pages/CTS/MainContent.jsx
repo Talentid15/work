@@ -3,7 +3,6 @@ import { BiSearch } from "react-icons/bi";
 import { Link, useNavigate } from "react-router-dom";
 import { PipelineContext } from "../../context/PipelineContext";
 import PopUps from "../../components/PopUps";
-import Navbar from "./SideNav";
 import { HiOutlineUsers } from "react-icons/hi";
 import { FaFileCircleQuestion, FaUserPlus } from "react-icons/fa6";
 import { IoIosArrowBack } from "react-icons/io";

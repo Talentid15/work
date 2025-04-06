@@ -30,9 +30,9 @@ const UserManagement = () => {
     setIsLoading(true);
     try {
       const response = await axios.get(`${API_URL}/api/team`, {
-        // headers: {
-        //   Authorization: `Bearer ${user.token}`,
-        // },
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
         withCredentials: true,
       });
       setTeamMembers(response.data);
@@ -90,9 +90,9 @@ const UserManagement = () => {
         `${API_URL}/api/team`,
         newMember,
         {
-          // headers: {
-          //   Authorization: `Bearer ${user.token}`,
-          // },
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
           withCredentials: true,
         }
       );
@@ -127,9 +127,9 @@ const UserManagement = () => {
           role: newMember.role,
         },
         {
-          // headers: {
-          //   Authorization: `Bearer ${user.token}`,
-          // },
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
           withCredentials: true,
         }
       );
@@ -151,9 +151,9 @@ const UserManagement = () => {
     setIsDeleting(true);
     try {
       const response = await axios.delete(`${API_URL}/api/team/${id}`, {
-        // headers: {
-        //   Authorization: `Bearer ${user.token}`,
-        // },
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
         withCredentials: true,
       });
 

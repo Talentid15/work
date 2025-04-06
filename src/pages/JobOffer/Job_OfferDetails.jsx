@@ -29,7 +29,7 @@ const OfferDetail = () => {
         `${API_URL}/api/offer/offer/updateStatus`,
         { offerId: id, status: "Retracted" },
         {
-          // headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         }
       );
@@ -51,7 +51,7 @@ const OfferDetail = () => {
         `${API_URL}/api/offer/update-show-status`,
         { offerId: id, showOffer: false },
         {
-          // headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         }
       );

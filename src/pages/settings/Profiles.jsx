@@ -43,9 +43,9 @@ const Profiles = () => {
         const response = await axios.get(
           `${API_URL}/api/users`,
           {
-            // headers: {
-            //   Authorization: `Bearer ${token}`,
-            // },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
             withCredentials: true
           }
         );
@@ -104,9 +104,9 @@ const Profiles = () => {
         `${API_URL}/api/users/update-user`,
         formData,
         {
-          // headers: {
-          //   Authorization: `Bearer ${token}`,
-          // },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           withCredentials: true
         }
       );

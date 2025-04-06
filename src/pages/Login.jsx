@@ -148,7 +148,6 @@ const LoginForm = () => {
               />
               <div className="flex items-center space-y-2 gap-12">
                 <Turnstile siteKey={siteKey} onSuccess={(token) => {
-
                   console.log(token);
                   setToken(token);
 

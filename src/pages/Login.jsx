@@ -93,7 +93,6 @@ const LoginForm = () => {
             }, {
                 withCredentials: true,
             });
-            console.log("res ka data ", response.data);
             if (response.status === 202) {
                 toast.error("Your documents are being verified. Please try again later.");
                 return;

@@ -15,7 +15,7 @@ const Profiles = () => {
     additionalDetails: {}
   });
 
-  const { token } = useSelector((state) => state.user.data || {});
+  const  token  = useSelector((state) => state.user.data?.token);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
 
   const [formData, setFormData] = useState({
@@ -43,9 +43,9 @@ const Profiles = () => {
         const response = await axios.get(
           `${API_URL}/api/users`,
           {
-            // headers: {
-            //   Authorization: `Bearer ${token}`,
-            // },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
             withCredentials: true
           }
         );

@@ -9,7 +9,7 @@ import { formateDate } from "../../utils";
 
 const SearchHistory = () => {
   const navigate = useNavigate();
-  const { token } = useSelector((state) => state.user.data || {});
+  const  token  = useSelector((state) => state.user.data?.token);;
   const [profileData, setProfileData] = useState({
     user: {},
     inviteLinks: []
@@ -24,9 +24,9 @@ const SearchHistory = () => {
         const response = await axios.get(
           `${API_URL}/api/users`,
           {
-            // headers: {
-            //   Authorization: `Bearer ${token}`,
-            // },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
             withCredentials: true
           }
         );

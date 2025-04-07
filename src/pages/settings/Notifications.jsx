@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 const Notifications = () => {
-  const { token } = useSelector((state) => state.user.data || {});
+  const  token  = useSelector((state) => state.user.data?.token);;
   const [preferences, setPreferences] = useState({
     masterToggle: true,
     specificNotifications: [

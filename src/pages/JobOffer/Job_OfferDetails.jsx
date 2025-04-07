@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import axios from "axios";
 
 const OfferDetail = () => {
-  const { token } = useSelector((state) => state.user.data || {});
+  const  token  = useSelector((state) => state.user.data?.token);;
   const navigate = useNavigate();
   const { id } = useParams();
   const [viewing, setViewing] = useState("resume");

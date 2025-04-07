@@ -14,6 +14,7 @@ const Job_Offer = () => {
 
   const [statusFilter, setStatusFilter] = useState("All");
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
+  const  token  = useSelector((state) => state.user.data?.token);;
 
 
   useEffect(() => {
@@ -21,6 +22,9 @@ const Job_Offer = () => {
       try {
         const response = await axios.get(`${API_URL}/api/offer/get-all-offers`, {
           withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         console.log("Fetched Offers Data:", response.data);
         dispatch(setOfferData(response.data));

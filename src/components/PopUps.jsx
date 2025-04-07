@@ -11,7 +11,7 @@ function PopUps({ setshowPopUps, emailSearch, setSearchedResponseData, setError 
   const data = useSelector((state) => state.user.data);
   const [loading, setLoading] = useState(false);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
-  const { token } = useSelector((state) => state.user.data || {});
+  const  token  = useSelector((state) => state.user.data?.token);;
 
   async function checkStatusHandler() {
     try {
@@ -40,7 +40,7 @@ function PopUps({ setshowPopUps, emailSearch, setSearchedResponseData, setError 
         backendUrl,
         { email: emailSearch, userId: data?._id },
         {
-          // withCredentials: true,
+          withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`,
 

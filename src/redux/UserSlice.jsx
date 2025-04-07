@@ -5,6 +5,7 @@ const initialState = {
     additionalDetails: null,
     userHistoryData: null,
     tokenExpiry: "",
+    token:null,
     loading: false,
     error: null,
     loggedIn: false,
@@ -30,7 +31,7 @@ const userSlice = createSlice({
                 state.userHistoryData = action.payload.searchHistory;
                 delete state.data.searchHistory;
             }
-            
+            state.token = action.payload.token || null;
             state.tokenExpiry = action.payload.tokenExpiry || "";
             state.expiryTimestamp = Date.now();
             state.loggedIn = true;

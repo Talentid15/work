@@ -13,6 +13,8 @@ const UserManagement = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // State for delete confirmation popup
   const [memberToDelete, setMemberToDelete] = useState(null); // Store the member ID to delete
   const user = useSelector((state) => state.user.data);
+  const  token  = useSelector((state) => state.user.data?.token);;
+
   const [teamMembers, setTeamMembers] = useState([]);
   const [newMember, setNewMember] = useState({
     firstName: "",
@@ -31,7 +33,7 @@ const UserManagement = () => {
     try {
       const response = await axios.get(`${API_URL}/api/team`, {
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${token}`,
         },
         withCredentials: true,
       });
@@ -91,7 +93,7 @@ const UserManagement = () => {
         newMember,
         {
           headers: {
-            Authorization: `Bearer ${user.token}`,
+            Authorization: `Bearer ${token}`,
           },
           withCredentials: true,
         }
@@ -128,7 +130,7 @@ const UserManagement = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${user.token}`,
+            Authorization: `Bearer ${token}`,
           },
           withCredentials: true,
         }
@@ -152,7 +154,7 @@ const UserManagement = () => {
     try {
       const response = await axios.delete(`${API_URL}/api/team/${id}`, {
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${token}`,
         },
         withCredentials: true,
       });

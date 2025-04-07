@@ -35,7 +35,7 @@ const Release_Offer = () => {
   });
   const [errors, setErrors] = useState({}); // State to store validation errors
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
-  const user = useSelector((state) => state.user.data);
+  const  token  = useSelector((state) => state.user.data?.token);;
 
   const validatePhoneNumber = (phoneNo) => {
     // Basic validation: 10 digits (e.g., 1234567890)
@@ -196,7 +196,7 @@ const Release_Offer = () => {
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${user.token}`,
+            Authorization: `Bearer ${token}`,
           },
           withCredentials: true,
         }

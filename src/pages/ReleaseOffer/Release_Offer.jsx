@@ -195,7 +195,6 @@ const Release_Offer = () => {
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
           },
           withCredentials: true,

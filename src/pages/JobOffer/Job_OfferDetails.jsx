@@ -59,11 +59,11 @@ const OfferDetail = () => {
         alert('Offer hidden successfully');
         navigate('/joboffers');
       } else {
-        throw new Error('Failed to hide offer');
+        throw new Error('Failed to Delete offer');
       }
     } catch (error) {
       console.error('Error hiding offer:', error);
-      alert(`Failed to hide offer: ${error.message}`);
+      alert(`Failed to Delete offer: ${error.message}`);
     }
   };
 
@@ -228,7 +228,7 @@ const OfferDetail = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <h3 className="text-lg font-semibold mb-4">Are you sure?</h3>
-            <p className="text-gray-600 mb-6">Do you really want to hide this offer? This action cannot be undone.</p>
+            <p className="text-gray-600 mb-6">Do you really want to Delete this offer? This action cannot be undone.</p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
@@ -243,7 +243,7 @@ const OfferDetail = () => {
                 }}
                 className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all"
               >
-                Yes, Hide Offer
+                Yes, Delete Offer
               </button>
             </div>
           </div>

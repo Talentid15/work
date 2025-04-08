@@ -3,14 +3,14 @@ import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
-
 import toast from "react-hot-toast";
 
 const OfferPunch = () => {
   const navigate = useNavigate();
   const data = useSelector((state) => state.user.data);
+  const token = useSelector((state) => state.user.data?.token);
 
-  console.log("user data ",data);
+  console.log("user data ", data);
 
   const [formData, setFormData] = useState({
     jobTitle: "",
@@ -25,12 +25,8 @@ const OfferPunch = () => {
     offerLetterStatus: "",
   });
 
-  const statusOptions = [
-    "Offer letter released",
-    "Candidate verbal commitment",
-  ];
-  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
-
+  const statusOptions = ["Offer letter released", "Candidate verbal commitment"];
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -53,21 +49,28 @@ const OfferPunch = () => {
       submissionData.append(key, formData[key]);
     });
 
+    console.log("Submitting Form Data:");
+    for (let [key, value] of submissionData.entries()) {
+      console.log(`${key}:`, value);
+    }
+
     try {
-      console.log("Submitting Form Data:", formData);
       const response = await axios.post(
         `${API_URL}/api/offer/create-offer-punch`,
         submissionData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
           },
           withCredentials: true,
         }
       );
       console.log("Response:", response.data);
+      toast.success("Offer submitted successfully!");
+      navigate(-1);
     } catch (error) {
-      console.error("Submission Error:", error);
+      console.error("Submission Error:", error.response?.data || error.message);
+      toast.error("Failed to submit offer. Please try again.");
     }
   };
 
@@ -90,25 +93,19 @@ const OfferPunch = () => {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* Left Column */}
           <div className="w-[90%] md:col-span-2 space-y-6">
             <InputField label="Candidate Name" name="candidateName" value={formData.candidateName} onChange={handleChange} />
             <InputField label="Candidate Email" type="email" name="candidateEmail" value={formData.candidateEmail} onChange={handleChange} />
             <InputField label="Candidate Phone No" type="tel" name="candidatePhoneNo" value={formData.candidatePhoneNo} onChange={handleChange} />
           </div>
 
-          {/* Right Column */}
           <div className="w-[90%] md:col-span-2 space-y-6">
             <InputField label="Job Title" name="jobTitle" value={formData.jobTitle} onChange={handleChange} />
             <InputField label="Company Name" name="companyName" value={formData.companyName} onChange={handleChange} />
-
-            {/* Dates */}
             <div className="grid grid-cols-2 gap-4">
               <InputField label="Joining Date" type="date" name="joiningDate" value={formData.joiningDate} onChange={handleChange} />
               <InputField label="Expiry Date" type="date" name="expiryDate" value={formData.expiryDate} onChange={handleChange} />
             </div>
-
-            {/* Status */}
             <div className="relative w-full">
               <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">
                 Status
@@ -132,15 +129,16 @@ const OfferPunch = () => {
           </div>
         </div>
 
-        {/* File Uploads */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <FileInput label="Offer Letter (PDF)" name="offerLetter" onChange={handleChange} />
           <FileInput label="Resume (PDF)" name="candidateResume" onChange={handleChange} />
         </div>
 
-        {/* Submit Button */}
         <div className="mt-6 flex justify-end">
-          <button type="submit" className="bg-purple-900 text-white py-2 px-16 rounded-full shadow-md hover:bg-purple-300 hover:text-black transition-all">
+          <button
+            type="submit"
+            className="bg-purple-900 text-white py-2 px-16 rounded-full shadow-md hover:bg-purple-300 hover:text-black transition-all"
+          >
             Submit
           </button>
         </div>
@@ -149,7 +147,6 @@ const OfferPunch = () => {
   );
 };
 
-// 🔹 Reusable Input Field Component
 const InputField = ({ label, type = "text", name, value, onChange }) => (
   <div className="relative w-full">
     <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">
@@ -165,7 +162,6 @@ const InputField = ({ label, type = "text", name, value, onChange }) => (
   </div>
 );
 
-// 🔹 Reusable File Upload Component
 const FileInput = ({ label, name, onChange }) => (
   <div className="relative w-full">
     <label className="absolute -top-3 left-3 bg-white px-1 text-gray-600 text-sm">

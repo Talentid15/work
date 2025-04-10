@@ -100,18 +100,18 @@ const DashBoard = () => {
         <div className="bg-white p-6 rounded-xl shadow-lg">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
             <h1 className="text-4xl font-extrabold text-gray-800">
-              Welcome, <span className="text-indigo-600">{userStats.fullname}</span> 👋
+              Welcome, <span className="text-[#652d96]">{userStats.fullname}</span> 👋
             </h1>
             <div className="flex items-center gap-4 mt-4 sm:mt-0">
               <button
-                className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-full shadow-md hover:bg-indigo-700 transition duration-300 transform hover:scale-105"
+                className="flex items-center gap-2 px-6 py-3 bg-[#652d96] text-white rounded-full shadow-md  transition duration-300 transform hover:scale-100"
                 onClick={() => navigate("/offer-punch")}
               >
                 <FaFileAlt />
                 Offer Punch
               </button>
               <button
-                className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-full shadow-md hover:bg-purple-700 transition duration-300 transform hover:scale-105"
+                className="flex items-center gap-2 px-6 py-3 bg-[#652d96] text-white rounded-full shadow-md  transition duration-300 transform hover:scale-100"
                 onClick={() => navigate("/release-offer")}
               >
                 <FaFileAlt />

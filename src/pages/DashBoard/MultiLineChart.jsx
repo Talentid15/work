@@ -227,7 +227,7 @@ const MultiLineChart = () => {
           </div>
           <button
             onClick={downloadChart}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 active:scale-95"
+            className="flex items-center gap-2 px-4 py-2 bg-[#652d96] text-white rounded-lg shadow-md transition duration-300 active:scale-95"
           >
             <FaFileDownload size={20} />
             Download

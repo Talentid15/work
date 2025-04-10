@@ -88,7 +88,7 @@ const DashBoard = () => {
     },
     {
       title: "Candidate Ghosting Alerts",
-      value: userStats.candidateGhosting,
+      value: user.ghostedCount || 0,
       statusColor: "text-red-400",
       iconColor: "#EF4444",
     },

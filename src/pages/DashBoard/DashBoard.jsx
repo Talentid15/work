@@ -26,7 +26,7 @@ const DashBoard = () => {
         });
 
         // Fetch offer punches
-        const offerPunchesResponse = await axios.get(`${API_URL}/api/offer/offer-punch/get-offer-punches`, {
+        const offerPunchesResponse = await axios.get(`${API_URL}/api/offer/get-offer-punches`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`,

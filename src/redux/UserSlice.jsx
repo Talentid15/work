@@ -19,6 +19,7 @@ const userSlice = createSlice({
         setData: (state, action) => {
             // Directly assign the payload properties to state
             state.data = { ...action.payload };
+            console.log('ddata: '+state.data)
             
             // Extract and store nested properties
             if (action.payload.additionalDetails) {

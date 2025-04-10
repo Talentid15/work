@@ -49,6 +49,7 @@ const Profiles = () => {
             withCredentials: true
           }
         );
+        console.log(response.data)
 
         if (response.data?.success) {
           const { user = {}, additionalDetails = {} } = response.data;

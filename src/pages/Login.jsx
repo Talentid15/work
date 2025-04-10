@@ -7,12 +7,8 @@ import ForgotPasswordCard from "../components/ForgotPasswordCard";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-
 import { useDispatch } from "react-redux";
-
-
 import { setData } from "../redux/UserSlice";
-
 import { Turnstile } from "@marsidev/react-turnstile"
 
 const LoginForm = () => {
@@ -97,6 +93,7 @@ const LoginForm = () => {
                 toast.error("Your documents are being verified. Please try again later.");
                 return;
             }
+            // console.log(response.data)
             dispatch(setData(response.data));
             toast.success("Logged in successfully!");
             navigate("/");
@@ -110,6 +107,7 @@ const LoginForm = () => {
         }
     }
 };
+
   return (
     <div className="flex flex-col lg:flex-row h-screen">
       {/* Left Section */}

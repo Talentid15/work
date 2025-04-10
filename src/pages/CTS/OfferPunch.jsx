@@ -20,8 +20,8 @@ const OfferPunch = () => {
     companyName: "",
     joiningDate: "",
     expiryDate: "",
-    offerLetter: null,
-    candidateResume: null,
+    offerLetter: null, // Will store base64 string
+    candidateResume: null, // Will store base64 string
     offerLetterStatus: "",
   });
 
@@ -30,37 +30,47 @@ const OfferPunch = () => {
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: type === "file" ? files[0] : value,
-    }));
+    if (type === "file") {
+      const file = files[0];
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+          toast.error(`${name === "offerLetter" ? "Offer Letter" : "Resume"} size exceeds 5MB limit.`);
+          return;
+        }
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          setFormData((prevData) => ({
+            ...prevData,
+            [name]: reader.result, // Store base64 string
+          }));
+        };
+        reader.onerror = () => toast.error(`Error reading ${name === "offerLetter" ? "Offer Letter" : "Resume"}`);
+      }
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
   const formSubmitHandler = async (e) => {
     e.preventDefault();
 
     if (!formData.offerLetter || !formData.candidateResume) {
-      toast.error("Please Upload Offer Letter and Candidate Resume");
+      toast.error("Please upload Offer Letter and Candidate Resume");
       return;
-    }
-
-    const submissionData = new FormData();
-    Object.keys(formData).forEach((key) => {
-      submissionData.append(key, formData[key]);
-    });
-
-    console.log("Submitting Form Data:");
-    for (let [key, value] of submissionData.entries()) {
-      console.log(`${key}:`, value);
     }
 
     try {
       const response = await axios.post(
         `${API_URL}/api/offer/create-offer-punch`,
-        submissionData,
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json", // Sending JSON with base64 strings
           },
           withCredentials: true,
         }

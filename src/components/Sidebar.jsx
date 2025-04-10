@@ -153,7 +153,7 @@ const Sidebar = () => {
               <span className="text-sm font-medium">Job Offers</span>
             </NavLink>
 
-            {/* <NavLink
+            <NavLink
               to="/offerIntelligence"
               className={({ isActive }) =>
                 isActive
@@ -162,9 +162,9 @@ const Sidebar = () => {
               }
               onClick={() => setSelectedNav("Offer Intelligence")}
             >
-              <SiLens className="h-5 w-5" />
+              {/* <SiLens className="h-5 w-5" /> */}
               <span className="text-sm font-medium">Offer Lens</span>
-            </NavLink> */}
+            </NavLink>
             {/* <NavLink
               to="/onboarding"
               className={({ isActive }) =>

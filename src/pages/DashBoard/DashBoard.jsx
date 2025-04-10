@@ -15,33 +15,45 @@ const DashBoard = () => {
   const [userStats, setUserStats] = useState(null);
 
   useEffect(() => {
-    const fetchOfferReleases = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/offer/get-all-offers`, {
+        // Fetch offer releases
+        const offerReleasesResponse = await axios.get(`${API_URL}/api/offer/get-all-offers`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        const offers = response.data;
+        // Fetch offer punches
+        const offerPunchesResponse = await axios.get(`${API_URL}/api/offer/offer-punch/get-offer-punches`, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const offers = offerReleasesResponse.data;
+        const offerPunches = offerPunchesResponse.data;
+
         // Count only offers where showOffer is true
         const offerReleasesCount = offers.filter(offer => offer.showOffer === true).length;
+        const offerPunchCount = offerPunches.length; // Total number of offer punches
 
         setUserStats({
           fullname: user?.fullname || "User",
           interviewTrackingCredits: user?.credits ? `${user.credits}/1000` : "0/1000",
-          offerPunchCount: "38", // Replace with API data if available
+          offerPunchCount: `${offerPunchCount}`, // Dynamic value from API
           offerReleases: `${offerReleasesCount}/20`, // Dynamic value from filtered API data
           candidateGhosting: "3/100", // Replace with API data if available
         });
       } catch (error) {
-        console.error("Error fetching offer releases:", error);
+        console.error("Error fetching dashboard data:", error);
         // Fallback stats in case of error
         setUserStats({
           fullname: user?.fullname || "User",
           interviewTrackingCredits: user?.credits ? `${user.credits}/1000` : "0/1000",
-          offerPunchCount: "38",
+          offerPunchCount: "0", // Default to 0 if fetch fails
           offerReleases: "0/20",
           candidateGhosting: "3/100",
         });
@@ -49,7 +61,7 @@ const DashBoard = () => {
     };
 
     if (token && user) {
-      fetchOfferReleases();
+      fetchDashboardData();
     }
   }, [token, user]);
 

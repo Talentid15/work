@@ -9,7 +9,7 @@ import { UserContext } from "../context/UserContext";
 const SignUpForm = () => {
   const navigate = useNavigate();
   const { setSignedUp } = useContext(UserContext);
-  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
 
   const [formData, setFormData] = useState({
     fullname: "",
@@ -21,16 +21,51 @@ const SignUpForm = () => {
     termsAccepted: false,
     captchaValue: "",
   });
-  const [errors,] = useState({});
+  const [errors, setErrors] = useState({});
   const [showPopup, setShowPopup] = useState(false);
-  const [file, setFile] = useState(null); // Single file
+  const [file, setFile] = useState(null);
   const [fileSelectedMessage, setFileSelectedMessage] = useState("");
   const [userId, setUserId] = useState(null);
   const [uploadError, setUploadError] = useState("");
 
-  // Handle input changes for signup form (unchanged)
+  // Validate company email
+  const validateEmail = (email) => {
+    const freeEmailDomains = [
+      'gmail.com',
+      'yahoo.com',
+      'hotmail.com',
+      'outlook.com',
+      'aol.com',
+      'icloud.com',
+      'protonmail.com',
+      'zoho.com',
+    ];
+    
+    const emailDomain = email.split('@')[1]?.toLowerCase();
+    if (!emailDomain) return false;
+    
+    return !freeEmailDomains.includes(emailDomain);
+  };
+
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
+    // Validate email on change
+    if (name === 'email') {
+      if (value && !validateEmail(value)) {
+        setErrors(prev => ({
+          ...prev,
+          email: 'Please use a company email address (not Gmail, Yahoo, etc.)'
+        }));
+      } else {
+        setErrors(prev => ({
+          ...prev,
+          email: ''
+        }));
+      }
+    }
+
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
@@ -47,6 +82,7 @@ const SignUpForm = () => {
       }
       setFile(selectedFile);
       setFileSelectedMessage(`Selected: ${selectedFile.name}`);
+      setUploadError("");
     } else {
       setFile(null);
       setFileSelectedMessage("");
@@ -55,15 +91,52 @@ const SignUpForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-        try {
+    
+    // Validate form
+    const newErrors = {};
+    
+    if (!formData.fullname.trim()) {
+      newErrors.fullname = "Full name is required";
+    }
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = "Please use a company email address (not Gmail, Yahoo, etc.)";
+    }
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    }
+    if (!formData.company.trim()) {
+      newErrors.company = "Company name is required";
+    }
+    if (!formData.role) {
+      newErrors.role = "Please select a role";
+    }
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    }
+    if (!formData.termsAccepted) {
+      newErrors.termsAccepted = "You must accept the terms and conditions";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
       const response = await axios.post(`${API_URL}/api/auth/signup`, formData);
       if (response.status === 200) {
         setSignedUp(true);
         setUserId(response.data.data.userId);
         setShowPopup(true);
+        setErrors({});
       }
     } catch (error) {
       setSignedUp(false);
+      setErrors({
+        general: error.response?.data?.message || "Error during signup. Please try again.",
+      });
       console.error("Error during signup:", error);
     }
   };
@@ -77,11 +150,11 @@ const SignUpForm = () => {
     }
 
     const reader = new FileReader();
-    reader.readAsDataURL(file); 
+    reader.readAsDataURL(file);
 
     reader.onload = async () => {
       const base64String = reader.result;
-      
+
       try {
         const response = await axios.post(
           `${API_URL}/api/auth/upload-documents`,
@@ -114,7 +187,7 @@ const SignUpForm = () => {
       console.error("FileReader error");
     };
   };
-  
+
   return (
     <div className="flex flex-col md:flex-row h-screen">
       {/* Left Section */}
@@ -144,20 +217,23 @@ const SignUpForm = () => {
           Lets get started. <br />
           Are you ready to be a part of something new?
         </p>
+        {errors.general && (
+          <p className="text-red-500 text-center text-sm mb-4">{errors.general}</p>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4 md:px-24">
           <InputField
             type="text"
             name="fullname"
             placeholder="Enter your Full Name"
-            value={formData.fullName}
+            value={formData.fullname}
             onChange={handleChange}
-            error={errors.fullName}
+            error={errors.fullname}
           />
 
           <InputField
             type="email"
             name="email"
-            placeholder="Enter your Email"
+            placeholder="Enter your Company Email"
             value={formData.email}
             onChange={handleChange}
             error={errors.email}
@@ -179,18 +255,24 @@ const SignUpForm = () => {
               placeholder="Enter your Company"
               value={formData.company}
               onChange={handleChange}
+              error={errors.company}
             />
-            <select
-              name="role"
-              className="w-full mt-3 md:mt-0 border-2 border-purple-300 rounded-lg p-3 focus:outline-none focus:border-purple-500 shadow-lg"
-              value={formData.role}
-              onChange={handleChange}
-            >
-              <option value="">Select Role</option>
-              <option value="Corporate HR">Corporate HR</option>
-              <option value="Manager">Manager</option>
-              <option value="Employee">Employee</option>
-            </select>
+            <div className="w-full mt-3 md:mt-0">
+              <select
+                name="role"
+                className="w-full border-2 border-purple-300 rounded-lg p-3 focus:outline-none focus:border-purple-500 shadow-lg"
+                value={formData.role}
+                onChange={handleChange}
+              >
+                <option value="">Select Role</option>
+                <option value="Corporate HR">Corporate HR</option>
+                <option value="HR Agency">HR Agency</option>
+                <option value="Others">Others</option>
+              </select>
+              {errors.role && (
+                <p className="text-red-500 text-sm">{errors.role}</p>
+              )}
+            </div>
           </div>
 
           <InputField
@@ -224,7 +306,6 @@ const SignUpForm = () => {
           {errors.termsAccepted && (
             <p className="text-red-500 text-sm">{errors.termsAccepted}</p>
           )}
-
 
           <div className="flex items-center justify-center">
             <button

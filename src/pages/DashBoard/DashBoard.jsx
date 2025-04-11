@@ -42,19 +42,19 @@ const DashBoard = () => {
 
         setUserStats({
           fullname: user?.fullname || "User",
-          interviewTrackingCredits: user?.credits ? `${user.credits}/1000` : "0/1000",
+          interviewTrackingCredits: user?.credits ? `${user.credits}` : "0",
           offerPunchCount: `${offerPunchCount}`, // Dynamic value from API
-          offerReleases: `${offerReleasesCount}/20`, // Dynamic value from filtered API data
-          candidateGhosting: "3/100", // Replace with API data if available
+          offerReleases: `${offerReleasesCount}`, // Dynamic value from filtered API data
+          candidateGhosting: `${user?.ghostedCount}`, // Replace with API data if available
         });
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
         // Fallback stats in case of error
         setUserStats({
           fullname: user?.fullname || "User",
-          interviewTrackingCredits: user?.credits ? `${user.credits}/1000` : "0/1000",
+          interviewTrackingCredits: user?.credits ? `${user.credits}` : "0",
           offerPunchCount: "0", // Default to 0 if fetch fails
-          offerReleases: "0/20",
+          offerReleases: "0",
           candidateGhosting: "3/100",
         });
       }

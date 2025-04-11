@@ -6,7 +6,7 @@ import { BiEdit } from "react-icons/bi";
 import { BiBriefcase } from "react-icons/bi";
 import { BsPersonBadge } from "react-icons/bs";
 import { BiSolidCheckShield } from "react-icons/bi";
-// import { SiLens } from "react-icons/si";
+import { SiLens } from "react-icons/si";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { FaChevronDown } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
@@ -162,7 +162,7 @@ const Sidebar = () => {
               }
               onClick={() => setSelectedNav("Offer Intelligence")}
             >
-              {/* <SiLens className="h-5 w-5" /> */}
+              <SiLens className="h-5 w-5" />
               <span className="text-sm font-medium">Offer Lens</span>
             </NavLink>
             {/* <NavLink

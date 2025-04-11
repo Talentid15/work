@@ -8,14 +8,12 @@ import { setOfferData } from "../../redux/offerSlice";
 import { formateDate } from "../../utils";
 
 const Job_Offer = () => {
-  const offersData = useSelector((state) => state.offer.data);
+  const offersData = useSelector((state) => state.offer.data); // Access offer data from Redux
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [statusFilter, setStatusFilter] = useState("All");
-  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
-  const  token  = useSelector((state) => state.user.data?.token);;
-
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
+  const token = useSelector((state) => state.user.data?.token); // Access token from Redux
 
   useEffect(() => {
     const fetchOffersData = async () => {

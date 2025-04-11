@@ -1,15 +1,14 @@
-// components/SignUpForm.js
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import backgroundImage2 from "../assets/rb_3790.png";
+import backgroundImage2 from "../assets/rb_3790.png"; // Ensure this asset exists
 import InputField from "../components/InputField";
 import { UserContext } from "../context/UserContext";
 
 const SignUpForm = () => {
   const navigate = useNavigate();
   const { setSignedUp } = useContext(UserContext);
-  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "http://localhost:4000";
 
   const [formData, setFormData] = useState({
     fullname: "",
@@ -19,60 +18,56 @@ const SignUpForm = () => {
     role: "",
     password: "",
     termsAccepted: false,
-    captchaValue: "",
   });
   const [errors, setErrors] = useState({});
-  const [showPopup, setShowPopup] = useState(false);
+  const [showEmailPopup, setShowEmailPopup] = useState(false);
+  const [showDocumentPopup, setShowDocumentPopup] = useState(false);
   const [file, setFile] = useState(null);
   const [fileSelectedMessage, setFileSelectedMessage] = useState("");
   const [userId, setUserId] = useState(null);
   const [uploadError, setUploadError] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpError, setOtpError] = useState("");
+  const [otpTimer, setOtpTimer] = useState(300); // 5 minutes in seconds
+
 
   // Validate company email
   const validateEmail = (email) => {
     const freeEmailDomains = [
-      'gmail.com',
-      'yahoo.com',
-      'hotmail.com',
-      'outlook.com',
-      'aol.com',
-      'icloud.com',
-      'protonmail.com',
-      'zoho.com',
+      "gmail.com",
+      "yahoo.com",
+      "hotmail.com",
+      "outlook.com",
+      "aol.com",
+      "icloud.com",
+      "protonmail.com",
+      "zoho.com",
     ];
-    
-    const emailDomain = email.split('@')[1]?.toLowerCase();
+    const emailDomain = email.split("@")[1]?.toLowerCase();
     if (!emailDomain) return false;
-    
     return !freeEmailDomains.includes(emailDomain);
   };
 
   // Handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
-    // Validate email on change
-    if (name === 'email') {
+    if (name === "email") {
       if (value && !validateEmail(value)) {
-        setErrors(prev => ({
+        setErrors((prev) => ({
           ...prev,
-          email: 'Please use a company email address (not Gmail, Yahoo, etc.)'
+          email: "Please use a company email address (not Gmail, Yahoo, etc.)",
         }));
       } else {
-        setErrors(prev => ({
-          ...prev,
-          email: ''
-        }));
+        setErrors((prev) => ({ ...prev, email: "" }));
       }
     }
-
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
     });
   };
 
-  // Handle single file selection
+  // Handle file selection
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -89,35 +84,31 @@ const SignUpForm = () => {
     }
   };
 
+  // Handle OTP input change
+  const handleOtpChange = (e) => {
+    const value = e.target.value;
+    if (/^\d{0,6}$/.test(value)) {
+      setOtp(value);
+      setOtpError("");
+    }
+  };
+
+  // Handle signup form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validate form
+
     const newErrors = {};
-    
-    if (!formData.fullname.trim()) {
-      newErrors.fullname = "Full name is required";
-    }
+    if (!formData.fullname.trim()) newErrors.fullname = "Full name is required";
     if (!formData.email) {
       newErrors.email = "Email is required";
     } else if (!validateEmail(formData.email)) {
       newErrors.email = "Please use a company email address (not Gmail, Yahoo, etc.)";
     }
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Phone number is required";
-    }
-    if (!formData.company.trim()) {
-      newErrors.company = "Company name is required";
-    }
-    if (!formData.role) {
-      newErrors.role = "Please select a role";
-    }
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    }
-    if (!formData.termsAccepted) {
-      newErrors.termsAccepted = "You must accept the terms and conditions";
-    }
+    if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
+    if (!formData.company.trim()) newErrors.company = "Company name is required";
+    if (!formData.role) newErrors.role = "Please select a role";
+    if (!formData.password) newErrors.password = "Password is required";
+    if (!formData.termsAccepted) newErrors.termsAccepted = "You must accept the terms and conditions";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -125,27 +116,85 @@ const SignUpForm = () => {
     }
 
     try {
-      const response = await axios.post(`${API_URL}/api/auth/signup`, formData);
+      const response = await axios.post(`${API_URL}/api/auth/signup`, {
+        ...formData,
+        captchaValue: "mock-captcha-token", // Mock value since CAPTCHA is disabled on server
+      });
       if (response.status === 200) {
+        if (!response.data.data?.userId) {
+          throw new Error("No userId returned from signup");
+        }
         setSignedUp(true);
         setUserId(response.data.data.userId);
-        setShowPopup(true);
+        setShowEmailPopup(true);
+        setOtpTimer(300);
         setErrors({});
       }
     } catch (error) {
       setSignedUp(false);
       setErrors({
-        general: error.response?.data?.message || "Error during signup. Please try again.",
+        general: error.response?.data?.message || error.message || "Error during signup. Please try again.",
       });
       console.error("Error during signup:", error);
     }
   };
 
+  // Verify OTP
+  const handleVerifyOtp = async () => {
+    if (!otp) {
+      setOtpError("Please enter the OTP.");
+      return;
+    }
+    if (otp.length !== 6) {
+      setOtpError("OTP must be 6 digits.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${API_URL}/api/auth/verify-otp`, {
+        email: formData.email, // Corrected to pass email as a key-value pair
+        otp: otp,             // Explicitly named for clarity
+      });
+      if (response.data.success) {
+        setShowEmailPopup(false);
+        setShowDocumentPopup(true); // Show ad popup
+        setOtp("");
+        setOtpError("");
+      }
+    } catch (error) {
+      setOtpError(error.response?.data?.message || "Invalid OTP. Please try again.");
+      console.error("Error verifying OTP:", error);
+    }
+  };
+
+  // Resend OTP
+  const handleResendOtp = async () => {
+    try {
+      const response = await axios.post(`${API_URL}/api/auth/resend-otp`, {
+        email: formData.email,
+      });
+      if (response.data.success) {
+        setOtpTimer(300); // Reset timer
+        setOtp("");       // Clear previous OTP
+        alert("OTP resent successfully. Check your email.");
+      }
+    } catch (error) {
+      setErrors({
+        general: error.response?.data?.message || "Error resending OTP.",
+      });
+      console.error("Error resending OTP:", error);
+    }
+  };
+
+  // Handle document submission
   const handleDocumentSubmit = async (e) => {
     e.preventDefault();
-
     if (!file) {
       setUploadError("Please upload a document.");
+      return;
+    }
+    if (!userId) {
+      setUploadError("User ID is missing. Please sign up again.");
       return;
     }
 
@@ -163,21 +212,16 @@ const SignUpForm = () => {
             document: base64String,
           },
           {
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { "Content-Type": "application/json" },
           }
         );
 
         if (response.status === 200) {
-          setShowPopup(false);
-          console.log("Cloudinary URL:", response.data.url);
+          setShowDocumentPopup(false);
           navigate("/login");
         }
       } catch (error) {
-        setUploadError(
-          error.response?.data?.message || "Error uploading document."
-        );
+        setUploadError(error.response?.data?.message || "Error uploading document.");
         console.error("Upload error:", error);
       }
     };
@@ -187,6 +231,17 @@ const SignUpForm = () => {
       console.error("FileReader error");
     };
   };
+
+  // OTP timer
+  useEffect(() => {
+    let timer;
+    if (showEmailPopup && otpTimer > 0) {
+      timer = setInterval(() => {
+        setOtpTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [showEmailPopup, otpTimer]);
 
   return (
     <div className="flex flex-col md:flex-row h-screen">
@@ -229,7 +284,6 @@ const SignUpForm = () => {
             onChange={handleChange}
             error={errors.fullname}
           />
-
           <InputField
             type="email"
             name="email"
@@ -238,7 +292,6 @@ const SignUpForm = () => {
             onChange={handleChange}
             error={errors.email}
           />
-
           <InputField
             type="tel"
             name="phone"
@@ -247,7 +300,6 @@ const SignUpForm = () => {
             onChange={handleChange}
             error={errors.phone}
           />
-
           <div className="flex flex-col md:flex-row md:space-x-4">
             <InputField
               type="text"
@@ -274,7 +326,6 @@ const SignUpForm = () => {
               )}
             </div>
           </div>
-
           <InputField
             type="password"
             name="password"
@@ -283,7 +334,6 @@ const SignUpForm = () => {
             onChange={handleChange}
             error={errors.password}
           />
-
           <div className="flex items-center">
             <input
               type="checkbox"
@@ -306,7 +356,6 @@ const SignUpForm = () => {
           {errors.termsAccepted && (
             <p className="text-red-500 text-sm">{errors.termsAccepted}</p>
           )}
-
           <div className="flex items-center justify-center">
             <button
               type="submit"
@@ -318,21 +367,71 @@ const SignUpForm = () => {
         </form>
       </div>
 
-      {/* Popup for Document Upload */}
-      {showPopup && (
+      {/* Email Verification Popup with OTP */}
+      {showEmailPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Verification</h2>
+              <h2 className="text-xl font-bold">Verify Your Email</h2>
               <button
-                onClick={() => setShowPopup(false)}
+                onClick={() => setShowEmailPopup(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
                 ✕
               </button>
             </div>
             <p className="mb-4">
-              Upload a copy of your company identity (e.g., Business Registration Document, CIN Document, GST Document). <br />
+              A 6-digit OTP has been sent to <strong>{formData.email}</strong>. Please check your
+              inbox (and spam/junk folder) and enter it below.
+              {otpTimer > 0 ? (
+                <span>
+                  {" "}
+                  Time remaining: {Math.floor(otpTimer / 60)}:
+                  {(otpTimer % 60).toString().padStart(2, "0")}
+                </span>
+              ) : (
+                <span className="text-red-500"> OTP expired. Please resend.</span>
+              )}
+            </p>
+            <input
+              type="text"
+              value={otp}
+              onChange={handleOtpChange}
+              placeholder="Enter OTP"
+              maxLength="6"
+              className="w-full border-2 border-gray-300 rounded-lg p-2 mb-4 focus:outline-none focus:border-purple-500"
+            />
+            {otpError && <p className="text-red-500 text-sm mb-4">{otpError}</p>}
+            <div className="flex justify-between">
+              <button onClick={handleResendOtp} className="text-blue-500 underline">
+                Resend OTP
+              </button>
+              <button
+                onClick={handleVerifyOtp}
+                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-all"
+              >
+                Verify OTP
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDocumentPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Verification</h2>
+              <button
+                onClick={() => setShowDocumentPopup(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="mb-4">
+              Upload a copy of your company identity (e.g., Business Registration Document, CIN
+              Document, GST Document). <br />
               Allowed formats: png, jpg, jpeg, pdf (max 5MB).
             </p>
             <form onSubmit={handleDocumentSubmit}>
@@ -351,9 +450,7 @@ const SignUpForm = () => {
                   <p className="text-green-500 text-sm mt-2">{fileSelectedMessage}</p>
                 )}
               </div>
-              {uploadError && (
-                <p className="text-red-500 text-sm mb-4">{uploadError}</p>
-              )}
+              {uploadError && <p className="text-red-500 text-sm mb-4">{uploadError}</p>}
               <button
                 type="submit"
                 className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition-all"

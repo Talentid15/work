@@ -4,7 +4,7 @@ import { MdMarkEmailUnread } from "react-icons/md";
 import { FaFileAlt } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
-import { setOfferData } from "../../redux/offerSlice";
+import { setOfferData, clearOfferData } from "../../redux/offerSlice";
 import { formateDate } from "../../utils";
 
 const Job_Offer = () => {
@@ -12,11 +12,15 @@ const Job_Offer = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("All");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
   const token = useSelector((state) => state.user.data?.token); // Access token from Redux
 
   useEffect(() => {
     const fetchOffersData = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await axios.get(`${API_URL}/api/offer/get-all-offers`, {
           withCredentials: true,
@@ -25,14 +29,22 @@ const Job_Offer = () => {
           },
         });
         console.log("Fetched Offers Data:", response.data);
-        dispatch(setOfferData(response.data));
+        if (Array.isArray(response.data) && response.data.length === 0) {
+          dispatch(clearOfferData());
+        } else {
+          dispatch(setOfferData(response.data));
+        }
       } catch (error) {
         console.error("Error fetching offers data:", error);
+        setError("Failed to fetch offers. Please try again later.");
+        dispatch(clearOfferData()); // Clear stale data on error
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchOffersData();
-  }, [dispatch]);
+  }, [dispatch, token]); // Added token as dependency to refetch if token changes
 
   const handleSendEmail = async (offerId) => {
     try {
@@ -91,7 +103,11 @@ const Job_Offer = () => {
         </button>
       </div>
 
-      {filteredOffers?.length > 0 ? (
+      {loading ? (
+        <div className="text-center text-gray-500">Loading offers...</div>
+      ) : error ? (
+        <div className="text-center text-red-500">{error}</div>
+      ) : filteredOffers?.length > 0 ? (
         <div className="overflow-x-auto border rounded-xl my-6 hidden md:block">
           <table className="w-full bg-white rounded-lg">
             <thead>
@@ -147,7 +163,11 @@ const Job_Offer = () => {
       )}
 
       <div className="block md:hidden">
-        {filteredOffers?.length > 0 ? (
+        {loading ? (
+          <div className="text-center text-gray-500">Loading offers...</div>
+        ) : error ? (
+          <div className="text-center text-red-500">{error}</div>
+        ) : filteredOffers?.length > 0 ? (
           filteredOffers.map((offer) => (
             <div key={offer._id} className="mb-5 p-5 border rounded-lg shadow-md bg-white">
               <p className="font-semibold text-lg text-purple-800">

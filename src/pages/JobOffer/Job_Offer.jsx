@@ -4,7 +4,7 @@ import { MdMarkEmailUnread } from "react-icons/md";
 import { FaFileAlt } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
-import { setOfferData, clearOfferData } from "../../redux/offerSlice";
+import { setOfferData } from "../../redux/offerSlice";
 import { formateDate } from "../../utils";
 
 const Job_Offer = () => {
@@ -29,15 +29,10 @@ const Job_Offer = () => {
           },
         });
         console.log("Fetched Offers Data:", response.data);
-        if (Array.isArray(response.data) && response.data.length === 0) {
-          dispatch(clearOfferData());
-        } else {
           dispatch(setOfferData(response.data));
-        }
       } catch (error) {
         console.error("Error fetching offers data:", error);
         setError("Failed to fetch offers. Please try again later.");
-        dispatch(clearOfferData()); // Clear stale data on error
       } finally {
         setLoading(false);
       }

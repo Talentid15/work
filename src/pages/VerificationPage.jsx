@@ -1,66 +1,85 @@
-import { useEffect } from "react";
+// src/context/VerificationContext.jsx
+import { createContext, useState, useContext } from "react";
+import OtpVerificationPopup from "./OtpVerify";
+import DocumentUploadPopup from "./documentVerify";
 
-// import usePreventNavigation from "../hooks/usePreventNavigation";
+const VerificationContext = createContext();
 
-import { useContext } from "react";
+// eslint-disable-next-line react/prop-types
+export const VerificationProvider = ({ children }) => {
+  const [showOtpPopup, setShowOtpPopup] = useState(false);
+  const [showDocumentPopup, setShowDocumentPopup] = useState(false);
+  const [userData, setUserData] = useState({
+    userId: null,
+    email: null,
+  });
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "http://localhost:4000";
 
-import { UserContext } from "../context/UserContext";
+  const showVerificationPopup = ({ actionRequired, userId, email }) => {
+    if (actionRequired === "verifyEmail") {
+      setUserData({ userId, email });
+      setShowOtpPopup(true);
+    } else if (actionRequired === "uploadDocuments") {
+      setShowDocumentPopup(true);
+    }
+  };
 
-import { useNavigate } from "react-router-dom";
+  const handleOtpVerify = () => {
+    setShowOtpPopup(false);
+    alert("Email verified successfully!");
+    // Optionally trigger a retry of the failed API call
+  };
 
-const VerificationPage = () => {
+  const handleOtpResend = () => {
+    alert("OTP resent successfully!");
+  };
 
-    // usePreventNavigation();
+  const handleOtpSkip = () => {
+    setShowOtpPopup(false);
+  };
 
-    const navigate = useNavigate();
+  const handleOtpClose = () => {
+    setShowOtpPopup(false);
+  };
 
-    const { isSignedUp, setSignedUp } = useContext(UserContext);
+  const handleDocumentSubmit = () => {
+    setShowDocumentPopup(false);
+    alert("Document uploaded successfully!");
+    // Optionally trigger a retry of the failed API call
+  };
 
+  const handleDocumentSkip = () => {
+    setShowDocumentPopup(false);
+  };
 
-    console.log(isSignedUp);
+  const handleDocumentClose = () => {
+    setShowDocumentPopup(false);
+  };
 
-    useEffect(() => {
-
-        if (!isSignedUp) {
-
-            navigate("/signup");
-
-        }
-
-    }, [])
-
-
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-purple-100">
-            <div className="max-w-md w-full bg-white shadow-md rounded-lg p-6 text-center">
-                <h1 className="text-2xl font-bold text-purple-700">Verify Your Email</h1>
-                <p className="mt-4 text-gray-600">
-                    We have sent a verification email to your registered email address.
-                    Please check your inbox and follow the link to verify your account.
-                </p>
-                <div className="mt-6">
-                    <button
-                        className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors duration-200"
-                        onClick={
-
-                            () => {
-
-                                window.location.href = 'https:www.//talentid.app/'
-                                setSignedUp(false);
-                            }
-                        }
-
-                    >
-
-                        Back to Home
-                    </button>
-                </div>
-                <p className='text-[15px] text-start pt-4'>For assistance email us <a href='mailTo:support@Talentid.app' className='text-blue-400'>support@Talentid.app</a></p>
-            </div>
-        </div>
-    );
+  return (
+    <VerificationContext.Provider value={{ showVerificationPopup }}>
+      {children}
+      {showOtpPopup && (
+        <OtpVerificationPopup
+          email={userData.email}
+          apiUrl={API_URL} 
+          onClose={handleOtpClose}
+          onSkip={handleOtpSkip}
+          onVerify={handleOtpVerify}
+          onResend={handleOtpResend}
+        />
+      )}
+      {showDocumentPopup && (
+        <DocumentUploadPopup
+          userId={userData.userId}
+          apiUrl={API_URL} 
+          onClose={handleDocumentClose}
+          onSkip={handleDocumentSkip}
+          onSubmit={handleDocumentSubmit}
+        />
+      )}
+    </VerificationContext.Provider>
+  );
 };
 
-export default VerificationPage;
-
-
+export const useVerification = () => useContext(VerificationContext);

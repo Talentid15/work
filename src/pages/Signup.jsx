@@ -1,13 +1,17 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import backgroundImage2 from "../assets/rb_3790.png"; // Ensure this asset exists
+import backgroundImage2 from "../assets/rb_3790.png";
 import InputField from "../components/InputField";
 import { UserContext } from "../context/UserContext";
+import OtpVerificationPopup from "./OtpVerify";
+import DocumentUploadPopup from "./documentVerify";
+import {useUserStore} from "../redux/userStore";
 
 const SignUpForm = () => {
   const navigate = useNavigate();
   const { setSignedUp } = useContext(UserContext);
+  const { setUserData } = useUserStore();
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "http://localhost:4000";
 
   const [formData, setFormData] = useState({
@@ -22,14 +26,6 @@ const SignUpForm = () => {
   const [errors, setErrors] = useState({});
   const [showEmailPopup, setShowEmailPopup] = useState(false);
   const [showDocumentPopup, setShowDocumentPopup] = useState(false);
-  const [file, setFile] = useState(null);
-  const [fileSelectedMessage, setFileSelectedMessage] = useState("");
-  const [userId, setUserId] = useState(null);
-  const [uploadError, setUploadError] = useState("");
-  const [otp, setOtp] = useState("");
-  const [otpError, setOtpError] = useState("");
-  const [otpTimer, setOtpTimer] = useState(300); // 5 minutes in seconds
-
 
   // Validate company email
   const validateEmail = (email) => {
@@ -67,33 +63,6 @@ const SignUpForm = () => {
     });
   };
 
-  // Handle file selection
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      if (selectedFile.size > 5 * 1024 * 1024) {
-        setUploadError("File size exceeds 5MB limit.");
-        return;
-      }
-      setFile(selectedFile);
-      setFileSelectedMessage(`Selected: ${selectedFile.name}`);
-      setUploadError("");
-    } else {
-      setFile(null);
-      setFileSelectedMessage("");
-    }
-  };
-
-  // Handle OTP input change
-  const handleOtpChange = (e) => {
-    const value = e.target.value;
-    if (/^\d{0,6}$/.test(value)) {
-      setOtp(value);
-      setOtpError("");
-    }
-  };
-
-  // Handle signup form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -118,16 +87,15 @@ const SignUpForm = () => {
     try {
       const response = await axios.post(`${API_URL}/api/auth/signup`, {
         ...formData,
-        captchaValue: "mock-captcha-token", // Mock value since CAPTCHA is disabled on server
+        captchaValue: "mock-captcha-token",
       });
       if (response.status === 200) {
         if (!response.data.data?.userId) {
           throw new Error("No userId returned from signup");
         }
         setSignedUp(true);
-        setUserId(response.data.data.userId);
+        setUserData({ userId: response.data.data.userId, email: formData.email });
         setShowEmailPopup(true);
-        setOtpTimer(300);
         setErrors({});
       }
     } catch (error) {
@@ -139,109 +107,33 @@ const SignUpForm = () => {
     }
   };
 
-  // Verify OTP
-  const handleVerifyOtp = async () => {
-    if (!otp) {
-      setOtpError("Please enter the OTP.");
-      return;
-    }
-    if (otp.length !== 6) {
-      setOtpError("OTP must be 6 digits.");
-      return;
-    }
-
-    try {
-      const response = await axios.post(`${API_URL}/api/auth/verify-otp`, {
-        email: formData.email, // Corrected to pass email as a key-value pair
-        otp: otp,             // Explicitly named for clarity
-      });
-      if (response.data.success) {
-        setShowEmailPopup(false);
-        setShowDocumentPopup(true); // Show ad popup
-        setOtp("");
-        setOtpError("");
-      }
-    } catch (error) {
-      setOtpError(error.response?.data?.message || "Invalid OTP. Please try again.");
-      console.error("Error verifying OTP:", error);
-    }
+  // OTP popup handlers
+  const handleSkipOtp = () => {
+    setShowEmailPopup(false);
+    setShowDocumentPopup(true); // Move to document popup
   };
 
-  // Resend OTP
-  const handleResendOtp = async () => {
-    try {
-      const response = await axios.post(`${API_URL}/api/auth/resend-otp`, {
-        email: formData.email,
-      });
-      if (response.data.success) {
-        setOtpTimer(300); // Reset timer
-        setOtp("");       // Clear previous OTP
-        alert("OTP resent successfully. Check your email.");
-      }
-    } catch (error) {
-      setErrors({
-        general: error.response?.data?.message || "Error resending OTP.",
-      });
-      console.error("Error resending OTP:", error);
-    }
+  const handleVerifyOtp = () => {
+    setShowEmailPopup(false);
+    setShowDocumentPopup(true); // Show document popup
   };
 
-  // Handle document submission
-  const handleDocumentSubmit = async (e) => {
-    e.preventDefault();
-    if (!file) {
-      setUploadError("Please upload a document.");
-      return;
-    }
-    if (!userId) {
-      setUploadError("User ID is missing. Please sign up again.");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-
-    reader.onload = async () => {
-      const base64String = reader.result;
-
-      try {
-        const response = await axios.post(
-          `${API_URL}/api/auth/upload-documents`,
-          {
-            userId,
-            document: base64String,
-          },
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-
-        if (response.status === 200) {
-          setShowDocumentPopup(false);
-          navigate("/login");
-        }
-      } catch (error) {
-        setUploadError(error.response?.data?.message || "Error uploading document.");
-        console.error("Upload error:", error);
-      }
-    };
-
-    reader.onerror = () => {
-      setUploadError("Error reading file.");
-      console.error("FileReader error");
-    };
+  const handleResendOtp = () => {
+    alert("OTP resent successfully. Check your email.");
   };
 
-  // OTP timer
-  useEffect(() => {
-    let timer;
-    if (showEmailPopup && otpTimer > 0) {
-      timer = setInterval(() => {
-        setOtpTimer((prev) => prev - 1);
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [showEmailPopup, otpTimer]);
+  // Document popup handlers
+  const handleSkipDocument = () => {
+    setShowDocumentPopup(false);
+    alert("Signup completed! Please log in to continue.");
+    navigate("/login"); // Redirect to login
+  };
+
+  const handleDocumentSubmit = () => {
+    setShowDocumentPopup(false);
+    alert("Signup completed! Please log in to continue.");
+    navigate("/login"); // Redirect to login
+  };
 
   return (
     <div className="flex flex-col md:flex-row h-screen">
@@ -367,99 +259,25 @@ const SignUpForm = () => {
         </form>
       </div>
 
-      {/* Email Verification Popup with OTP */}
+      {/* OTP Verification Popup */}
       {showEmailPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Verify Your Email</h2>
-              <button
-                onClick={() => setShowEmailPopup(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ✕
-              </button>
-            </div>
-            <p className="mb-4">
-              A 6-digit OTP has been sent to <strong>{formData.email}</strong>. Please check your
-              inbox (and spam/junk folder) and enter it below.
-              {otpTimer > 0 ? (
-                <span>
-                  {" "}
-                  Time remaining: {Math.floor(otpTimer / 60)}:
-                  {(otpTimer % 60).toString().padStart(2, "0")}
-                </span>
-              ) : (
-                <span className="text-red-500"> OTP expired. Please resend.</span>
-              )}
-            </p>
-            <input
-              type="text"
-              value={otp}
-              onChange={handleOtpChange}
-              placeholder="Enter OTP"
-              maxLength="6"
-              className="w-full border-2 border-gray-300 rounded-lg p-2 mb-4 focus:outline-none focus:border-purple-500"
-            />
-            {otpError && <p className="text-red-500 text-sm mb-4">{otpError}</p>}
-            <div className="flex justify-between">
-              <button onClick={handleResendOtp} className="text-blue-500 underline">
-                Resend OTP
-              </button>
-              <button
-                onClick={handleVerifyOtp}
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-all"
-              >
-                Verify OTP
-              </button>
-            </div>
-          </div>
-        </div>
+        <OtpVerificationPopup
+          apiUrl={API_URL}
+          onClose={() => setShowEmailPopup(false)}
+          onSkip={handleSkipOtp}
+          onVerify={handleVerifyOtp}
+          onResend={handleResendOtp}
+        />
       )}
 
+      {/* Document Upload Popup */}
       {showDocumentPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Verification</h2>
-              <button
-                onClick={() => setShowDocumentPopup(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ✕
-              </button>
-            </div>
-            <p className="mb-4">
-              Upload a copy of your company identity (e.g., Business Registration Document, CIN
-              Document, GST Document). <br />
-              Allowed formats: png, jpg, jpeg, pdf (max 5MB).
-            </p>
-            <form onSubmit={handleDocumentSubmit}>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-4 text-center">
-                <input
-                  type="file"
-                  accept=".png,.jpg,.jpeg,.pdf"
-                  onChange={handleFileChange}
-                  className="hidden"
-                  id="file-upload"
-                />
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <p className="text-gray-500">Drop your file to upload or browse</p>
-                </label>
-                {fileSelectedMessage && (
-                  <p className="text-green-500 text-sm mt-2">{fileSelectedMessage}</p>
-                )}
-              </div>
-              {uploadError && <p className="text-red-500 text-sm mb-4">{uploadError}</p>}
-              <button
-                type="submit"
-                className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition-all"
-              >
-                Submit
-              </button>
-            </form>
-          </div>
-        </div>
+        <DocumentUploadPopup
+          apiUrl={API_URL}
+          onClose={() => setShowDocumentPopup(false)}
+          onSkip={handleSkipDocument}
+          onSubmit={handleDocumentSubmit}
+        />
       )}
     </div>
   );

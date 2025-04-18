@@ -34,7 +34,7 @@ import OnboardMaretial from "./pages/onboarding/OnboardMaretial";
 import PublicRoute from "./pages/PublicRoutes";
 import ProtectedRoute from "./pages/ProtectedRoute";
 
-import VerificationPage from "./pages/VerificationPage";
+// import VerificationPage from "./pages/VerificationPage";
 
 import Release_Offer from "./pages/ReleaseOffer/Release_Offer";
 import Job_Offer from "./pages/JobOffer/Job_Offer";
@@ -42,9 +42,82 @@ import CareerPage from "./pages/CarrerPage/CarrerPage";
 
 import OfferDetail from "./pages/JobOffer/Job_OfferDetails";
 import InvitePage from './pages/CTS/InvitePage';
+import toast from 'react-hot-toast';
+import api, { setupAxiosInterceptors } from './utils/api';
+import { useVerificationStore } from './redux/userStore';
+import { useEffect } from 'react';
+import DocumentUploadPopup from './pages/documentVerify';
+import OtpVerificationPopup from './pages/OtpVerify';
 
 
 function App() {
+  const { showOtpPopup, showDocumentPopup, failedRequest, setOtpPopup, setDocumentPopup } =
+    useVerificationStore();
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "http://localhost:4000";
+
+  useEffect(() => {
+    console.log("Setting up Axios interceptors");
+    setupAxiosInterceptors();
+  }, []);
+
+  // OTP popup handlers
+  const handleOtpVerify = async () => {
+    console.log("OTP Verified, retrying request:", failedRequest);
+    setOtpPopup(false);
+    if (failedRequest) {
+      try {
+        const response = await api.request(failedRequest);
+        console.log("Retry success:", response.data);
+        toast.success("Action completed successfully");
+        return response;
+      } catch (error) {
+        console.error("Retry failed:", error);
+        toast.error(error.response?.data?.message || "Failed to retry action");
+      }
+    }
+  };
+
+  const handleOtpResend = () => {
+    console.log("Resending OTP");
+    toast.success("OTP resent successfully. Check your email.");
+  };
+
+  const handleOtpSkip = () => {
+    console.log("Skipping OTP");
+    setOtpPopup(false);
+  };
+
+  const handleOtpClose = () => {
+    console.log("Closing OTP popup");
+    setOtpPopup(false);
+  };
+
+  // Document popup handlers
+  const handleDocumentSubmit = async () => {
+    console.log("Document submitted, retrying request:", failedRequest);
+    setDocumentPopup(false);
+    if (failedRequest) {
+      try {
+        const response = await api.request(failedRequest);
+        console.log("Retry success:", response.data);
+        toast.success("Action completed successfully");
+        return response;
+      } catch (error) {
+        console.error("Retry failed:", error);
+        toast.error(error.response?.data?.message || "Failed to retry action");
+      }
+    }
+  };
+
+  const handleDocumentSkip = () => {
+    console.log("Skipping document upload");
+    setDocumentPopup(false);
+  };
+
+  const handleDocumentClose = () => {
+    console.log("Closing document popup");
+    setDocumentPopup(false);
+  };
   return (
     <>
 
@@ -64,7 +137,7 @@ function App() {
 
           />
 
-          <Route path="/verification-page" element={<PublicRoute><VerificationPage></VerificationPage></PublicRoute>}></Route>
+          {/* <Route path="/verification-page" element={<PublicRoute><VerificationPage></VerificationPage></PublicRoute>}></Route> */}
 
           <Route path="/auth/forgot-password/:id" element={
 
@@ -127,11 +200,29 @@ function App() {
               <Route path='prediction' element={<Predictions />} />
               <Route path='addCandidate' element={<AddCandidate />} />
             </Route>
+
           </Route>
+
         </Routes>
 
       </Router>
-
+      {showOtpPopup && (
+        <OtpVerificationPopup
+          apiUrl={API_URL}
+          onClose={handleOtpClose}
+          onSkip={handleOtpSkip}
+          onVerify={handleOtpVerify}
+          onResend={handleOtpResend}
+        />
+      )}
+      {showDocumentPopup && (
+        <DocumentUploadPopup
+          apiUrl={API_URL}
+          onClose={handleDocumentClose}
+          onSkip={handleDocumentSkip}
+          onSubmit={handleDocumentSubmit}
+        />
+      )}
     </>
   );
 }

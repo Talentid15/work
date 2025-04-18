@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { setOfferData } from "../../redux/offerSlice";
 import { formateDate } from "../../utils";
+import api from "../../utils/api";
 
 const Job_Offer = () => {
   const offersData = useSelector((state) => state.offer.data); // Access offer data from Redux
@@ -43,7 +44,7 @@ const Job_Offer = () => {
 
   const handleSendEmail = async (offerId) => {
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/api/offer/send-offer-email/${offerId}`,
         {},
         { withCredentials: true }

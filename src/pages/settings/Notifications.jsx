@@ -1,7 +1,7 @@
-// components/Notifications.jsx
-import axios from "axios";
+
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import api from "../../utils/api";
 
 const Notifications = () => {
   const  token  = useSelector((state) => state.user.data?.token);;
@@ -34,7 +34,7 @@ const Notifications = () => {
 
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `${API_URL}/api/notifications/all/me`,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -72,7 +72,7 @@ const Notifications = () => {
 
   const updatePreferences = async (newPrefs) => {
     try {
-      await axios.put(
+      await api.put(
         `${API_URL}/api/notifications/preferences/me`,
         newPrefs,
         {

@@ -1,17 +1,18 @@
 import { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import backgroundImage2 from "../assets/rb_3790.png";
 import InputField from "../components/InputField";
 import { UserContext } from "../context/UserContext";
 import OtpVerificationPopup from "./OtpVerify";
 import DocumentUploadPopup from "./documentVerify";
-import {useUserStore} from "../redux/userStore";
+import { useUserStore } from "../redux/userStore";
 
 const SignUpForm = () => {
   const navigate = useNavigate();
   const { setSignedUp } = useContext(UserContext);
-  const { setUserData } = useUserStore();
+  const { setUserData, setVerifiedDocuments, verifiedDocuments } = useUserStore();
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "http://localhost:4000";
 
   const [formData, setFormData] = useState({
@@ -27,7 +28,6 @@ const SignUpForm = () => {
   const [showEmailPopup, setShowEmailPopup] = useState(false);
   const [showDocumentPopup, setShowDocumentPopup] = useState(false);
 
-  // Validate company email
   const validateEmail = (email) => {
     const freeEmailDomains = [
       "gmail.com",
@@ -44,7 +44,6 @@ const SignUpForm = () => {
     return !freeEmailDomains.includes(emailDomain);
   };
 
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (name === "email") {
@@ -94,7 +93,12 @@ const SignUpForm = () => {
           throw new Error("No userId returned from signup");
         }
         setSignedUp(true);
-        setUserData({ userId: response.data.data.userId, email: formData.email });
+        setUserData({
+          userId: response.data.data.userId,
+          email: formData.email,
+          emailVerified: false,
+          verifiedDocuments: false,
+        });
         setShowEmailPopup(true);
         setErrors({});
       }
@@ -107,37 +111,46 @@ const SignUpForm = () => {
     }
   };
 
-  // OTP popup handlers
   const handleSkipOtp = () => {
     setShowEmailPopup(false);
-    setShowDocumentPopup(true); // Move to document popup
+    setUserData((prev) => ({ ...prev, emailVerified: false }));
+    if (!verifiedDocuments) {
+      setShowDocumentPopup(true); // Show popup only if no document uploaded
+    } else {
+      toast.success("Signup completed! Please log in to continue.");
+      navigate("/login");
+    }
   };
 
   const handleVerifyOtp = () => {
     setShowEmailPopup(false);
-    setShowDocumentPopup(true); // Show document popup
+    if (!verifiedDocuments) {
+      setShowDocumentPopup(true); // Show popup only if no document uploaded
+    } else {
+      toast.success("Signup completed! Please log in to continue.");
+      navigate("/login");
+    }
   };
 
   const handleResendOtp = () => {
-    alert("OTP resent successfully. Check your email.");
+    toast.success("OTP resent successfully. Check your email.", { id: "otp-resent" });
   };
 
-  // Document popup handlers
   const handleSkipDocument = () => {
+    setVerifiedDocuments(false);
     setShowDocumentPopup(false);
-    alert("Signup completed! Please log in to continue.");
-    navigate("/login"); // Redirect to login
+    toast.success("Signup completed! Please log in to continue.");
+    navigate("/login");
   };
 
   const handleDocumentSubmit = () => {
     setShowDocumentPopup(false);
-    alert("Signup completed! Please log in to continue.");
-    navigate("/login"); // Redirect to login
+    toast.success("Document uploaded! Please log in to continue.");
+    navigate("/login");
   };
 
   return (
     <div className="flex flex-col md:flex-row h-screen">
-      {/* Left Section */}
       <div className="flex-1 bg-gradient-to-b from-purple-900 via-purple-700 to-purple-400 text-white flex flex-col justify-center items-center rounded-b-2xl md:rounded-r-3xl md:rounded-b-none p-6">
         <img
           src={backgroundImage2}
@@ -155,13 +168,12 @@ const SignUpForm = () => {
         </div>
       </div>
 
-      {/* Right Section */}
       <div className="flex-1 bg-white p-6 md:p-10 flex flex-col justify-center rounded-t-2xl md:rounded-l-2xl md:rounded-t-none">
         <h2 className="text-purple-700 text-center text-3xl md:text-5xl font-bold mb-6">
           Sign Up
         </h2>
         <p className="text-center px-6 md:px-20 mb-4 text-sm md:text-base">
-          Lets get started. <br />
+          Let's get started. <br />
           Are you ready to be a part of something new?
         </p>
         {errors.general && (
@@ -259,7 +271,6 @@ const SignUpForm = () => {
         </form>
       </div>
 
-      {/* OTP Verification Popup */}
       {showEmailPopup && (
         <OtpVerificationPopup
           apiUrl={API_URL}
@@ -270,7 +281,6 @@ const SignUpForm = () => {
         />
       )}
 
-      {/* Document Upload Popup */}
       {showDocumentPopup && (
         <DocumentUploadPopup
           apiUrl={API_URL}

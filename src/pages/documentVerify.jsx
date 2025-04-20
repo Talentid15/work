@@ -1,14 +1,18 @@
 import { useState } from "react";
 import axios from "axios";
-import { useUserStore } from "../redux/userStore";
+import { useUserStore, useVerificationStore } from "../redux/userStore";
+import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
-  const { userId } = useUserStore();
+  const { userId, verifiedDocuments, setVerifiedDocuments } = useUserStore();
+  const { is403Error } = useVerificationStore();
+  const { token } = useSelector((state) => state.user.data || {});
   const [file, setFile] = useState(null);
   const [fileSelectedMessage, setFileSelectedMessage] = useState("");
   const [uploadError, setUploadError] = useState("");
+  const [documentStatus, setDocumentStatus] = useState(null);
 
-  // Handle file selection
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -25,7 +29,6 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
     }
   };
 
-  // Handle document submission
   const handleDocumentSubmit = async (e) => {
     e.preventDefault();
     if (!file) {
@@ -44,7 +47,7 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
       const base64String = reader.result;
 
       try {
-        console.log("Uploading document for userId:", userId); // Debug
+        console.log("Uploading document for userId:", userId);
         const response = await axios.post(
           `${apiUrl}/api/auth/upload-documents`,
           {
@@ -52,25 +55,65 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
             document: base64String,
           },
           {
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
 
         if (response.status === 200) {
-          console.log("Document upload successful"); // Debug
+          console.log("Document upload successful");
+          setDocumentStatus("pending");
+          setVerifiedDocuments(true);
+          toast.success("Document uploaded. Verifying documents...", {
+            id: "document-verified",
+          });
           onSubmit();
         }
       } catch (error) {
-        console.error("Upload error:", error); // Debug
+        console.error("Upload error:", error);
         setUploadError(error.response?.data?.message || "Error uploading document.");
       }
     };
 
     reader.onerror = () => {
-      console.error("FileReader error"); // Debug
+      console.error("FileReader error");
       setUploadError("Error reading file.");
     };
   };
+
+  const user = useSelector((state) => state.user.data || {});
+  const isBackendVerified = user?.verifiedDocuments === true;
+
+  if ((verifiedDocuments || documentStatus === "pending") && !isBackendVerified) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Document Verification</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+          </div>
+          <p className="mb-4">
+            Your document has been uploaded and is <strong>still verifying</strong>. We will notify you once verification is complete.
+          </p>
+          <div className="flex justify-end">
+            <button
+              onClick={onClose}
+              className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -107,13 +150,15 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
           </div>
           {uploadError && <p className="text-red-500 text-sm mb-4">{uploadError}</p>}
           <div className="flex justify-between">
-            <button
-              type="button"
-              onClick={onSkip}
-              className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
-            >
-              Skip
-            </button>
+            {!is403Error && (
+              <button
+                type="button"
+                onClick={onSkip}
+                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
+              >
+                Skip
+              </button>
+            )}
             <button
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"

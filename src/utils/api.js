@@ -1,31 +1,49 @@
 import axios from "axios";
-import {useVerificationStore} from "../redux/userStore";
+import { useVerificationStore } from "../redux/userStore";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_REACT_BACKEND_URL ?? "http://localhost:4000",
   withCredentials: true,
 });
 
-// Function to set up interceptors
+let interceptorId = null;
+
 export const setupAxiosInterceptors = () => {
-  api.interceptors.response.use(
+  if (interceptorId !== null) {
+    api.interceptors.response.eject(interceptorId);
+  }
+
+  interceptorId = api.interceptors.response.use(
     (response) => {
-      console.log("API Response:", response); // Debug
+      console.log("api.js: API Response:", {
+        method: response.config.method,
+        url: response.config.url,
+        status: response.status,
+        data: response.data,
+      });
       return response;
     },
     (error) => {
-      console.log("API Error:", error.response); // Debug
+      console.log("api.js: API Error:", {
+        method: error.config?.method,
+        url: error.config?.url,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+
       if (error.response?.status === 403) {
         const { actionRequired } = error.response.data;
-        console.log("Action Required:", actionRequired); // Debug
+        console.log("api.js: Action Required:", actionRequired);
         const { setOtpPopup, setDocumentPopup } = useVerificationStore.getState();
 
         if (actionRequired === "verifyEmail") {
-          setOtpPopup(true, error.config);
+          console.log("api.js: Setting OTP popup");
+          setOtpPopup(true, error.config, true);
         } else if (actionRequired === "uploadDocuments") {
-          setDocumentPopup(true, error.config);
+          console.log("api.js: Setting Document popup");
+          setDocumentPopup(true, error.config, true);
         }
       }
+
       return Promise.reject(error);
     }
   );

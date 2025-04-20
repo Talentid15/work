@@ -9,14 +9,12 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { setData } from "../redux/UserSlice";
-import { Turnstile } from "@marsidev/react-turnstile"
+import { Turnstile } from "@marsidev/react-turnstile";
 
 const LoginForm = () => {
-
   const dispatch = useDispatch();
-
   const siteKey = import.meta.env.VITE_SITE_KEY;
-  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
 
   const [formData, setFormData] = useState({
     email: "",
@@ -24,10 +22,9 @@ const LoginForm = () => {
   });
 
   const [token, setToken] = useState("");
-
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-
   const navigate = useNavigate();
+  const [errors, setErrors] = useState({});
 
   const handleForgotPasswordClick = () => {
     setShowForgotPassword(true);
@@ -36,8 +33,6 @@ const LoginForm = () => {
   const handleCloseForgotPassword = () => {
     setShowForgotPassword(false);
   };
-
-  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,128 +47,113 @@ const LoginForm = () => {
     if (!formData.email) {
       newErrors.email = "Email is required.";
     }
-
-    // Email Validation
-
-    // const genericDomains = [
-    //   'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'protonmail.com',
-    //   'yandex.com', 'gmx.com', 'zoho.com', 'mail.com', 'inbox.com', 'live.com', 'msn.com', 'qq.com',
-    //   'naver.com', 'web.de', 'mail.ru', 'tutanota.com', 'pm.me', 'bk.ru', 'rambler.ru', 'rocketmail.com',
-    //   'ymail.com', 'excite.com', 'lycos.com', 'rediffmail.com', 'hushmail.com', 'fastmail.com', 'bellsouth.net',
-    //   'verizon.net', 'att.net', 'comcast.net', 'sbcglobal.net', 'charter.net', 'shaw.ca', 'cox.net',
-    //   'earthlink.net', 'frontier.com', 'juno.com', 'netzero.net', 'aim.com', 'optonline.net', 'me.com', 'mac.com'
-    // ];
-
-    // const emailDomain = formData.email.split('@')[1];
-
-    // if (genericDomains.includes(emailDomain)) {
-
-    //   newErrors.email = 'Please enter a company email address.';
-
-    // }
-
     if (!formData.password) {
       newErrors.password = "Password is required.";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-        try {
-            const response = await axios.post(`${API_URL}/api/auth/login`, {
-                email: formData.email,
-                password: formData.password,
-                captchaValue: token
-            }, {
-                withCredentials: true,
-            });
-            if (response.status === 202) {
-                toast.error("Your documents are being verified. Please try again later.");
-                return;
-            }
-            // console.log(response.data)
-            dispatch(setData(response.data));
-            toast.success("Logged in successfully!");
-            navigate("/");
-        } catch (error) {
-            console.error("Error logging in:", error);
-                        if (error.response?.status === 202) {
-                toast.info("Your documents are being verified. Please try again later.");
-            } else {
-                toast.error(error.message || "Login failed. Please try again.");
-            }
+      try {
+        const response = await axios.post(`${API_URL}/api/auth/login`, {
+          email: formData.email,
+          password: formData.password,
+          captchaValue: token
+        }, {
+          withCredentials: true,
+        });
+        if (response.status === 202) {
+          toast.error("Your documents are being verified. Please try again later.");
+          return;
         }
+        dispatch(setData(response.data));
+        toast.success("Logged in successfully!");
+        navigate("/");
+      } catch (error) {
+        console.error("Error logging in:", error);
+        if (error.response?.status === 202) {
+          toast.info("Your documents are being verified. Please try again later.");
+        } else {
+          toast.error(error.message || "Login failed. Please try again.");
+        }
+      }
     }
-};
+  };
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen">
+    <div className="flex flex-col lg:flex-row h-screen bg-gray-50">
       {/* Left Section */}
-      <div
-        className={`w-[full] lg:w-[45%] bg-white p-6   transition-transform duration-300 ${showForgotPassword ? "blur-sm" : ""
-          }`}
-      >
-        <div className="flex  flex-col justify-center items-center gap-10 p-6 sm:p-10 lg:rounded-l-3xl">
-          <div className=" w-full   p-6 flex justify-start items-start">
-            <img src={logo} alt="Logo" className="w-[60%] sm:w-[40%] h-auto" />
+      <div className={`w-full lg:w-[50%] bg-white flex items-center justify-center relative transition-transform duration-300 ${showForgotPassword ? "blur-sm" : ""}`}>
+        <div className="w-full max-w-md px-6 py-12">
+          {/* Logo area */}
+          <div className="mb-10">
+            <img src={logo} alt="Logo" className="w-[50%] h-auto" />
           </div>
-          <div>
-            <h2 className="text-purple-700 text-center text-2xl sm:text-4xl font-bold mb-4">
-              Login
-            </h2>
-            <p className="text-center text-sm sm:text-base mb-4 px-4 sm:px-20">
-              Ready to dive back in? Enter your credentials to continue.
+
+          {/* Login form */}
+          <div className="bg-white rounded-2xl shadow-lg p-8">
+            <h2 className="text-purple-700 text-3xl font-bold mb-2 text-center">Welcome Back</h2>
+            <p className="text-gray-500 text-center mb-8">
+              Sign in to continue your journey
             </p>
-            <form onSubmit={handleSubmit} className="space-y-4 px-4 sm:px-10">
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
               <InputField
                 type="email"
                 name="email"
-                placeholder="Enter your Email"
+                placeholder="Email Address"
                 value={formData.email}
                 onChange={handleChange}
                 error={errors.email}
+                className="focus:ring-purple-500 focus:border-purple-500"
               />
+              
               <InputField
                 type="password"
                 name="password"
-                placeholder="Enter your Password"
+                placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
                 error={errors.password}
+                className="focus:ring-purple-500 focus:border-purple-500"
               />
-              <div className="flex items-center space-y-2 gap-12">
-                <Turnstile siteKey={siteKey} onSuccess={(token) => {
-                  console.log(token);
-                  setToken(token);
-
-                }} />
+              
+              <div className="flex justify-end">
                 <p
-                  className=" text-sm text-purple-500 text-center cursor-pointer hover:underline "
+                  className="text-sm text-purple-600 font-medium cursor-pointer hover:text-purple-800"
                   onClick={handleForgotPasswordClick}
                 >
                   Forgot Password?
                 </p>
               </div>
-
-              <div className="flex items-center justify-center">
-                <button
-                  type="submit"
-                  className="w-[75%] sm:w-[40%] transition-all bg-purple-600 text-white p-3 rounded-lg hover:scale-105 font-semibold hover:bg-purple-700 flex items-center justify-center space-x-2"
-                >
-                  <p>Login</p>
-                  <IoArrowForwardSharp size={20} />
-                </button>
+              
+              <div className="mt-2">
+                <Turnstile 
+                  siteKey={siteKey} 
+                  onSuccess={(token) => setToken(token)} 
+                  className="mx-auto"
+                />
               </div>
-              <div className="text-center">
+
+              <button
+                type="submit"
+                className="w-full bg-purple-600 text-white py-3 rounded-xl hover:bg-purple-700 transition-all duration-300 font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+              >
+                <span>Sign In</span>
+                <IoArrowForwardSharp />
+              </button>
+              
+              <div className="text-center mt-6">
                 <p className="text-gray-600">
                   Dont have an account?{" "}
                   <a
                     href="/signup"
-                    className="text-purple-600 font-semibold hover:underline"
+                    className="text-purple-600 font-semibold hover:text-purple-800 transition-colors"
                   >
-                    Create one
+                    Sign Up
                   </a>
                 </p>
               </div>
@@ -182,30 +162,34 @@ const LoginForm = () => {
         </div>
       </div>
 
-      {/* Forgot Password Card */}
+      {/* Forgot Password Modal */}
       {showForgotPassword && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
           <ForgotPasswordCard onClose={handleCloseForgotPassword} />
         </div>
       )}
 
       {/* Right Section */}
-      <div
-        className="hidden lg:flex flex-1 bg-center bg-white rounded-3xl lg:rounded-3xl m-3 bg-cover text-white flex-col justify-center items-center p-6 sm:p-10"
-      // style={{ backgroundImage: url(${backgroundImage}) }}
-      >
-        <h1 className="text-2xl sm:text-5xl font-bold mb-4 text-center">
-          Welcome Back!
-        </h1>
-        <p className="w-full sm:w-[80%] text-sm sm:text-base text-center">
-          The best way to predict the future is to create it – starting with
-          hiring exceptional talent.
-        </p>
-        <img
-          src={backgroundImage2}
-          alt="Decorative"
-          className="w-[70%] sm:w-[60%] h-auto mt-4"
-        />
+      <div className="hidden lg:flex lg:w-[50%] bg-gradient-to-b from-purple-900 via-purple-700 to-purple-400 text-white  rounded-l-3xl overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-purple-700/30"></div>
+        <div className="relative z-10 flex flex-col items-center justify-center w-full h-full p-12 text-center">
+          <div className="max-w-lg">
+            <h1 className="text-4xl font-bold mb-6">
+              Unlock Your Potential
+            </h1>
+            <p className="text-lg mb-10">
+              The best way to predict the future is to create it – starting with
+              hiring exceptional talent.
+            </p>
+            <div className="flex justify-center">
+              <img
+                src={backgroundImage2}
+                alt="Decorative"
+                className="w-4/5 h-auto rounded-xl shadow-xl"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

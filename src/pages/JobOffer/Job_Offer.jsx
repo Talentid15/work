@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { MdMarkEmailUnread } from "react-icons/md";
 import { FaFileAlt } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import axios from "axios";
+
 import { setOfferData } from "../../redux/offerSlice";
 import { formateDate } from "../../utils";
 import api from "../../utils/api";
@@ -23,7 +23,7 @@ const Job_Offer = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`${API_URL}/api/offer/get-all-offers`, {
+        const response = await api.get(`${API_URL}/api/offer/get-all-offers`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`,

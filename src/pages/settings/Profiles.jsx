@@ -29,12 +29,10 @@ const Profiles = () => {
     employees: ""
   });
 
-  // Helper function to safely access nested properties
   const getSafeValue = (obj, path, defaultValue = "") => {
     return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : defaultValue), obj);
   };
 
-  // Fetch profile data from API
   useEffect(() => {
     const fetchProfile = async () => {
       try {

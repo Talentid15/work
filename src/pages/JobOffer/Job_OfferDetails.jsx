@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { MdArrowBack, MdDownload } from "react-icons/md";
 import { format } from "date-fns";
-import axios from "axios";
+import api from "../../utils/api";
 
 const OfferDetail = () => {
   const  token  = useSelector((state) => state.user.data?.token);;
@@ -25,7 +25,7 @@ const OfferDetail = () => {
 
   const handleRetract = async () => {
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/api/offer/offer/updateStatus`,
         { offerId: id, status: "Retracted" },
         {
@@ -47,7 +47,7 @@ const OfferDetail = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/api/offer/update-show-status`,
         { offerId: id, showOffer: false },
         {

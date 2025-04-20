@@ -3,6 +3,7 @@ import { FaPencilAlt, FaTrash, FaUserPlus } from "react-icons/fa";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import api from "../../utils/api";
 
 const UserManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,7 +32,7 @@ const UserManagement = () => {
   const fetchTeamMembers = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/api/team`, {
+      const response = await api.get(`${API_URL}/api/team`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -88,7 +89,7 @@ const UserManagement = () => {
 
   const handleAddMember = async () => {
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/api/team`,
         newMember,
         {
@@ -121,7 +122,7 @@ const UserManagement = () => {
 
   const handleUpdateMember = async () => {
     try {
-      const response = await axios.patch(
+      const response = await api.patch(
         `${API_URL}/api/team/${currentMemberId}`,
         {
           firstName: newMember.firstName,
@@ -152,7 +153,7 @@ const UserManagement = () => {
   const handleDeleteMember = async (id) => {
     setIsDeleting(true);
     try {
-      const response = await axios.delete(`${API_URL}/api/team/${id}`, {
+      const response = await api.delete(`${API_URL}/api/team/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

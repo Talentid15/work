@@ -176,15 +176,6 @@ const OtpVerificationPopup = ({ apiUrl, onClose, onSkip, onVerify, onResend }) =
                 <span className="text-red-500"> OTP expired. Please resend.</span>
               )}
             </p>
-            {showEmailInput && (
-              <input
-                type="email"
-                value={inputEmail}
-                onChange={handleEmailChange}
-                placeholder="Enter your email"
-                className="w-full border-2 border-gray-300 rounded-lg p-2 mb-4 focus:outline-none focus:border-purple-500"
-              />
-            )}
             <input
               type="text"
               value={otp}

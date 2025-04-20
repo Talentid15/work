@@ -5,13 +5,25 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 
 const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
-  const { userId, verifiedDocuments, setVerifiedDocuments } = useUserStore();
+  const { userId: zustandUserId, verifiedDocuments, setVerifiedDocuments } = useUserStore();
   const { is403Error } = useVerificationStore();
-  const { token } = useSelector((state) => state.user.data || {});
+  const { token, userId: reduxUserId } = useSelector((state) => state.user.data || {});
   const [file, setFile] = useState(null);
   const [fileSelectedMessage, setFileSelectedMessage] = useState("");
   const [uploadError, setUploadError] = useState("");
   const [documentStatus, setDocumentStatus] = useState(null);
+
+  // Use Redux userId as fallback if Zustand userId is missing
+  const effectiveUserId = zustandUserId || reduxUserId;
+
+  console.log("DocumentUploadPopup.jsx: Rendering with state:", {
+    effectiveUserId,
+    zustandUserId,
+    reduxUserId,
+    verifiedDocuments,
+    is403Error,
+    token,
+  });
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -35,7 +47,7 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
       setUploadError("Please upload a document.");
       return;
     }
-    if (!userId) {
+    if (!effectiveUserId) {
       setUploadError("User ID is missing. Please sign up again.");
       return;
     }
@@ -47,11 +59,11 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
       const base64String = reader.result;
 
       try {
-        console.log("Uploading document for userId:", userId);
+        console.log("DocumentUploadPopup.jsx: Uploading document for userId:", effectiveUserId);
         const response = await axios.post(
           `${apiUrl}/api/auth/upload-documents`,
           {
-            userId,
+            userId: effectiveUserId,
             document: base64String,
           },
           {
@@ -63,7 +75,7 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
         );
 
         if (response.status === 200) {
-          console.log("Document upload successful");
+          console.log("DocumentUploadPopup.jsx: Document upload successful");
           setDocumentStatus("pending");
           setVerifiedDocuments(true);
           toast.success("Document uploaded. Verifying documents...", {
@@ -72,13 +84,13 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
           onSubmit();
         }
       } catch (error) {
-        console.error("Upload error:", error);
+        console.error("DocumentUploadPopup.jsx: Upload error:", error);
         setUploadError(error.response?.data?.message || "Error uploading document.");
       }
     };
 
     reader.onerror = () => {
-      console.error("FileReader error");
+      console.error("DocumentUploadPopup.jsx: FileReader error");
       setUploadError("Error reading file.");
     };
   };

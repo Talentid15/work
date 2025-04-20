@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useUserStore, useVerificationStore } from "./redux/userStore";
 import toast from "react-hot-toast";
 import api, { setupAxiosInterceptors } from "./utils/api";
@@ -46,28 +46,27 @@ import OtpVerificationPopup from "./pages/OtpVerify";
 function App() {
   const { showOtpPopup, showDocumentPopup, failedRequest, setOtpPopup, setDocumentPopup } =
     useVerificationStore();
-  const { emailVerified, verifiedDocuments } = useUserStore();
+  const { emailVerified, verifiedDocuments, setUserData } = useUserStore();
   const user = useSelector((state) => state.user.data || {});
+  const dispatch = useDispatch();
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "http://localhost:4000";
 
   useEffect(() => {
     console.log("App.jsx: Setting up Axios interceptors");
-    console.log("App.jsx: Verification state:", { showOtpPopup, showDocumentPopup, failedRequest });
+    console.log("App.jsx: Initial verification state:", { showOtpPopup, showDocumentPopup, failedRequest });
     setupAxiosInterceptors();
 
-    // Fetch user data to ensure verifiedDocuments is up-to-date
-    const fetchUser = async () => {
-      try {
-        const response = await api.get(`${API_URL}/api/auth/me`);
-        // Assuming Redux dispatch to update user state
-        console.log("App.jsx: Fetched user data:", response.data);
-      } catch (error) {
-        console.error("App.jsx: Error fetching user data:", error);
-      }
-    };
-    fetchUser();
+    // Subscribe to verification store changes
+    const unsubscribe = useVerificationStore.subscribe((state) => {
+      console.log("App.jsx: Verification store updated:", {
+        showOtpPopup: state.showOtpPopup,
+        showDocumentPopup: state.showDocumentPopup,
+        failedRequest: state.failedRequest,
+        is403Error: state.is403Error,
+      });
+    });
 
-    // Add response interceptor for verification toasts
+
     const responseInterceptor = api.interceptors.response.use(
       (response) => {
         if (!emailVerified || (emailVerified && !user?.isEmailVerified)) {
@@ -89,11 +88,12 @@ function App() {
       }
     );
 
-    // Clean up interceptor on unmount
+    // Clean up interceptor and subscriber on unmount
     return () => {
       api.interceptors.response.eject(responseInterceptor);
+      unsubscribe();
     };
-  }, [emailVerified, verifiedDocuments, user]);
+  }, [emailVerified, verifiedDocuments, user, dispatch, setUserData]);
 
   // OTP popup handlers
   const handleOtpVerify = async () => {
@@ -153,6 +153,8 @@ function App() {
     console.log("App.jsx: Closing document popup");
     setDocumentPopup(false);
   };
+
+  console.log("App.jsx: Rendering, showDocumentPopup:", showDocumentPopup, "userId:", user.userId);
 
   return (
     <Router>

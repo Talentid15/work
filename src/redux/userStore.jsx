@@ -19,6 +19,8 @@ const useUserStore = create(
       name: "user-storage",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
+        userId: state.userId,
+        email: state.email,
         emailVerified: state.emailVerified,
         verifiedDocuments: state.verifiedDocuments,
       }),

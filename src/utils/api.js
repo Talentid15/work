@@ -38,10 +38,14 @@ export const setupAxiosInterceptors = () => {
         if (actionRequired === "verifyEmail") {
           console.log("api.js: Setting OTP popup");
           setOtpPopup(true, error.config, true);
-        } else if (actionRequired === "uploadDocuments") {
-          console.log("api.js: Setting Document popup");
+        } else if (actionRequired === "uploadDocuments" || actionRequired === "verifyDocuments") {
+          console.log("api.js: Setting Document popup for action:", actionRequired);
           setDocumentPopup(true, error.config, true);
+        } else {
+          console.log("api.js: Unknown actionRequired:", actionRequired);
         }
+      } else {
+        console.log("api.js: Non-403 error:", error.message);
       }
 
       return Promise.reject(error);

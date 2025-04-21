@@ -5,6 +5,7 @@ import MultiLineChart from "./MultiLineChart";
 import Card from "./Card";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import Loader from "../../components/common/Loader";
 
 const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
 
@@ -65,7 +66,11 @@ const DashBoard = () => {
     }
   }, [token, user]);
 
-  if (!userStats) return <div className="text-center text-gray-500">Loading...</div>;
+  if (!userStats) return (
+    <div className="h-full w-full flex items-center justify-center">
+      <Loader /> 
+    </div>
+  );
 
   const stats = [
     {

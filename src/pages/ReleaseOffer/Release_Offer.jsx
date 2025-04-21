@@ -2,10 +2,9 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import axios from "axios";
+import api from "../../../src/utils/api";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-
 import { dateDifference } from "../../utils";
 
 const readFileAsBase64 = (file) => {
@@ -20,6 +19,7 @@ const readFileAsBase64 = (file) => {
 const Release_Offer = () => {
   const data = useSelector((state) => state.user.data);
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false); // New state for loading
   const [form, setForm] = useState({
     jobTitle: "",
     joiningDate: "",
@@ -33,26 +33,29 @@ const Release_Offer = () => {
     offerLetter: null,
     candidateResume: null,
   });
-  const [errors, setErrors] = useState({}); // State to store validation errors
-  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
-  const  token  = useSelector((state) => state.user.data?.token);;
+  const [errors, setErrors] = useState({});
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
+  const token = useSelector((state) => state.user.data?.token);
 
   const validatePhoneNumber = (phoneNo) => {
-    // Basic validation: 10 digits (e.g., 1234567890)
-    // You can modify the regex for a more specific format, e.g., +XX-XXXXXXXXXX
     const phoneRegex = /^\d{10}$/;
     if (!phoneNo) return "Phone number is required";
     if (!phoneRegex.test(phoneNo)) return "Phone number must be 10 digits";
     return "";
   };
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) return "Candidate email is required";
+    if (!emailRegex.test(email)) return "Invalid email format";
+    return "";
+  };
+
   const validateJoiningDate = (joiningDate) => {
     if (!joiningDate) return "Joining date is required";
-
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
+    today.setHours(0, 0, 0, 0);
     const joining = new Date(joiningDate);
-
     if (isNaN(joining.getTime())) return "Invalid joining date format";
     if (joining < today) return "Joining date must be today or a future date";
     return "";
@@ -60,75 +63,83 @@ const Release_Offer = () => {
 
   const validateExpiryDate = (expiryDate, joiningDate) => {
     if (!expiryDate) return "Expiry date is required";
-
     const expiry = new Date(expiryDate);
     if (isNaN(expiry.getTime())) return "Invalid expiry date format";
-
     if (!joiningDate) return "Please enter the joining date first";
-
     const joining = new Date(joiningDate);
     if (expiry <= joining) return "Expiry date must be after the joining date";
-
     const diffDays = dateDifference(joiningDate, expiryDate);
     if (diffDays > 90) return "Expiry date must be within 90 days of the joining date";
+    return "";
+  };
 
+  const validateFile = (file, fieldName) => {
+    if (!file) return `${fieldName} is required`;
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) return `${fieldName} must be less than 5MB`;
     return "";
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // Update form state
     setForm((prev) => ({ ...prev, [name]: value }));
 
-    // Validate the field and update errors
     let newErrors = { ...errors };
-
     if (name === "candidatePhoneNo") {
       newErrors.candidatePhoneNo = validatePhoneNumber(value);
+    } else if (name === "candidateEmail") {
+      newErrors.candidateEmail = validateEmail(value);
     } else if (name === "joiningDate") {
       newErrors.joiningDate = validateJoiningDate(value);
-      // Re-validate expiry date if joining date changes
       if (form.expiryDate) {
         newErrors.expiryDate = validateExpiryDate(form.expiryDate, value);
       }
     } else if (name === "expiryDate") {
       newErrors.expiryDate = validateExpiryDate(value, form.joiningDate);
+    } else if (name === "jobTitle") {
+      newErrors.jobTitle = value ? "" : "Job title is required";
+    } else if (name === "candidateName") {
+      newErrors.candidateName = value ? "" : "Candidate name is required";
     }
-
     setErrors(newErrors);
   };
 
   const handleFileChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.files[0] }));
+    const { name, files } = e.target;
+    const file = files[0];
+    let newErrors = { ...errors };
+
+    if (file) {
+      newErrors[name] = validateFile(file, name === "offerLetter" ? "Offer letter" : "Candidate resume");
+    } else {
+      newErrors[name] = `${name === "offerLetter" ? "Offer letter" : "Candidate resume"} is required`;
+    }
+
+    setForm((prev) => ({ ...prev, [name]: file }));
+    setErrors(newErrors);
   };
 
   const validateFormStep1 = () => {
     const newErrors = {
       jobTitle: !form.jobTitle ? "Job title is required" : "",
       candidateName: !form.candidateName ? "Candidate name is required" : "",
-      candidateEmail: !form.candidateEmail ? "Candidate email is required" : "",
+      candidateEmail: validateEmail(form.candidateEmail),
       candidatePhoneNo: validatePhoneNumber(form.candidatePhoneNo),
       joiningDate: validateJoiningDate(form.joiningDate),
       expiryDate: validateExpiryDate(form.expiryDate, form.joiningDate),
     };
-
     setErrors(newErrors);
-
-    // Return true if there are no errors
     return Object.values(newErrors).every((error) => error === "");
   };
 
   const validateFormStep2 = () => {
     const newErrors = {
       emailSubject: !form.emailSubject ? "Email subject is required" : "",
-      emailMessage: !form.emailMessage ? "Email message is required" : "",
-      offerLetter: !form.offerLetter ? "Offer letter is required" : "",
-      candidateResume: !form.candidateResume ? "Candidate resume is required" : "",
+      emailMessage: !form.emailMessage || form.emailMessage === "<p><br></p>" ? "Email message is required" : "",
+      offerLetter: validateFile(form.offerLetter, "Offer letter"),
+      candidateResume: validateFile(form.candidateResume, "Candidate resume"),
     };
-
     setErrors((prev) => ({ ...prev, ...newErrors }));
-
     return Object.values(newErrors).every((error) => error === "");
   };
 
@@ -148,66 +159,62 @@ const Release_Offer = () => {
       return;
     }
 
-    let diffBwDays = dateDifference(form.joiningDate, form.expiryDate);
-    if (diffBwDays > 90) {
-      toast.error("Joining Date should be within 90 days of the Expiry Date");
-      return;
-    }
-
-    const offerLetterBase64 = await readFileAsBase64(form.offerLetter);
-
-    const digioRequestBody = {
-      file_name: `offer-letter-${form.candidateName}`,
-      file_data: offerLetterBase64,
-      signers: [
-        {
-          identifier: form.candidateEmail,
-          reason: "for sign the offer letter",
-          sign_type: "electronic",
-        },
-      ],
-      display_on_page: "All",
-      include_authentication_url: true,
-    };
-
-    console.log("digio req body at the frontend side ", digioRequestBody);
-
-    var formData = new FormData();
-    formData.append("jobTitle", form.jobTitle);
-    formData.append("joiningDate", form.joiningDate);
-    formData.append("expiryDate", form.expiryDate);
-    formData.append("emailSubject", form.emailSubject);
-    formData.append("emailMessage", form.emailMessage);
-    formData.append("candidateEmail", form.candidateEmail);
-    formData.append("candidateName", form.candidateName);
-    formData.append("candidatePhoneNo", form.candidatePhoneNo);
-    formData.append("companyName", form.companyName);
-
-    formData.append("offerLetter", form.offerLetter, form.offerLetter.name);
-    formData.append("candidateResume", form.candidateResume, form.candidateResume.name);
-
-    formData.append("digioReqBody", JSON.stringify(digioRequestBody));
-
+    setIsLoading(true); // Start loading
     try {
-      console.log("Form data is", form);
-      const response = await axios.post(
+      const offerLetterBase64 = await readFileAsBase64(form.offerLetter);
+      const digioRequestBody = {
+        file_name: `offer-letter-${form.candidateName}`,
+        file_data: offerLetterBase64,
+        signers: [
+          {
+            identifier: form.candidateEmail,
+            reason: "for sign the offer letter",
+            sign_type: "electronic",
+          },
+        ],
+        display_on_page: "All",
+        include_authentication_url: true,
+      };
+
+      console.log("Release_Offer.jsx: Digio request body:", digioRequestBody);
+
+      const formData = new FormData();
+      formData.append("jobTitle", form.jobTitle);
+      formData.append("joiningDate", form.joiningDate);
+      formData.append("expiryDate", form.expiryDate);
+      formData.append("emailSubject", form.emailSubject);
+      formData.append("emailMessage", form.emailMessage);
+      formData.append("candidateEmail", form.candidateEmail);
+      formData.append("candidateName", form.candidateName);
+      formData.append("candidatePhoneNo", form.candidatePhoneNo);
+      formData.append("companyName", form.companyName);
+      formData.append("offerLetter", form.offerLetter, form.offerLetter.name);
+      formData.append("candidateResume", form.candidateResume, form.candidateResume.name);
+      formData.append("digioReqBody", JSON.stringify(digioRequestBody));
+
+      console.log("Release_Offer.jsx: Submitting form data:", form);
+
+      const response = await api.post(
         `${API_URL}/api/offer/create-offer`,
         formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
           },
           withCredentials: true,
         }
       );
-      console.log("Response is", response.data);
+
+      console.log("Release_Offer.jsx: API response:", response.data);
       toast.success("Offer released successfully!");
       setTimeout(() => {
         window.location.reload();
-      },2000)
+      }, 2000);
     } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error("Failed to submit form. Please try again.");
+      console.error("Release_Offer.jsx: Error submitting form:", error);
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -257,13 +264,13 @@ const Release_Offer = () => {
                 {name.replace(/([A-Z])/g, " $1")}
               </label>
               <input
-                type={name.includes("Date") ? "date" : "text"}
+                type={name.includes("Date") ? "date" : name === "candidateEmail" ? "email" : "text"}
                 name={name}
                 value={form[name]}
                 onChange={handleChange}
                 className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                   name === "companyName" ? "bg-gray-100 cursor-not-allowed" : ""
-                } ${errors[name] ? "border-red-500" : ""}`}
+                } ${errors[name] ? "border-red-500" : "border-gray-300"}`}
                 readOnly={name === "companyName"}
               />
               {errors[name] && (
@@ -294,7 +301,7 @@ const Release_Offer = () => {
               value={form.emailSubject}
               onChange={handleChange}
               className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                errors.emailSubject ? "border-red-500" : ""
+                errors.emailSubject ? "border-red-500" : "border-gray-300"
               }`}
             />
             {errors.emailSubject && (
@@ -310,25 +317,25 @@ const Release_Offer = () => {
                 setForm((prev) => ({ ...prev, emailMessage: value }))
               }
               className={`w-full border rounded-lg ${
-                errors.emailMessage ? "border-red-500" : ""
+                errors.emailMessage ? "border-red-500" : "border-gray-300"
               }`}
             />
             {errors.emailMessage && (
               <p className="text-red-500 text-sm mt-1">{errors.emailMessage}</p>
             )}
           </div>
-
           {["candidateResume", "offerLetter"].map((name, index) => (
             <div key={index}>
               <label className="font-semibold text-gray-700">
-                Upload {name.replace(/([A-Z])/g, " $1")}
+                Upload {name.replace(/([A-Z])/g, " $1")} (Max 5MB)
               </label>
               <input
                 type="file"
                 name={name}
+                accept=".pdf,.doc,.docx"
                 onChange={handleFileChange}
                 className={`w-full border rounded-lg p-3 ${
-                  errors[name] ? "border-red-500" : ""
+                  errors[name] ? "border-red-500" : "border-gray-300"
                 }`}
               />
               {errors[name] && (
@@ -336,7 +343,6 @@ const Release_Offer = () => {
               )}
             </div>
           ))}
-
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <button
               type="button"
@@ -347,14 +353,36 @@ const Release_Offer = () => {
             </button>
             <button
               type="submit"
-              className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700"
+              disabled={isLoading}
+              className={`relative bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed flex items-center justify-center`}
             >
-              Release Offer
+              {isLoading ? (
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              ) : null}
+              {isLoading ? "Releasing..." : "Release Offer"}
             </button>
           </div>
         </form>
       )}
-
       <div className="flex flex-col justify-center items-center p-3 w-full">
         <Outlet />
       </div>

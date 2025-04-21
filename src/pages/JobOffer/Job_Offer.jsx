@@ -7,16 +7,17 @@ import { useSelector, useDispatch } from "react-redux";
 import { setOfferData } from "../../redux/offerSlice";
 import { formateDate } from "../../utils";
 import api from "../../utils/api";
+import Loader from "../../components/common/Loader";
 
 const Job_Offer = () => {
-  const offersData = useSelector((state) => state.offer.data); // Access offer data from Redux
+  const offersData = useSelector((state) => state.offer.data);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
-  const token = useSelector((state) => state.user.data?.token); // Access token from Redux
+  const token = useSelector((state) => state.user.data?.token); 
 
   useEffect(() => {
     const fetchOffersData = async () => {
@@ -40,7 +41,7 @@ const Job_Offer = () => {
     };
 
     fetchOffersData();
-  }, [dispatch, token]); // Added token as dependency to refetch if token changes
+  }, [dispatch, token]); 
 
   const handleSendEmail = async (offerId) => {
     try {
@@ -68,7 +69,6 @@ const Job_Offer = () => {
     "Retracted"
   ];
 
-  // Filter out offers where showOffer is false
   const visibleOffers = offersData?.filter(offer => offer.showOffer !== false);
   const filteredOffers =
     statusFilter === "All"
@@ -100,7 +100,9 @@ const Job_Offer = () => {
       </div>
 
       {loading ? (
-        <div className="text-center text-gray-500">Loading offers...</div>
+        <div className="flex items-center justify-center h-full w-full">
+          <Loader />
+        </div>
       ) : error ? (
         <div className="text-center text-red-500">{error}</div>
       ) : filteredOffers?.length > 0 ? (

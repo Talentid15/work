@@ -65,7 +65,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white px-6 py-4 relative z-10">
+    <header className="bg-white px-6 py-4 relative z-10 border-b border-gray-300">
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <img src={logo} alt="TalentID Logo" className="h-8 w-32" />

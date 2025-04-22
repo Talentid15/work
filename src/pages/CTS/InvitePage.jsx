@@ -50,8 +50,8 @@ const InvitePage = () => {
   return (
     <div className="min-h-screen  flex flex-col">
       {/* Header */}
-      <header className="bg-gradient-to-r from-purple-700 to-purple-900 text-white shadow-lg rounded-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center">
+      <header className="bg-gradient-to-r mt-10 from-purple-700 to-purple-900 text-white shadow-lg rounded-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-6 py-2 flex flex-col sm:flex-row justify-between items-center">
           <div className="flex items-center space-x-3">
             <button
               onClick={() => navigate("/")}

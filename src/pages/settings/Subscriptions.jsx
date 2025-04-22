@@ -1,113 +1,100 @@
-import React from 'react';
-import { FaCheckCircle, FaArrowRight, FaHistory } from 'react-icons/fa';
-import { FaRegEdit } from "react-icons/fa";
+import { FaCheckCircle, FaRegEdit, FaHistory } from "react-icons/fa";
 
 const SubscriptionPage = () => {
-  // Sample data for past transactions
   const pastTransactions = [
-    { id: 1, plan: 'STARTER',email:'jai@gmail.com', date: '2025-02-01', amount: '₹2500.99', status: 'Completed' },
-    { id: 2, plan: 'PRO',email:'jai@gmail.com', date: '2025-02-01', amount: '₹3500.99', status: 'Completed' },
-    { id: 3, plan: 'STARTER',email:'jai@gmail.com', date: '2025-02-01', amount: '₹2500.99', status: 'Completed' },
+    { id: 1, plan: "STARTER", email: "jai@gmail.com", date: "2025-02-01", amount: "₹2500.99", status: "Completed" },
+    { id: 2, plan: "PRO", email: "jai@gmail.com", date: "2025-02-01", amount: "₹3500.99", status: "Completed" },
+    { id: 3, plan: "STARTER", email: "jai@gmail.com", date: "2025-02-01", amount: "₹2500.99", status: "Completed" },
   ];
 
   return (
-    <div className="h-[500px] overflow-y-auto bg-white p-2 w-full no-scrollbar">
-      {/* Subscription Header */}
-      <div className="text-start mb-3">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Subscriptions</h1>
-        <p className="text-gray-600">Manage your subscription plan and usage</p>
-      </div>
+    <div className="w-full mx-auto p-6">
+      <div className="bg-white rounded-3xl shadow-2xl p-8 animate-fade-in">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Subscriptions</h2>
+        <p className="text-gray-600 mb-8">Manage your subscription plan and usage</p>
 
-      {/* Subscription Details Card */}
-      <div className="max-w-full  bg-white rounded-lg shadow-lg p-6 mb-8 ">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4 pb-4 border-b-2 border-gray-400 text-center">Subscription Details</h2>
-
-        {/* Current Plan */}
-        <div className="mb-10 flex  items-center justify-between ">
-          <div>
-          <p className="text-gray-600">You are currently on</p>
-          <p className="text-2xl font-bold text-purple-900">STARTER Plan</p>
-
+        {/* Subscription Details Card */}
+        <div className="bg-gray-50 rounded-2xl p-6 mb-8 shadow-md">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+            <div>
+              <p className="text-gray-600">You are currently on</p>
+              <p className="text-2xl font-bold text-purple-900">STARTER Plan</p>
+            </div>
+            <button
+              onClick={() => (window.location.href = "/pricing")}
+              className="mt-4 sm:mt-0 flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-full hover:bg-purple-700 hover:scale-105 transition-all duration-300 shadow-md"
+              aria-label="Upgrade plan"
+            >
+              <FaRegEdit /> Upgrade Plan
+            </button>
           </div>
-          <div className="">
-          <button
-            className="w-full bg-purple-900 text-white py-2 px-4 rounded-lg hover:bg-gray-200 hover:text-black transition duration-300 flex items-center justify-center"
-            onClick={() => {
-              
-              window.location.href = '/pricing';
-            }}
-          >
-            Upgrade Plan <FaRegEdit className='ml-4' />
-          </button>
-        </div>
-        </div>
 
-       
-     
+          <div className="space-y-4">
+            {[
+              { label: "Interview tracking credits left", value: "680/1000", progress: 68 },
+              { label: "No. of Offer Punch", value: "150", progress: null },
+              { label: "Offer Releases", value: "45", progress: null },
+              { label: "Candidate Ghosting Notification", value: "12", progress: null },
+            ].map((item, index) => (
+              <div key={index} className="flex flex-col">
+                <div className="flex justify-between items-center">
+                  <p className="text-gray-600">{item.label}</p>
+                  <p className="text-gray-800 font-semibold">{item.value}</p>
+                </div>
+                {item.progress && (
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div
+                      className="bg-purple-600 h-2 rounded-full transition-all duration-500"
+                      style={{ width: `${item.progress}%` }}
+                    ></div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
 
-    
-       
-
-       
-        <div className="space-y-4 px-28  ">
-          <div className="flex items-center justify-between">
-            <p className="text-gray-600">Interview tracking credits left</p>
-            <p className="text-gray-800 font-semibold">680/1000</p>
-          </div>
-          <div className="flex items-center justify-between">
-            <p className="text-gray-600">No. of Offer Punch</p>
-            <p className="text-gray-800 font-semibold">150</p>
-          </div>
-          <div className="flex items-center justify-between">
-            <p className="text-gray-600">Offer Releases</p>
-            <p className="text-gray-800 font-semibold">45</p>
-          </div>
-          <div className="flex items-center justify-between">
-            <p className="text-gray-600">Candidate Ghosting Notification</p>
-            <p className="text-gray-800 font-semibold">12</p>
+          <div className="mt-6 text-center">
+            <p className="text-red-600">Your plan expires on</p>
+            <p className="text-sm font-bold text-gray-500">15/07/2025</p>
           </div>
         </div>
 
-        {/* Expiration Date */}
-        <div className="mt-10 text-center">
-          <p className="text-red-600">Your plan expires on</p>
-          <p className="text-sm font-bold text-gray-500">15/07/2025</p>
-        </div>
-      </div>
-
-      {/* Past Transactions Table */}
-      <div className="max-w-5xl mx-auto bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-          <FaHistory className="mr-2" /> Past Transactions
-        </h2>
-
-        <div className="overflow-x-auto">
-          <table className="w-full table-auto">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2 text-left text-gray-600">Plan</th>
-                <th className="px-4 py-2 text-left text-gray-600">Email</th>
-                <th className="px-4 py-2 text-left text-gray-600">Start Date</th>
-                <th className="px-4 py-2 text-left text-gray-600">Amount</th>
-                <th className="px-4 py-2 text-left text-gray-600">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pastTransactions.map((transaction) => (
-                <tr key={transaction.id} className="border-b hover:bg-gray-50 transition duration-300">
-                  <td className="px-4 py-2 text-gray-800">{transaction.plan}</td>
-                  <td className="px-4 py-2 text-gray-800">{transaction.email}</td>
-                  <td className="px-4 py-2 text-gray-800">{transaction.date}</td>
-                  <td className="px-4 py-2 text-gray-800">{transaction.amount}</td>
-                  <td className="px-4 py-2 text-gray-800">
-                    <span className="flex items-center">
-                      <FaCheckCircle className="text-green-500 mr-2" /> {transaction.status}
-                    </span>
-                  </td>
+        {/* Past Transactions Table */}
+        <div className="bg-gray-50 rounded-2xl p-6 shadow-md">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <FaHistory className="mr-2" /> Past Transactions
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-100">
+                <tr>
+                  {["Plan", "Email", "Start Date", "Amount", "Status"].map((header) => (
+                    <th
+                      key={header}
+                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      {header}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {pastTransactions.map((transaction) => (
+                  <tr key={transaction.id} className="hover:bg-purple-50 transition-all duration-200">
+                    <td className="px-4 py-3 text-gray-800">{transaction.plan}</td>
+                    <td className="px-4 py-3 text-gray-800">{transaction.email}</td>
+                    <td className="px-4 py-3 text-gray-800">{transaction.date}</td>
+                    <td className="px-4 py-3 text-gray-800">{transaction.amount}</td>
+                    <td className="px-4 py-3 text-gray-800">
+                      <span className="flex items-center">
+                        <FaCheckCircle className="text-green-500 mr-2" /> {transaction.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

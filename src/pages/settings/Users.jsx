@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { FaPencilAlt, FaTrash, FaUserPlus } from "react-icons/fa";
-import axios from "axios";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import api from "../../utils/api";

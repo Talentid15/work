@@ -75,7 +75,13 @@ const Release_Offer = () => {
 
   const validateFile = (file, fieldName) => {
     if (!file) return `${fieldName} is required`;
-    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    const maxSize = 5 * 1024 * 1024;
+    const allowedTypes = ["application/pdf"];
+  
+    if (!allowedTypes.includes(file.type)) {
+      return `${fieldName} must be a PDF file`;
+    }
+
     if (file.size > maxSize) return `${fieldName} must be less than 5MB`;
     return "";
   };

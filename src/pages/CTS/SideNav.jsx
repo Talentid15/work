@@ -9,15 +9,13 @@ const Navbar = () => {
   const { credits } = useSelector((state) => state.user.data || {});
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-white shadow-lg">
-      {/* Credits Badge */}
+    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 shadow-lg">
       <div className="flex items-center">
         <div className="bg-gradient-to-r from-[#74449E] to-[#803CD8] text-white px-4 py-2 rounded-full shadow-md">
           <p className="text-sm font-semibold">Credits: {credits || 0}</p>
         </div>
       </div>
 
-      {/* Navigation Links */}
       <div className="flex items-center gap-4 bg-gray-100 p-2 rounded-full shadow-md">
         <Link to="/">
           <button

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { FaFileAlt } from "react-icons/fa";
+import { FaFileAlt, FaPaperPlane } from "react-icons/fa";
 import MultiLineChart from "./MultiLineChart";
 import Card from "./Card";
 import { useSelector } from "react-redux";
@@ -14,9 +14,11 @@ const DashBoard = () => {
   const user = useSelector((state) => state.user.data);
   const token = useSelector((state) => state.user.data?.token);
   const [userStats, setUserStats] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      setIsLoading(true);
       try {
         // Fetch offer releases
         const offerReleasesResponse = await axios.get(`${API_URL}/api/offer/get-all-offers`, {
@@ -46,7 +48,7 @@ const DashBoard = () => {
           interviewTrackingCredits: user?.credits ? `${user.credits}` : "0",
           offerPunchCount: `${offerPunchCount}`, // Dynamic value from API
           offerReleases: `${offerReleasesCount}`, // Dynamic value from filtered API data
-          candidateGhosting: `${user?.ghostedCount}`, // Replace with API data if available
+          candidateGhosting: `${user?.ghostedCount || 0}`, // Replace with API data if available
         });
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -56,19 +58,23 @@ const DashBoard = () => {
           interviewTrackingCredits: user?.credits ? `${user.credits}` : "0",
           offerPunchCount: "0", // Default to 0 if fetch fails
           offerReleases: "0",
-          candidateGhosting: "3/100",
+          candidateGhosting: "0",
         });
+      } finally {
+        setIsLoading(false);
       }
     };
 
     if (token && user) {
       fetchDashboardData();
+    } else {
+      setIsLoading(false);
     }
   }, [token, user]);
 
-  if (!userStats) return (
-    <div className="h-full w-full flex items-center justify-center">
-      <Loader /> 
+  if (isLoading) return (
+    <div className="h-screen w-full flex items-center justify-center">
+      <Loader />
     </div>
   );
 
@@ -76,68 +82,85 @@ const DashBoard = () => {
     {
       title: "Interview Tracking Credits",
       value: userStats.interviewTrackingCredits,
-      statusColor: "text-green-400",
-      iconColor: "#34D399",
+      statusColor: "text-green-500",
+      iconColor: "#10B981",
+      icon: "credits",
     },
     {
       title: "Number of Offer Punches",
       value: userStats.offerPunchCount,
-      statusColor: "text-blue-400",
+      statusColor: "text-blue-500",
       iconColor: "#3B82F6",
+      icon: "punches",
     },
     {
       title: "Offer Letter Releases",
       value: userStats.offerReleases,
-      statusColor: "text-yellow-400",
-      iconColor: "#FBBF24",
+      statusColor: "text-amber-500",
+      iconColor: "#F59E0B",
+      icon: "letters",
     },
     {
       title: "Candidate Ghosting Alerts",
-      value: user.ghostedCount || 0,
-      statusColor: "text-red-400",
+      value: userStats.candidateGhosting,
+      statusColor: "text-red-500",
       iconColor: "#EF4444",
+      icon: "alerts",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+    <div className="min-h-screen p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white p-6 rounded-xl shadow-lg">
-          <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
-            <h1 className="text-4xl font-extrabold text-gray-800">
-              Welcome, <span className="text-[#652d96]">{userStats.fullname}</span> 👋
-            </h1>
-            <div className="flex items-center gap-4 mt-4 sm:mt-0">
-              <button
-                className="flex items-center gap-2 px-6 py-3 bg-[#652d96] text-white rounded-full shadow-md  transition duration-300 transform hover:scale-100"
-                onClick={() => navigate("/offer-punch")}
-              >
-                <FaFileAlt />
-                Offer Punch
-              </button>
-              <button
-                className="flex items-center gap-2 px-6 py-3 bg-[#652d96] text-white rounded-full shadow-md  transition duration-300 transform hover:scale-100"
-                onClick={() => navigate("/release-offer")}
-              >
-                <FaFileAlt />
-                Release Offer
-              </button>
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="bg-gradient-to-r from-purple-50 to-white p-6 border-b border-gray-100">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 flex items-center gap-2">
+                  Welcome back, <span className="text-[#74449D]">{userStats.fullname}</span>
+                  <span className="animate-wave inline-block">👋</span>
+                </h1>
+                <p className="text-gray-500 mt-1">Here{"'"}s what{"'"}s happening with your account today.</p>
+              </div>
+              <div className="flex items-center gap-3 self-end sm:self-auto">
+                <button
+                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-br from-[#74449D] to-[#4B2775] text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 text-sm font-medium"
+                  onClick={() => navigate("/offer-punch")}
+                >
+                  <FaFileAlt className="text-white/90" />
+                  Offer Punch
+                </button>
+                <button
+                  className="flex items-center gap-2 px-4 py-2.5 bg-white border border-[#74449D] text-[#74449D] rounded-lg shadow-sm hover:shadow-md hover:bg-purple-50 transition-all duration-300 text-sm font-medium"
+                  onClick={() => navigate("/release-offer")}
+                >
+                  <FaPaperPlane className="text-[#74449D]/90" />
+                  Release Offer
+                </button>
+              </div>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((item, index) => (
-              <Card
-                key={index}
-                {...item}
-                className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:-translate-y-1"
-              />
-            ))}
+
+          {/* Stats Cards */}
+          <div className="p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {stats.map((item, index) => (
+                <Card
+                  key={index}
+                  {...item}
+                />
+              ))}
+            </div>
           </div>
         </div>
-        <div className="mt-8">
+
+        {/* Chart Section */}
+        <div className="mt-6">
           <MultiLineChart />
         </div>
-        <div className="mt-8">
+
+        {/* Outlet for nested routes */}
+        <div className="mt-6">
           <Outlet />
         </div>
       </div>

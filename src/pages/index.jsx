@@ -21,7 +21,7 @@ function Index() {
       <div className="flex flex-1 pt-14">
         {/* Sidebar */}
         <div
-          className={` top-14 z-10 h-auto bg-[#652D96] text-white shadow-lg transition-all duration-300 ${
+          className={` top-14 z-10 h-auto bg-transparent transition-all duration-300 ${
             isSidebarOpen ? "w-64" : "lg:w-[20%] h-auto"
           }`}
         >

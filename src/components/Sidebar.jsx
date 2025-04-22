@@ -15,8 +15,9 @@ import { GiBackwardTime } from "react-icons/gi";
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCandidateTrackingOpen, setIsCandidateTrackingOpen] = useState(false);
-
   const [selectedNav, setSelectedNav] = useState("Candidate Tracking");
+  const location = useLocation();
+  const isOfferPunchActive = location.pathname === "/offer-punch";
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -26,209 +27,150 @@ const Sidebar = () => {
     setIsCandidateTrackingOpen(!isCandidateTrackingOpen);
   };
 
-  const location = useLocation();
-  const isOfferPunchActive = location.pathname === "/offer-punch";
-
   return (
-    <div className=" h-screen overflow-hidden flex fixed  ">
-      {/* Menu Icon */}
+    <div className="h-screen overflow-hidden flex fixed">
+      {/* Mobile Menu Toggle Button */}
       <button
         onClick={toggleSidebar}
-        className="absolute top-4 left-4 text-black text-2xl md:hidden z-50"
+        className="absolute top-4 left-4 text-black text-2xl md:hidden z-50 bg-white rounded-full p-2 shadow-md"
       >
         {isOpen ? (
-          <AiOutlineClose className="hover:scale-105 transition-all" />
+          <AiOutlineClose className="text-purple-700 hover:scale-110 transition-all" />
         ) : (
-          <AiOutlineMenu className="hover:scale-105 transition-all" />
+          <AiOutlineMenu className="text-purple-700 hover:scale-110 transition-all" />
         )}
       </button>
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0  bottom-0 h-full sm:w-[70%]  lg:w-90   bg-gradient-to-b from-[#74449D] to-[#4B2775] text-white shadow-lg transform transition-transform duration-300 z-40 ${isOpen ? "translate-x-0" : "-translate-x-full "
-          } md:relative md:translate-x-0 lg:w-80  flex flex-col justify-between  `}
+        className={`fixed top-0 left-0 bottom-0 h-full sm:w-64 lg:w-72 bg-gradient-to-br from-[#74449D] to-[#4B2775] text-white shadow-xl transform transition-all duration-300 ease-in-out z-40 ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } md:relative md:translate-x-0 rounded-r-xl flex flex-col justify-between`}
       >
         {/* Header */}
-        <div >
-          <h1 className="text-xl font-bold text-center py-4 lg:border-b border-purple-400 mt-1">
-            {selectedNav}
-          </h1>
+        <div>
+          <div className="flex items-center justify-center py-6 border-b border-purple-400/30">
+            <h1 className="text-xl font-bold text-center tracking-wide">
+              {selectedNav}
+            </h1>
+          </div>
 
           {/* Navigation */}
-          <nav className="mt-4 space-y-3 sm:space-y-0 sm:mt-[1px]  ">
+          <nav className="mt-6 px-3 space-y-1">
             <NavLink
               to="/dashboard"
               className={({ isActive }) =>
                 isActive
-                  ? "flex items-center space-x-4 px-4 py-6 bg-purple-400  shadow-md "
-                  : "flex items-center space-x-4 px-4 py-6 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95  transition-all duration-200"
+                  ? "flex items-center space-x-3 px-4 py-3 bg-white/20 rounded-xl text-white font-medium shadow-md"
+                  : "flex items-center space-x-3 px-4 py-3 hover:bg-white/10 rounded-xl transition-all duration-200"
               }
               onClick={() => setSelectedNav("Dashboard")}
             >
-              <MdDashboard className="h-6 w-6" />
-              <span className="text-sm font-medium">Dashboard</span>
+              <MdDashboard className="h-5 w-5" />
+              <span className="text-sm">Dashboard</span>
             </NavLink>
 
-            <div>
+            <div className="rounded-xl overflow-hidden transition-all duration-300">
               <NavLink
                 to="/"
-                onClick={() => {
-                  toggleCandidateTracking(); // Call your first function
-                  setSelectedNav("Candidate Tracker"); // Call your second function
+                onClick={(e) => {
+                  e.preventDefault();
+                  toggleCandidateTracking();
+                  setSelectedNav("Candidate Tracker");
                 }}
                 className={({ isActive }) =>
                   isActive || isOfferPunchActive
-                    ? "flex items-center space-x-4 pl-4 py-6 bg-purple-400 shadow-md"
-                    : "flex items-center space-x-4 pl-4 py-6 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
+                    ? "flex items-center justify-between px-4 py-3 bg-white/20 text-white font-medium"
+                    : "flex items-center justify-between px-4 py-3 hover:bg-white/10 transition-all duration-200"
                 }
               >
-                <button
-                  className="w-full flex items-center justify-start font-semibold "
-                  onClick={(e) => {
-                    e.preventDefault(); // Prevent NavLink default behavior on button click
-                    setIsCandidateTrackingOpen(!isCandidateTrackingOpen);
-                  }}
-                >
-                  <BiSolidCheckShield className="h-6 w-6" />
-                  <span className="text-sm font-medium mr-3 ml-3">Candidate Search</span>
-                  <FaChevronDown
-                    className={`transition-transform ${isCandidateTrackingOpen ? "rotate-180 ml-10" : "ml-10"
-                      }`}
-                  />
-                </button>
+                <div className="flex items-center space-x-3">
+                  <BiSolidCheckShield className="h-5 w-5" />
+                  <span className="text-sm">Candidate Search</span>
+                </div>
+                <FaChevronDown
+                  className={`transition-transform duration-300 ${
+                    isCandidateTrackingOpen ? "rotate-180" : ""
+                  }`}
+                />
               </NavLink>
 
               {/* Sub-options for Candidate Tracking */}
-              {isCandidateTrackingOpen && (
-                <div className="w-full flex flex-col items-center justify-start">
-                  <NavLink
-                    to="/"
-                    className={({ isActive }) =>
-                      isActive
-                        ? "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-10 bg-purple-300 shadow-md"
-                        : "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-10 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
-                    }
-                    onClick={() => setSelectedNav("Candidate Tracker (Interview)")}
-                  >
-                    <BsPersonBadge className="h-5 w-5" />
-                    <span className="text-center">Interview</span>
-                  </NavLink>
-                  <NavLink
-                    to="/offer-punch"
-                    className={({ isActive }) =>
-                      isActive
-                        ? "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 bg-purple-300 shadow-md"
-                        : "w-full flex items-center justify-center space-x-4 pl-4 py-3 pr-5 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
-                    }
-                    onClick={() => setSelectedNav("Candidate Tracker (Offer punch)")}
-                  >
-                    <BiEdit className="h-5 w-5" />
-                    <span className="text-center">Offer Punch</span>
-                  </NavLink>
-                </div>
-              )}
+              <div
+                className={`transition-all duration-300 overflow-hidden ${
+                  isCandidateTrackingOpen ? "max-h-40" : "max-h-0"
+                }`}
+              >
+                <NavLink
+                  to="/"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "flex items-center pl-12 pr-4 py-3 bg-white/15 border-l-2 border-white text-white"
+                      : "flex items-center pl-12 pr-4 py-3 hover:bg-white/5 border-l-2 border-transparent hover:border-purple-300/50 transition-all duration-200"
+                  }
+                  onClick={() => setSelectedNav("Candidate Tracker (Interview)")}
+                >
+                  <BsPersonBadge className="h-4 w-4 mr-3" />
+                  <span className="text-sm">Interview</span>
+                </NavLink>
+                <NavLink
+                  to="/offer-punch"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "flex items-center pl-12 pr-4 py-3 bg-white/15 border-l-2 border-white text-white"
+                      : "flex items-center pl-12 pr-4 py-3 hover:bg-white/5 border-l-2 border-transparent hover:border-purple-300/50 transition-all duration-200"
+                  }
+                  onClick={() => setSelectedNav("Candidate Tracker (Offer punch)")}
+                >
+                  <BiEdit className="h-4 w-4 mr-3" />
+                  <span className="text-sm">Offer Punch</span>
+                </NavLink>
+              </div>
             </div>
 
-            {/* <NavLink
-              to="/backgroundchecks"
-              className={({ isActive }) =>
-                isActive
-                  ? "flex items-center space-x-4 px-4 py-3 bg-purple-400  shadow-md"
-                  : "sm: flex items-center space-x-4 px-4 py-3 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
-              }
-            >
-              <TbUserCheck className="h-6 w-6" />
-              <span className="text-sm font-medium">Background Checks</span>
-            </NavLink> */}
             <NavLink
               to="/joboffers"
               className={({ isActive }) =>
                 isActive
-                  ? "flex items-center space-x-4 px-4 py-6 bg-purple-400  shadow-md"
-                  : "flex items-center space-x-4 px-4 py-6 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95  transition-all duration-200"
+                  ? "flex items-center space-x-3 px-4 py-3 bg-white/20 rounded-xl text-white font-medium shadow-md"
+                  : "flex items-center space-x-3 px-4 py-3 hover:bg-white/10 rounded-xl transition-all duration-200"
               }
               onClick={() => setSelectedNav("Job Offers")}
             >
-              <BiBriefcase className="h-6 w-6" />
-              <span className="text-sm font-medium">Job Offers</span>
+              <BiBriefcase className="h-5 w-5" />
+              <span className="text-sm">Job Offers</span>
             </NavLink>
 
             <NavLink
               to="/offerIntelligence"
               className={({ isActive }) =>
                 isActive
-                  ? "flex items-center space-x-4 px-4 py-6 bg-purple-400  shadow-md"
-                  : "flex items-center space-x-4 px-4 py-6 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95  transition-all duration-200"
+                  ? "flex items-center space-x-3 px-4 py-3 bg-white/20 rounded-xl text-white font-medium shadow-md"
+                  : "flex items-center space-x-3 px-4 py-3 hover:bg-white/10 rounded-xl transition-all duration-200"
               }
               onClick={() => setSelectedNav("Offer Intelligence")}
             >
               <SiLens className="h-5 w-5" />
-              <span className="text-sm font-medium">Offer Lens</span>
+              <span className="text-sm">Offer Lens</span>
             </NavLink>
-            {/* <NavLink
-              to="/onboarding"
-              className={({ isActive }) =>
-                isActive
-                  ? "flex items-center space-x-4 px-4 py-3 bg-purple-400  shadow-md"
-                  : "flex items-center space-x-4 px-4 py-3 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95  transition-all duration-200"
-              }
-            >
-              <TbFileStack className="h-6 w-6" />
-              <span className="text-sm font-medium">Onboarding</span>
-            </NavLink> */}
-            {/* <NavLink
-              to="/assetManagement"
-              className={({ isActive }) =>
-                isActive
-                  ? "flex items-center space-x-4 px-4 py-3 bg-purple-400  shadow-md"
-                  : "flex items-center space-x-4 px-4 py-3 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95  transition-all duration-200"
-              }
-            >
-              <FaSuperpowers className="h-6 w-6" />
-              <span className="text-sm font-medium">Asset Management</span>
-            </NavLink>
-            <NavLink
-              to="/performanceManagement"
-              className={({ isActive }) =>
-                isActive
-                  ? "flex items-center space-x-4 px-4 py-3 bg-purple-400  shadow-md"
-                  : "flex items-center space-x-4 px-4 py-3 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95 transition-all duration-200"
-              }
-            >
-              <CgPerformance className="h-6 w-6" />
-              <span className="text-sm font-medium">
-                Performance Management
-              </span>
-            </NavLink> */}
-            {/* <NavLink
-              to="/offboarding"
-              className={({ isActive }) =>
-                isActive
-                  ? "flex items-center space-x-4 px-4 py-3 bg-purple-400  shadow-md"
-                  : "flex items-center space-x-4 px-4 py-3 hover:text-black hover:bg-[#E8DEF8] bg-opacity-95  transition-all duration-200"
-              }
-            >
-              <TbFileStack className="h-6 w-6" />
-              <span className="text-sm font-medium">Offboarding</span>
-            </NavLink> */}
           </nav>
         </div>
 
         {/* Footer Buttons */}
-        <div className=" px-4 pb-4 space-y-4 mb-24">
+        <div className="px-6 pb-20 space-y-3 mt-auto">
           {/* Support Button */}
           <Link
             to="/support"
-            className="w-full flex items-center space-x-4 px-4 py-3 bg-transparent border border-white text-white rounded-full hover:bg-purple-300 hover:border-purple-500 hover:text-black transition-all duration-200"
+            className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all duration-200"
           >
             <GiBackwardTime className="h-5 w-5" />
-            <span className="text-sm font-medium">Support</span>
+            <span className="text-sm">Support</span>
           </Link>
 
           {/* Settings Button */}
           <Link
             to="/settings"
-            className="w-full flex items-center space-x-4 px-4 py-3 bg-white text-purple-700 rounded-full hover:bg-gray-100 transition-all duration-200"
+            className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-white text-purple-700 rounded-xl hover:bg-purple-50 transition-all duration-200 shadow-md"
             onClick={() => setSelectedNav("Settings")}
           >
             <MdOutlineSettings className="h-5 w-5" />
@@ -237,11 +179,10 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* Content Overlay for smaller screens */}
       {isOpen && (
         <div
           onClick={toggleSidebar}
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-30 md:hidden"
         ></div>
       )}
     </div>

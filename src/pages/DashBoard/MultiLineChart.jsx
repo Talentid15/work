@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { Line } from "react-chartjs-2";
 import axios from "axios";
 import {
@@ -20,12 +20,12 @@ const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
 
 const MultiLineChart = () => {
   const chartRef = useRef(null);
-  const dispatch = useDispatch();
   const token = useSelector((state) => state.user.data?.token);
   const [chartData, setChartData] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState("All");
   const [availableMonths, setAvailableMonths] = useState([]);
-  const [noData, setNoData] = useState(false); // New state for no data case
+  const [noData, setNoData] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const monthNames = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -34,8 +34,8 @@ const MultiLineChart = () => {
 
   useEffect(() => {
     const fetchOffersData = async () => {
+      setIsLoading(true);
       try {
-        console.log("Fetching with token:", token); // Debug token
         const response = await axios.get(`${API_URL}/api/offer/get-all-offers`, {
           withCredentials: true,
           headers: {
@@ -44,13 +44,13 @@ const MultiLineChart = () => {
         });
 
         const offers = response.data;
-        console.log("Fetched Offers Data:", offers);
 
         // Check for no data
         if (!offers || offers.length === 0) {
           setNoData(true);
           setChartData(null);
           setAvailableMonths([]);
+          setIsLoading(false);
           return;
         }
 
@@ -73,7 +73,7 @@ const MultiLineChart = () => {
           const offerMonth = new Date(offer.offerDate).getMonth();
           total[offerMonth]++;
           if (offer.status === "Accepted") accepted[offerMonth]++;
-          else if (offer.status === "Declined") rejected[offerMonth]++; // Changed "Rejected" to "Declined" to match backend
+          else if (offer.status === "Declined") rejected[offerMonth]++; 
           else if (offer.status === "Retracted") retracted[offerMonth]++;
         });
 
@@ -83,66 +83,86 @@ const MultiLineChart = () => {
             {
               label: "Offer Accepted",
               data: accepted,
-              borderColor: "rgba(34, 197, 94, 1)", // Green
-              backgroundColor: "rgba(34, 197, 94, 0.2)",
+              borderColor: "rgba(16, 185, 129, 1)", // Green
+              backgroundColor: "rgba(16, 185, 129, 0.1)",
               tension: 0.4,
-              pointRadius: 5,
-              pointHoverRadius: 7,
+              pointRadius: 4,
+              pointHoverRadius: 6,
               borderWidth: 2,
+              fill: true,
             },
             {
               label: "Offer Declined",
               data: rejected,
               borderColor: "rgba(239, 68, 68, 1)", // Red
-              backgroundColor: "rgba(239, 68, 68, 0.2)",
+              backgroundColor: "rgba(239, 68, 68, 0.1)",
               tension: 0.4,
-              pointRadius: 5,
-              pointHoverRadius: 7,
+              pointRadius: 4,
+              pointHoverRadius: 6,
               borderWidth: 2,
+              fill: true,
             },
             {
               label: "Offer Retracted",
               data: retracted,
-              borderColor: "rgba(249, 115, 22, 1)", // Orange
-              backgroundColor: "rgba(249, 115, 22, 0.2)",
+              borderColor: "rgba(245, 158, 11, 1)", // Amber
+              backgroundColor: "rgba(245, 158, 11, 0.1)",
               tension: 0.4,
-              pointRadius: 5,
-              pointHoverRadius: 7,
+              pointRadius: 4,
+              pointHoverRadius: 6,
               borderWidth: 2,
+              fill: true,
             },
           ],
         });
         setNoData(false);
       } catch (error) {
         console.error("Error fetching offers data:", error);
-        setNoData(true); // Treat errors as no data for simplicity
+        setNoData(true);
         setChartData(null);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     if (token) fetchOffersData();
-  }, [token, dispatch]);
+    else setIsLoading(false);
+  }, [token]);
 
   const handleMonthChange = (event) => {
     setSelectedMonth(event.target.value);
   };
 
-  // Render no data message
-  if (noData) {
+  const handleResetZoom = () => {
+    if (chartRef.current) {
+      chartRef.current.resetZoom();
+    }
+  };
+
+  // Render no data or loading states
+  if (isLoading) {
     return (
-      <div className="w-full max-w-5xl mx-auto p-6 bg-white rounded-xl shadow-lg text-center text-gray-500">
-        No data available
+      <div className="w-full max-w-5xl mx-auto p-6 bg-white rounded-xl shadow-lg text-center text-gray-500 animate-pulse">
+        <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-8"></div>
+        <div className="h-64 bg-gray-100 rounded w-full"></div>
       </div>
     );
   }
 
-  // Render loading state
-  if (!chartData) {
+  if (noData) {
     return (
-      <div className="w-full max-w-5xl mx-auto p-6 bg-white rounded-xl shadow-lg text-center text-gray-500">
-        Loading chart...
+      <div className="w-full max-w-5xl mx-auto p-8 bg-white rounded-xl shadow-lg text-center">
+        <svg className="w-16 h-16 mx-auto text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        <h3 className="mt-4 text-lg font-medium text-gray-700">No Chart Data Available</h3>
+        <p className="mt-2 text-gray-500">Start creating offers to see your statistics here</p>
       </div>
     );
+  }
+
+  if (!chartData) {
+    return null;
   }
 
   // Filter labels and datasets based on selected month
@@ -159,26 +179,45 @@ const MultiLineChart = () => {
       legend: {
         position: "top",
         labels: {
-          font: { size: 14, weight: "bold" },
-          color: "#1f2937",
+          font: { size: 12, weight: "500" },
+          color: "#4B5563",
           padding: 20,
+          usePointStyle: true,
+          pointStyle: "circle",
         },
+        align: "end",
       },
       tooltip: {
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        titleFont: { size: 16 },
-        bodyFont: { size: 14 },
-        padding: 10,
+        backgroundColor: "rgba(255, 255, 255, 0.95)",
+        titleColor: "#111827",
+        bodyColor: "#4B5563",
+        titleFont: { size: 14, weight: "bold" },
+        bodyFont: { size: 12 },
+        padding: 12,
+        borderColor: "rgba(229, 231, 235, 1)",
+        borderWidth: 1,
+        cornerRadius: 8,
         callbacks: {
           label: (context) => `${context.dataset.label}: ${context.raw}`,
         },
+        displayColors: true,
+        boxWidth: 8,
+        boxHeight: 8,
+        boxPadding: 4,
       },
       zoom: {
-        pan: { enabled: true, mode: "x" },
+        pan: { 
+          enabled: true, 
+          mode: "x",
+          modifierKey: 'shift',
+        },
         zoom: {
           wheel: { enabled: true },
           pinch: { enabled: true },
           mode: "x",
+          onZoomComplete: ({chart}) => {
+            chart.update('none');
+          }
         },
       },
     },
@@ -187,54 +226,71 @@ const MultiLineChart = () => {
         title: {
           display: true,
           text: "Months",
-          font: { size: 18, weight: "bold" },
-          color: "#1f2937",
+          font: { size: 14, weight: "bold" },
+          color: "#4B5563",
+          padding: { top: 10 }
         },
-        ticks: { font: { size: 14 }, color: "#4b5563" },
+        ticks: { font: { size: 12 }, color: "#6B7280" },
         grid: { display: false },
       },
       y: {
         title: {
           display: true,
           text: "Number of Offers",
-          font: { size: 18, weight: "bold" },
-          color: "#1f2937",
+          font: { size: 14, weight: "bold" },
+          color: "#4B5563",
         },
-        ticks: { font: { size: 14 }, color: "#4b5563" },
-        grid: { color: "rgba(209, 213, 219, 0.3)" },
+        ticks: { font: { size: 12 }, color: "#6B7280" },
+        grid: { color: "rgba(243, 244, 246, 1)", drawBorder: false },
+        beginAtZero: true,
       },
     },
     interaction: { mode: "index", intersect: false },
     animation: {
-      duration: 1000,
-      easing: "easeInOutQuart",
+      duration: 800,
+      easing: "easeOutQuart",
     },
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-6 bg-white rounded-xl shadow-lg">
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">Offer Status Overview</h2>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <label className="text-lg font-semibold text-gray-700">Filter by Month:</label>
+    <div className="w-full max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-white">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-gray-800">Offer Status Overview</h2>
+            <p className="text-gray-500 text-sm mt-1">Track your offers performance over time</p>
+          </div>
+          <div className="flex items-center gap-3 self-end sm:self-auto">
             <select
               value={selectedMonth}
               onChange={handleMonthChange}
-              className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200 hover:bg-gray-200"
+              className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm transition-all duration-200 hover:bg-gray-50 shadow-sm"
             >
               <option value="All">All Months</option>
               {availableMonths.map((month) => (
-                <option key={month} value={month}>
-                  {month}
-                </option>
+                <option key={month} value={month}>{month}</option>
               ))}
             </select>
+            <button
+              onClick={handleResetZoom}
+              className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium flex items-center gap-1 shadow-sm"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M15 15l6 6m-6-6v4.8m0-4.8h4.8" />
+                <circle cx="10.5" cy="10.5" r="7.5" />
+              </svg>
+              Reset Zoom
+            </button>
           </div>
         </div>
       </div>
-      <div className="relative" style={{ height: "450px" }}>
-        <Line ref={chartRef} data={{ labels: filteredLabels, datasets: filteredDatasets }} options={options} />
+      <div className="p-6">
+        <div className="relative" style={{ height: "450px" }}>
+          <Line ref={chartRef} data={{ labels: filteredLabels, datasets: filteredDatasets }} options={options} />
+        </div>
+        <div className="mt-4 text-xs text-gray-500 text-center">
+          Use mouse wheel to zoom or shift+drag to pan the chart
+        </div>
       </div>
     </div>
   );

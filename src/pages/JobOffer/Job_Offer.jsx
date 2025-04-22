@@ -17,7 +17,7 @@ const Job_Offer = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
-  const token = useSelector((state) => state.user.data?.token); 
+  const token = useSelector((state) => state.user.data?.token);
 
   useEffect(() => {
     const fetchOffersData = async () => {
@@ -31,7 +31,7 @@ const Job_Offer = () => {
           },
         });
         console.log("Fetched Offers Data:", response.data);
-          dispatch(setOfferData(response.data));
+        dispatch(setOfferData(response.data));
       } catch (error) {
         console.error("Error fetching offers data:", error);
         setError("Failed to fetch offers. Please try again later.");
@@ -41,7 +41,7 @@ const Job_Offer = () => {
     };
 
     fetchOffersData();
-  }, [dispatch, token]); 
+  }, [dispatch, token]);
 
   const handleSendEmail = async (offerId) => {
     try {
@@ -76,133 +76,150 @@ const Job_Offer = () => {
       : visibleOffers?.filter((offer) => offer.status === statusFilter);
 
   return (
-    <div className="w-full max-w-6xl mx-auto mt-6 p-6 bg-white rounded-xl shadow-md">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <select
-          className="px-4 py-2 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          {statusOptions.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
-
-        <button
-          className="flex items-center gap-2 px-6 py-2 bg-[#5C3386] text-white rounded-full shadow-md hover:bg-purple-900 transition-all"
-          onClick={() => navigate("/release-offer")}
-        >
-          <FaFileAlt />
-          Release an Offer
-        </button>
-      </div>
-
-      {loading ? (
-        <div className="flex items-center justify-center h-full w-full">
-          <Loader />
+    <div className="min-h-screen  py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-purple-800 mb-6">Job Offers Dashboard</h1>
+        
+        {/* Header Controls */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+          <select
+            className="w-full sm:w-48 px-4 py-2  border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-700"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            {statusOptions.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+          <button
+            className="flex items-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto justify-center sm:justify-start"
+            onClick={() => navigate("/release-offer")}
+          >
+            <FaFileAlt />
+            Release an Offer
+          </button>
         </div>
-      ) : error ? (
-        <div className="text-center text-red-500">{error}</div>
-      ) : filteredOffers?.length > 0 ? (
-        <div className="overflow-x-auto border rounded-xl my-6 hidden md:block">
-          <table className="w-full bg-white rounded-lg">
-            <thead>
-              <tr className="border-b bg-gray-100 text-gray-700">
-                <th className="p-4 text-left">Name</th>
-                <th className="p-4 text-left">Email</th>
-                <th className="p-4 text-left">Status</th>
-                <th className="p-4 text-left">Offer Letter</th>
-                <th className="p-4 text-left">Date Added</th>
-                <th className="p-4 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+
+        {/* Content */}
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+            <Loader />
+          </div>
+        ) : error ? (
+          <div className="text-center text-red-500 font-medium py-8">{error}</div>
+        ) : filteredOffers?.length > 0 ? (
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden lg:block overflow-x-auto rounded-xl border border-gray-200 mb-6">
+              <table className="w-full bg-white">
+                <thead className="bg-purple-50 text-purple-800">
+                  <tr>
+                    <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Name</th>
+                    <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Role</th>
+                    <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Status</th>
+                    <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Offer Letter</th>
+                    <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Date Added</th>
+                    <th className="p-4 text-center font-semibold text-sm uppercase tracking-wide min-w-[180px]">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredOffers.map((offer) => (
+                    <tr
+                      key={offer._id}
+                      className="border-b hover:bg-purple-50 transition-all"
+                    >
+                      <td className="p-4 text-gray-700">{offer?.candidate?.name || "N/A"}</td>
+                      <td className="p-4 text-gray-700">{offer?.jobTitle || "N/A"}</td>
+                      <td className="p-4">
+                        <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+                          {offer.status}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+                          {offer.offerLetterStatus}
+                        </span>
+                      </td>
+                      <td className="p-4 text-gray-700">{formateDate(offer.offerDate) || "N/A"}</td>
+                      <td className="p-4 flex items-center justify-center gap-3">
+                        {offer.status === "Pending" ? (
+                          <button
+                            className="p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-all"
+                            onClick={() => handleSendEmail(offer._id)}
+                            title="Send Offer Email"
+                          >
+                            <MdMarkEmailUnread className="text-purple-600" size={20} />
+                          </button>
+                        ) : (
+                          <div className="w-10 h-10 flex-shrink-0" /> // Placeholder for alignment
+                        )}
+                        <button
+                          className="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all text-sm font-medium"
+                          onClick={() => navigate(`/joboffers/${offer._id}`)}
+                        >
+                          View More
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="lg:hidden space-y-4">
               {filteredOffers.map((offer) => (
-                <tr key={offer._id} className="border-b hover:bg-gray-50 transition">
-                  <td className="p-4">{offer?.candidate?.name || "N/A"}</td>
-                  <td className="p-4">{offer?.candidate?.email || "N/A"}</td>
-                  <td className="p-4">
-                    <span className="px-3 py-1 rounded-full bg-gray-200 text-sm">
+                <div
+                  key={offer._id}
+                  className="p-6 bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg transition-all"
+                >
+                  <h3 className="text-lg font-semibold text-purple-800">
+                    {offer?.candidate?.name || "N/A"}
+                  </h3>
+                  <p className="text-gray-600 mt-1">{offer?.candidate?.email || "N/A"}</p>
+                  <div className="mt-3 flex items-center gap-2 flex-wrap">
+                    <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
                       {offer.status}
                     </span>
-                  </td>
-                  <td className="p-4">
-                    <span className="px-3 py-1 rounded-full bg-gray-200 text-sm">
+                    <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
                       {offer.offerLetterStatus}
                     </span>
-                  </td>
-                  <td className="p-4">{formateDate(offer.offerDate) || "N/A"}</td>
-                  <td className="p-4 flex items-center justify-center space-x-3">
-                    {offer.status === "Pending" && (
+                  </div>
+                  <p className="text-sm text-gray-500 mt-3">
+                    {formateDate(offer.offerDate) || "N/A"}
+                  </p>
+                  <div className="mt-4 flex flex-col sm:flex-row gap-3 justify-start">
+                    {offer.status === "Pending" ? (
                       <button
-                        className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                        className="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all text-sm font-medium flex items-center gap-2"
                         onClick={() => handleSendEmail(offer._id)}
-                        title="Send Offer Email"
                       >
-                        <MdMarkEmailUnread size={20} />
+                        <MdMarkEmailUnread size={16} />
+                        Send Email
                       </button>
+                    ) : (
+                      <div className="w-0 sm:w-28 h-10 flex-shrink-0" /> // Placeholder for alignment
                     )}
                     <button
-                      className="text-white bg-purple-700 px-4 py-2 rounded-full text-sm hover:bg-purple-900 transition-all"
+                      className="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all text-sm font-medium"
                       onClick={() => navigate(`/joboffers/${offer._id}`)}
                     >
                       View More
                     </button>
-                  </td>
-                </tr>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <p className="text-center text-gray-500 mt-6">No offers available.</p>
-      )}
-
-      <div className="block md:hidden">
-        {loading ? (
-          <div className="text-center text-gray-500">Loading offers...</div>
-        ) : error ? (
-          <div className="text-center text-red-500">{error}</div>
-        ) : filteredOffers?.length > 0 ? (
-          filteredOffers.map((offer) => (
-            <div key={offer._id} className="mb-5 p-5 border rounded-lg shadow-md bg-white">
-              <p className="font-semibold text-lg text-purple-800">
-                {offer?.candidate?.name || "N/A"}
-              </p>
-              <p className="text-gray-600">{offer?.candidate?.email || "N/A"}</p>
-              <p className="text-gray-500">
-                <span className="px-3 py-1 bg-gray-200 rounded-full text-sm">
-                  {offer.status || "Pending"}
-                </span>
-              </p>
-              <p className="text-sm text-gray-400">{formateDate(offer.offerDate) || "N/A"}</p>
-              <div className="mt-3 flex space-x-3">
-                {offer.status === "Pending" && (
-                  <button
-                    className="text-sm bg-purple-700 text-white px-4 py-1 rounded-lg hover:bg-purple-900 transition"
-                    onClick={() => handleSendEmail(offer._id)}
-                  >
-                    Send Email
-                  </button>
-                )}
-                <button
-                  className="text-white bg-purple-700 px-4 py-1 rounded-lg text-sm hover:bg-purple-900 transition-all"
-                  onClick={() => navigate(`/joboffers/${offer._id}`)}
-                >
-                  View More
-                </button>
-              </div>
             </div>
-          ))
+          </>
         ) : (
-          <p className="text-center text-gray-500 mt-4">No offers available.</p>
+          <p className="text-center text-gray-500 font-medium py-8">No offers available.</p>
         )}
-      </div>
 
-      <div className="flex flex-col justify-center items-center p-5 w-full">
-        <Outlet />
+        <div className="mt-8">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

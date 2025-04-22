@@ -52,12 +52,13 @@ const Header = () => {
 
   // Show verification banner based on document status
   const isDocumentPending = verifiedDocuments && !user?.verifiedDocuments;
-  const isDocumentNotUploaded = !verifiedDocuments;
+  const isDocumentNotUploaded = !verifiedDocuments && !user?.verifiedDocuments;
+  const isDocumentVerified = user?.verifiedDocuments === true;
 
   const handleVerificationClick = () => {
     if (!userId) {
-      toast.error("Please sign up to upload documents");
-      navigate("/signup");
+      toast.error("Please log in to upload documents");
+      navigate("/login");
       return;
     }
     setDocumentPopup(true, null, false);
@@ -198,7 +199,7 @@ const Header = () => {
       </div>
       
       {/* Verification Banner */}
-      {(isDocumentPending || isDocumentNotUploaded) && (
+      {!isDocumentVerified && (isDocumentPending || isDocumentNotUploaded) && (
         <div 
           className="mt-3 bg-gradient-to-r from-amber-50 to-yellow-50 border-l-4 border-yellow-400 rounded-r-lg p-3 flex items-center justify-between cursor-pointer transition-all hover:from-amber-100 hover:to-yellow-100"
           onClick={handleVerificationClick}

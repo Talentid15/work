@@ -46,7 +46,7 @@ import OtpVerificationPopup from "./pages/OtpVerify";
 function App() {
   const { showOtpPopup, showDocumentPopup, failedRequest, setOtpPopup, setDocumentPopup } =
     useVerificationStore();
-  const { emailVerified, verifiedDocuments, setUserData } = useUserStore();
+  const { emailVerified, verifiedDocuments, setUserData, setVerifiedDocuments } = useUserStore();
   const user = useSelector((state) => state.user.data || {});
   const dispatch = useDispatch();
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "http://localhost:4000";
@@ -55,6 +55,14 @@ function App() {
     console.log("App.jsx: Setting up Axios interceptors");
     console.log("App.jsx: Initial verification state:", { showOtpPopup, showDocumentPopup, failedRequest });
     setupAxiosInterceptors();
+
+    // Sync verifiedDocuments with backend on user data update
+    if (user?.verifiedDocuments === true) {
+      setVerifiedDocuments(true);
+      setDocumentPopup(false); // Ensure popup is hidden if backend verifies documents
+    } else if (user?.verifiedDocuments === false && verifiedDocuments) {
+      toast("Verifying documents...", { id: "document-verifying" });
+    }
 
     // Subscribe to verification store changes
     const unsubscribe = useVerificationStore.subscribe((state) => {
@@ -66,13 +74,15 @@ function App() {
       });
     });
 
-
     const responseInterceptor = api.interceptors.response.use(
       (response) => {
         if (!emailVerified || (emailVerified && !user?.isEmailVerified)) {
           toast("Verifying email...", { id: "email-verifying" });
         }
-        if (verifiedDocuments && !user?.verifiedDocuments) {
+        if (user?.verifiedDocuments === true) {
+          setVerifiedDocuments(true);
+          setDocumentPopup(false);
+        } else if (verifiedDocuments && !user?.verifiedDocuments) {
           toast("Verifying documents...", { id: "document-verifying" });
         }
         return response;
@@ -81,7 +91,10 @@ function App() {
         if (!emailVerified || (emailVerified && !user?.isEmailVerified)) {
           toast("Verifying email...", { id: "email-verifying" });
         }
-        if (verifiedDocuments && !user?.verifiedDocuments) {
+        if (user?.verifiedDocuments === true) {
+          setVerifiedDocuments(true);
+          setDocumentPopup(false);
+        } else if (verifiedDocuments && !user?.verifiedDocuments) {
           toast("Verifying documents...", { id: "document-verifying" });
         }
         return Promise.reject(error);
@@ -93,7 +106,7 @@ function App() {
       api.interceptors.response.eject(responseInterceptor);
       unsubscribe();
     };
-  }, [emailVerified, verifiedDocuments, user, dispatch, setUserData]);
+  }, [emailVerified, verifiedDocuments, user, dispatch, setUserData, setVerifiedDocuments, setDocumentPopup]);
 
   // OTP popup handlers
   const handleOtpVerify = async () => {
@@ -146,6 +159,7 @@ function App() {
 
   const handleDocumentSkip = () => {
     console.log("App.jsx: Skipping document upload");
+    setVerifiedDocuments(false);
     setDocumentPopup(false);
   };
 
@@ -208,7 +222,7 @@ function App() {
           onResend={handleOtpResend}
         />
       )}
-      {showDocumentPopup && (
+      {showDocumentPopup && !user?.verifiedDocuments && (
         <DocumentUploadPopup
           apiUrl={API_URL}
           onClose={handleDocumentClose}

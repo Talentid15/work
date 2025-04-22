@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useVerificationStore } from "../redux/userStore";
+import { useSelector } from "react-redux";
 
 const api = axios.create({
   withCredentials: true,
@@ -30,7 +31,8 @@ export const setupAxiosInterceptors = () => {
         data: error.response?.data,
       });
 
-      if (error.response?.status === 403) {
+      const user = useSelector((state) => state.user.data || {});
+      if (error.response?.status === 403 && !user?.verifiedDocuments) {
         const { actionRequired } = error.response.data;
         console.log("api.js: Action Required:", actionRequired);
         const { setOtpPopup, setDocumentPopup } = useVerificationStore.getState();
@@ -45,7 +47,7 @@ export const setupAxiosInterceptors = () => {
           console.log("api.js: Unknown actionRequired:", actionRequired);
         }
       } else {
-        console.log("api.js: Non-403 error:", error.message);
+        console.log("api.js: Non-403 error or documents verified:", error.message);
       }
 
       return Promise.reject(error);

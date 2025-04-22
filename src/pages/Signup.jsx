@@ -12,7 +12,7 @@ import { useUserStore } from "../redux/userStore";
 const SignUpForm = () => {
   const navigate = useNavigate();
   const { setSignedUp } = useContext(UserContext);
-  const { setUserData, setVerifiedDocuments, verifiedDocuments } = useUserStore();
+  const { setUserData, setVerifiedDocuments } = useUserStore();
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "http://localhost:4000";
 
   const [formData, setFormData] = useState({
@@ -97,7 +97,7 @@ const SignUpForm = () => {
           userId: response.data.data.userId,
           email: formData.email,
           emailVerified: false,
-          verifiedDocuments: false,
+          verifiedDocuments: false, // Initialize as false
         });
         setShowEmailPopup(true);
         setErrors({});
@@ -114,22 +114,12 @@ const SignUpForm = () => {
   const handleSkipOtp = () => {
     setShowEmailPopup(false);
     setUserData((prev) => ({ ...prev, emailVerified: false }));
-    if (!verifiedDocuments) {
-      setShowDocumentPopup(true); // Show popup only if no document uploaded
-    } else {
-      toast.success("Signup completed! Please log in to continue.");
-      navigate("/login");
-    }
+    setShowDocumentPopup(true); // Always show document popup after skipping OTP
   };
 
   const handleVerifyOtp = () => {
     setShowEmailPopup(false);
-    if (!verifiedDocuments) {
-      setShowDocumentPopup(true); // Show popup only if no document uploaded
-    } else {
-      toast.success("Signup completed! Please log in to continue.");
-      navigate("/login");
-    }
+    setShowDocumentPopup(true); // Always show document popup after verifying OTP
   };
 
   const handleResendOtp = () => {
@@ -144,8 +134,9 @@ const SignUpForm = () => {
   };
 
   const handleDocumentSubmit = () => {
+    setVerifiedDocuments(true);
     setShowDocumentPopup(false);
-    toast.success("Document uploaded! Please log in to continue.");
+    toast.success("Document uploaded! Verifying documents...");
     navigate("/login");
   };
 

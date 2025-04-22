@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
   const { userId: zustandUserId, verifiedDocuments, setVerifiedDocuments } = useUserStore();
   const { is403Error } = useVerificationStore();
-  const { token, userId: reduxUserId } = useSelector((state) => state.user.data || {});
+  const { token, userId: reduxUserId, verifiedDocuments: backendVerifiedDocuments } = useSelector((state) => state.user.data || {});
   const [file, setFile] = useState(null);
   const [fileSelectedMessage, setFileSelectedMessage] = useState("");
   const [uploadError, setUploadError] = useState("");
@@ -21,6 +21,7 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
     zustandUserId,
     reduxUserId,
     verifiedDocuments,
+    backendVerifiedDocuments,
     is403Error,
     token,
   });
@@ -48,7 +49,9 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
       return;
     }
     if (!effectiveUserId) {
-      setUploadError("User ID is missing. Please sign up again.");
+      setUploadError("Please log in to upload documents.");
+      toast.error("Please log in to upload documents.", { id: "login-required" });
+      window.location.href = "/login";
       return;
     }
 
@@ -95,10 +98,19 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
     };
   };
 
-  const user = useSelector((state) => state.user.data || {});
-  const isBackendVerified = user?.verifiedDocuments === true;
+  const handleSkip = () => {
+    setVerifiedDocuments(false);
+    onSkip();
+  };
 
-  if ((verifiedDocuments || documentStatus === "pending") && !isBackendVerified) {
+  // Hide popup if backend has verified documents
+  if (backendVerifiedDocuments === true) {
+    setVerifiedDocuments(true);
+    return null;
+  }
+
+  // Show verifying message if documents are pending
+  if ((verifiedDocuments || documentStatus === "pending") && !backendVerifiedDocuments) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
@@ -165,7 +177,7 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
             {!is403Error && (
               <button
                 type="button"
-                onClick={onSkip}
+                onClick={handleSkip}
                 className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
               >
                 Skip
@@ -173,7 +185,7 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
             )}
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-all"
             >
               Submit
             </button>

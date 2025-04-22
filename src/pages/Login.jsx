@@ -10,9 +10,11 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { setData } from "../redux/UserSlice";
 import { Turnstile } from "@marsidev/react-turnstile";
+import { useUserStore } from "../redux/userStore";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
+  const { setVerifiedDocuments } = useUserStore();
   const siteKey = import.meta.env.VITE_SITE_KEY;
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
 
@@ -70,6 +72,7 @@ const LoginForm = () => {
           return;
         }
         dispatch(setData(response.data));
+        setVerifiedDocuments(response.data.verifiedDocuments || false); // Sync verifiedDocuments
         toast.success("Logged in successfully!");
         navigate("/");
       } catch (error) {
@@ -170,7 +173,7 @@ const LoginForm = () => {
       )}
 
       {/* Right Section */}
-      <div className="hidden lg:flex lg:w-[50%] bg-gradient-to-b from-purple-900 via-purple-700 to-purple-400 text-white  rounded-l-3xl overflow-hidden relative">
+      <div className="hidden lg:flex lg:w-[50%] bg-gradient-to-b from-purple-900 via-purple-700 to-purple-400 text-white rounded-l-3xl overflow-hidden relative">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-purple-700/30"></div>
         <div className="relative z-10 flex flex-col items-center justify-center w-full h-full p-12 text-center">
           <div className="max-w-lg">

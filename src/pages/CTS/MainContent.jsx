@@ -9,17 +9,17 @@ import { IoIosArrowBack } from "react-icons/io";
 
 const StatusCard = ({ company, status, offerDate, statusColor, iconColor }) => {
   return (
-    <div className="flex flex-col items-center p-5 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-xs">
+    <div className="flex flex-col items-center p-6 bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
       <div
-        className="flex items-center justify-center w-14 h-14 rounded-full mb-4"
+        className="flex items-center justify-center w-12 h-12 rounded-full mb-4"
         style={{ backgroundColor: `${iconColor}20` }}
       >
-        <HiOutlineUsers className="h-7 w-7" style={{ color: iconColor }} />
+        <HiOutlineUsers className="h-6 w-6" style={{ color: iconColor }} />
       </div>
       <h3 className="text-lg font-semibold text-gray-800 text-center truncate w-full">
         {company || "N/A"}
       </h3>
-      <p className={`text-sm font-medium ${statusColor} mt-1`}>{status || "Unknown"}</p>
+      <p className={`text-sm font-medium ${statusColor} mt-2`}>{status || "Unknown"}</p>
       {offerDate && (
         <p className="text-xs text-gray-500 mt-2">Offer Date: {offerDate}</p>
       )}
@@ -29,8 +29,8 @@ const StatusCard = ({ company, status, offerDate, statusColor, iconColor }) => {
 
 const HiringCandidateDetails = ({ data }) => {
   return (
-    <div className="mb-10 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
-      <h2 className="text-2xl font-bold mb-5 text-gray-900">Hiring Process Details</h2>
+    <div className="mb-12 p-6 bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 animate-fade-in">
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">Hiring Process Details</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <p className="text-gray-700">
@@ -89,14 +89,14 @@ const MainContent = () => {
     if (!searchedResponseData) return null;
 
     return (
-      <div className="w-full space-y-10">
+      <div className="w-full space-y-12">
         {searchedResponseData.hiringCandidateData && (
           <HiringCandidateDetails data={searchedResponseData.hiringCandidateData} />
         )}
 
         {searchedResponseData.filteredAppliedCompanies?.length > 0 && (
-          <div className="mb-10">
-            <h2 className="text-2xl font-bold mb-6 text-gray-900">Applied Companies</h2>
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Applied Companies</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {searchedResponseData.filteredAppliedCompanies.map((resData, index) => (
                 <StatusCard
@@ -112,8 +112,8 @@ const MainContent = () => {
         )}
 
         {searchedResponseData.signedOfferData?.length > 0 && (
-          <div className="mb-10">
-            <h2 className="text-2xl font-bold mb-6 text-gray-900">Signed Offers</h2>
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Signed Offers</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {searchedResponseData.signedOfferData.map((offer, index) => (
                 <StatusCard
@@ -130,8 +130,8 @@ const MainContent = () => {
         )}
 
         {searchedResponseData.hiringCandidateData?.allOfferData?.length > 0 && (
-          <div className="mb-10">
-            <h2 className="text-2xl font-bold mb-6 text-gray-900">All Offers</h2>
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">All Offers</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {searchedResponseData.hiringCandidateData.allOfferData.map((offer, index) => (
                 <StatusCard
@@ -151,72 +151,69 @@ const MainContent = () => {
   };
 
   return (
-    <div className="flex-1 min-h-screen pt-10">
-      <div className="w-full relative flex flex-col md:flex-row align-start justify-between pb-5 px-10 border-b border-gray-300 mb-6">
-        <div className="flex items-center mb-4 md:mb-0">
-          <button className="flex items-center text-gray-800 focus:outline-none" >
-            <IoIosArrowBack className="text-2xl mr-4" onClick={() => {
-
-              navigate("/")
-
-            }} />
-            <span className="font-bold text-xl md:text-2xl">Search Candidate</span>
-          </button>
-        </div>
-
-        <div className="flex justify-end items-center gap-4">
-          <Link to="/">
-            <button className="flex items-center px-4 py-2  font-semibold bg-purple-900 rounded-full text-white space-x-3 transition duration-200 shadow-md">
-              <HiOutlineUsers className="h-5 w-5" />
-              <span>Track Candidate</span>
-            </button>
-          </Link>
-
-          <Link to="/history">
+    <div className="min-h-screen  flex flex-col">
+      {/* Header */}
+      <header className="bg-gradient-to-r from-purple-700 rounded-full to-purple-900 text-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center">
+          <div className="flex items-center space-x-3">
             <button
-              className={`flex items-center gap-2 px-5 py-2 font-medium text-sm rounded-full transition-all duration-300 ${"text-gray-700 hover:bg-gray-200 hover:shadow-sm"
-                }`}
+              onClick={() => navigate("/")}
+              className="flex items-center text-white hover:text-purple-200 transition-colors duration-200"
+              aria-label="Go back"
             >
-              <FaFileCircleQuestion className="h-5 w-5" />
-              History
+              <IoIosArrowBack className="text-2xl" />
+              <span className="ml-2 text-lg font-semibold">Search Candidate</span>
             </button>
-          </Link>
-          <Link to="/invite">
-            <button
-              className={`flex items-center gap-2 px-5 py-2 font-medium text-sm rounded-full transition-all duration-300 ${"text-gray-700 hover:shadow-sm"
-                }`}
-            >
-              <FaUserPlus className="h-5 w-5" />
-              Invites
-            </button>
-          </Link>
+          </div>
+          <nav className="flex space-x-3 mt-4 sm:mt-0">
+            <Link to="/">
+              <button className="flex items-center px-4 py-2 text-purple-900 bg-white rounded-full hover:bg-purple-100 transition-all duration-200 shadow-md">
+                <HiOutlineUsers className="h-5 w-5 mr-2" />
+                Track
+              </button>
+            </Link>
+            <Link to="/history">
+              <button className="flex items-center px-4 py-2 text-white bg-transparent border border-white rounded-full hover:bg-purple-600 hover:border-transparent transition-all duration-200">
+                <FaFileCircleQuestion className="h-5 w-5 mr-2" />
+                History
+              </button>
+            </Link>
+            <Link to="/invite">
+              <button className="flex items-center px-4 py-2 text-white bg-purple-600 rounded-full hover:bg-purple-500 transition-all duration-200 shadow-md">
+                <FaUserPlus className="h-5 w-5 mr-2" />
+                Invites
+              </button>
+            </Link>
+          </nav>
         </div>
-      </div>
-      <div className="flex flex-col items-center justify-center px-6 py-12">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-8">
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
+        <h1 className="text-4xl font-extrabold text-gray-900 mb-8 text-center animate-fade-in">
           Search Candidate Pipeline
         </h1>
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full max-w-2xl">
-          <div className="relative w-full">
+        <div className="flex flex-col md:flex-row items-center gap-4 w-full max-w-4xl">
+          <div className="relative w-full group">
             <input
               type="email"
-              placeholder="Enter email address"
+              placeholder="Enter candidate email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-4 pl-12 border border-gray-200 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-[#803CD8] transition-all duration-200"
               onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+              className="w-full p-4 pl-12 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm transition-all duration-300 group-hover:shadow-md"
+              aria-label="Search candidate by email"
             />
-            <BiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-500" />
+            <BiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 group-hover:text-purple-600 transition-colors duration-200" />
           </div>
-          <button
-            onClick={handleSearch}
-            className="px-6 min-w-40 py-3 bg-gradient-to-r from-[#74449E] to-[#803CD8] text-white font-semibold rounded-full shadow-lg hover:shadow-xl  transition-all duration-300"
-          >
-            Check Status
-          </button>
+          <button onClick={handleSearch} className="px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium rounded-full hover:shadow-xl hover:scale-105 transition-all duration-300" aria-label="Search candidate">Check Status</button>
+
         </div>
-        {isError && <p className="mt-3 text-sm text-red-500 font-medium">{isError}</p>}
-      </div>
+        {isError && (
+          <p className="mt-4 text-sm text-red-500 text-center animate-pulse">{isError}</p>
+        )}
+        <div className="w-full max-w-7xl mx-auto px-4 py-12">{renderContent()}</div>
+      </main>
 
       {/* Popup */}
       {showPopups && (
@@ -229,9 +226,6 @@ const MainContent = () => {
           setError={setError}
         />
       )}
-
-      {/* Results */}
-      <div className="w-full max-w-7xl mx-auto px-6 py-10">{renderContent()}</div>
     </div>
   );
 };

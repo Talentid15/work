@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 
 const SettingsNav = () => {
   return (
-    <nav className="w-full flex space-x-28 ml-8">
+    <nav className="w-full flex space-x-28 justify-center mt-6">
       {[
         { name: "Profile", path: "/settings", exact: true },
         { name: "Users", path: "/settings/user" },

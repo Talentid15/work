@@ -5,6 +5,7 @@ import { MdEmail } from "react-icons/md";
 import ChangePassword from "../../components/settings/ChangePassword";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
+import api from "../../utils/api";
 
 const Profiles = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -92,7 +93,7 @@ const Profiles = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/api/users/update-user`,
         formData,
         {

@@ -1,9 +1,9 @@
 import { useState, useRef } from "react";
-import { ArrowLeft, CheckCircle, AlertTriangle } from "lucide-react";
+import { CheckCircle, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import axios from "axios";
 import toast from "react-hot-toast";
+import api from "../../utils/api";
 
 const OfferPunch = () => {
   const navigate = useNavigate();
@@ -111,7 +111,7 @@ const OfferPunch = () => {
 
     setIsSubmitting(true);
     try {
-       await axios.post(
+       await api.post(
         `${API_URL}/api/offer/create-offer-punch`,
         formData,
         {

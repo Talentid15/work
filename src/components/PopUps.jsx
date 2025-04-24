@@ -1,10 +1,10 @@
 import { useState } from "react";
-import axios from "axios";
 import toast from "react-hot-toast";
 import Loader from "./Loader";
 import { useSelector, useDispatch } from "react-redux";
 import { isValidEmail } from "../utils";
 import { setUserHistory } from "../redux/UserSlice";
+import api from "../utils/api";
 
 function PopUps({ setshowPopUps, emailSearch, setSearchedResponseData, setError }) {
   const dispatch = useDispatch();
@@ -36,7 +36,7 @@ function PopUps({ setshowPopUps, emailSearch, setSearchedResponseData, setError 
       }
 
       const backendUrl = `${API_URL}/api/users/user-info`;
-      const response = await axios.post(
+      const response = await api.post(
         backendUrl,
         { email: emailSearch, userId: data?._id },
         {

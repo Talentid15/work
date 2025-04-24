@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Line } from "react-chartjs-2";
-import axios from "axios";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,6 +12,7 @@ import {
   Legend,
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
+import api from "../../utils/api";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, zoomPlugin);
 
@@ -36,7 +36,7 @@ const MultiLineChart = () => {
     const fetchOffersData = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get(`${API_URL}/api/offer/get-all-offers`, {
+        const response = await api.get(`${API_URL}/api/offer/get-all-offers`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`,

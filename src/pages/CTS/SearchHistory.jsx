@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Users, FileText, UserPlus, ArrowLeft, Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import axios from "axios";
 import { formateDate } from "../../utils";
+import api from "../../utils/api";
 
 const SearchHistory = () => {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const SearchHistory = () => {
     const fetchProfile = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(
+        const response = await api.get(
           `${API_URL}/api/users`,
           {
             headers: {

@@ -4,8 +4,8 @@ import { FaFileAlt, FaPaperPlane } from "react-icons/fa";
 import MultiLineChart from "./MultiLineChart";
 import Card from "./Card";
 import { useSelector } from "react-redux";
-import axios from "axios";
 import Loader from "../../components/common/Loader";
+import api from "../../utils/api";
 
 const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
 
@@ -21,7 +21,7 @@ const DashBoard = () => {
       setIsLoading(true);
       try {
         // Fetch offer releases
-        const offerReleasesResponse = await axios.get(`${API_URL}/api/offer/get-all-offers`, {
+        const offerReleasesResponse = await api.get(`${API_URL}/api/offer/get-all-offers`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`,
@@ -29,7 +29,7 @@ const DashBoard = () => {
         });
 
         // Fetch offer punches
-        const offerPunchesResponse = await axios.get(`${API_URL}/api/offer/get-offer-punches`, {
+        const offerPunchesResponse = await api.get(`${API_URL}/api/offer/get-offer-punches`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`,

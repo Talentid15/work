@@ -1,16 +1,14 @@
 import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { FaUserPlus, FaPaperPlane } from "react-icons/fa6";
+import { UserPlus, Send, Users, FileText, ArrowLeft, Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { HiOutlineUsers } from "react-icons/hi";
-import { IoIosArrowBack } from "react-icons/io";
-import { FaFileCircleQuestion } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 
 const InvitePage = () => {
   const [inviteEmail, setInviteEmail] = useState("");
   const [error, setError] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const token = useSelector((state) => state.user.data?.token);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
@@ -47,47 +45,88 @@ const InvitePage = () => {
     }
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <div className="min-h-screen  flex flex-col">
-      {/* Header */}
-      <header className="bg-gradient-to-r mt-10 from-purple-700 to-purple-900 text-white shadow-lg rounded-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-6 py-2 flex flex-col sm:flex-row justify-between items-center">
-          <div className="flex items-center space-x-3">
+      {/* Navbar */}
+      <header className="relative  backdrop-blur-md shadow-sm z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <div className="flex items-center space-x-4">
             <button
               onClick={() => navigate("/")}
-              className="flex items-center text-white hover:text-purple-200 transition-colors duration-200"
+              className="flex items-center text-gray-700 hover:text-purple-600 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-full p-2"
               aria-label="Go back"
             >
-              <IoIosArrowBack className="text-2xl" />
+              <ArrowLeft size={24} />
               <span className="ml-2 text-lg font-semibold">Invite Candidate</span>
             </button>
           </div>
-          <nav className="flex space-x-3 mt-4 sm:mt-0">
-            <Link to="/">
-              <button className="flex items-center px-4 py-2 text-white bg-purple-600 rounded-full hover:bg-purple-500 transition-all duration-200 shadow-md">
-                <HiOutlineUsers className="h-5 w-5 mr-2" />
+          <nav className="hidden md:flex space-x-4">
+            <Link to="/" className="group relative">
+              <button className="flex items-center px-4 py-2 text-gray-700 hover:text-purple-600 rounded-lg hover:bg-purple-50 transition-all duration-200">
+                <Users className="h-5 w-5 mr-2" />
                 Track
               </button>
+              <span className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 -bottom-8 left-1/2 transform -translate-x-1/2 z-10">
+                Track Candidates
+              </span>
             </Link>
-            <Link to="/history">
-              <button className="flex items-center px-4 py-2 text-white bg-transparent border border-white rounded-full hover:bg-purple-600 hover:border-transparent transition-all duration-200">
-                <FaFileCircleQuestion className="h-5 w-5 mr-2" />
+            <Link to="/history" className="group relative">
+              <button className="flex items-center px-4 py-2 text-gray-700 hover:text-purple-600 rounded-lg hover:bg-purple-50 transition-all duration-200">
+                <FileText className="h-5 w-5 mr-2" />
                 History
               </button>
+              <span className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 -bottom-8 left-1/2 transform -translate-x-1/2 z-10">
+                View History
+              </span>
             </Link>
-            <Link to="/invite">
-              <button className="flex items-center px-4 py-2 text-purple-900 bg-white rounded-full hover:bg-purple-100 transition-all duration-200 shadow-md">
-                <FaUserPlus className="h-5 w-5 mr-2" />
+            <Link to="/invite" className="group relative">
+              <button className="flex items-center px-4 py-2 text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-all duration-200 shadow-md">
+                <UserPlus className="h-5 w-5 mr-2" />
                 Invites
               </button>
+              <span className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 -bottom-8 left-1/2 transform -translate-x-1/2 z-10">
+                Send Invites
+              </span>
             </Link>
           </nav>
+          <button className="md:hidden text-gray-700 hover:text-purple-600 focus:outline-none" onClick={toggleMenu} aria-label="Toggle menu">
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden bg-white shadow-lg px-4 py-6 animate-slide-in">
+            <nav className="flex flex-col space-y-4">
+              <Link to="/" onClick={toggleMenu}>
+                <button className="flex items-center px-4 py-2 text-gray-700 hover:text-purple-600 rounded-lg hover:bg-purple-50 transition-all duration-200 w-full text-left">
+                  <Users className="h-5 w-5 mr-2" />
+                  Track
+                </button>
+              </Link>
+              <Link to="/history" onClick={toggleMenu}>
+                <button className="flex items-center px-4 py-2 text-gray-700 hover:text-purple-600 rounded-lg hover:bg-purple-50 transition-all duration-200 w-full text-left">
+                  <FileText className="h-5 w-5 mr-2" />
+                  History
+                </button>
+              </Link>
+              <Link to="/invite" onClick={toggleMenu}>
+                <button className="flex items-center px-4 py-2 text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-all duration-200 w-full text-left">
+                  <UserPlus className="h-5 w-5 mr-2" />
+                  Invites
+                </button>
+              </Link>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-lg animate-fade-in">
+        <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl p-8 w-full max-w-lg border border-white/50 animate-fade-in">
           <h1 className="text-3xl font-extrabold text-gray-900 text-center mb-6">
             Invite a Candidate
           </h1>
@@ -102,17 +141,17 @@ const InvitePage = () => {
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleInvite()}
-                className="w-full p-4 pl-12 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm transition-all duration-300 group-hover:shadow-md"
+                className="w-full p-4 pl-12 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm transition-all duration-300 group-hover:shadow-md bg-white/80"
                 aria-label="Email address for invitation"
               />
-              <FaUserPlus className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 group-hover:text-purple-600 transition-colors duration-200" />
+              <UserPlus className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 group-hover:text-purple-600 transition-colors duration-200" size={20} />
             </div>
             <button
               onClick={handleInvite}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold rounded-full hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2"
+              className="w-full py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2"
               aria-label="Send invitation"
             >
-              <FaPaperPlane className="h-5 w-5" />
+              <Send className="h-5 w-5" />
               <span>Send Invite</span>
             </button>
             {error && (

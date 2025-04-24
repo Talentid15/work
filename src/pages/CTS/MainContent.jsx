@@ -1,20 +1,17 @@
 import { useState, useContext } from "react";
-import { BiSearch } from "react-icons/bi";
+import { Search, Users, FileText, UserPlus, Menu, X, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { PipelineContext } from "../../context/PipelineContext";
 import PopUps from "../../components/PopUps";
-import { HiOutlineUsers } from "react-icons/hi";
-import { FaFileCircleQuestion, FaUserPlus } from "react-icons/fa6";
-import { IoIosArrowBack } from "react-icons/io";
 
 const StatusCard = ({ company, status, offerDate, statusColor, iconColor }) => {
   return (
-    <div className="flex flex-col items-center p-6 bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+    <div className="flex flex-col items-center p-6 bg-white/30 backdrop-blur-lg rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-white/50">
       <div
         className="flex items-center justify-center w-12 h-12 rounded-full mb-4"
         style={{ backgroundColor: `${iconColor}20` }}
       >
-        <HiOutlineUsers className="h-6 w-6" style={{ color: iconColor }} />
+        <Users className="h-6 w-6" style={{ color: iconColor }} />
       </div>
       <h3 className="text-lg font-semibold text-gray-800 text-center truncate w-full">
         {company || "N/A"}
@@ -29,7 +26,7 @@ const StatusCard = ({ company, status, offerDate, statusColor, iconColor }) => {
 
 const HiringCandidateDetails = ({ data }) => {
   return (
-    <div className="mb-12 p-6 bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 animate-fade-in">
+    <div className="mb-12 p-6 bg-white/30 backdrop-blur-lg rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-white/50 animate-fade-in">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Hiring Process Details</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
@@ -70,6 +67,7 @@ const MainContent = () => {
   const [email, setEmail] = useState("");
   const { searchedResponseData, setSearchedResponseData } = useContext(PipelineContext);
   const [isError, setError] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleSearch = () => {
@@ -83,6 +81,10 @@ const MainContent = () => {
     }
     setShowPopups(true);
     setError("");
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
   };
 
   const renderContent = () => {
@@ -151,41 +153,78 @@ const MainContent = () => {
   };
 
   return (
-    <div className="min-h-screen  flex flex-col">
-      {/* Header */}
-      <header className="bg-gradient-to-r mt-10 from-purple-700 rounded-full to-purple-900 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row justify-between items-center">
-          <div className="flex items-center space-x-3">
+    <div className="min-h-screen  flex flex-col relative">
+      {/* Navbar */}
+      <header className=" sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <div className="flex items-center space-x-4">
             <button
               onClick={() => navigate("/")}
-              className="flex items-center text-white hover:text-purple-200 transition-colors duration-200"
+              className="flex items-center text-gray-700 hover:text-purple-600 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-full p-2"
               aria-label="Go back"
             >
-              <IoIosArrowBack className="text-2xl" />
+              <ArrowLeft size={24} />
               <span className="ml-2 text-lg font-semibold">Search Candidate</span>
             </button>
           </div>
-          <nav className="flex space-x-3 mt-4 sm:mt-0">
-            <Link to="/">
-              <button className="flex items-center px-4 py-2 text-purple-900 bg-white rounded-full hover:bg-purple-100 transition-all duration-200 shadow-md">
-                <HiOutlineUsers className="h-5 w-5 mr-2" />
+          <nav className="hidden md:flex space-x-4">
+            <Link to="/" className="group relative">
+              <button className="flex items-center px-4 py-2 text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-all duration-200 shadow-md">
+                <Users className="h-5 w-5 mr-2" />
                 Track
               </button>
+              <span className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 -bottom-8 left-1/2 transform -translate-x-1/2 z-10">
+                Track Candidates
+              </span>
             </Link>
-            <Link to="/history">
-              <button className="flex items-center px-4 py-2 text-white bg-transparent border border-white rounded-full hover:bg-purple-600 hover:border-transparent transition-all duration-200">
-                <FaFileCircleQuestion className="h-5 w-5 mr-2" />
+            <Link to="/history" className="group relative">
+              <button className="flex items-center px-4 py-2 text-gray-700 hover:text-purple-600 rounded-lg hover:bg-purple-50 transition-all duration-200">
+                <FileText className="h-5 w-5 mr-2" />
                 History
               </button>
+              <span className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 -bottom-8 left-1/2 transform -translate-x-1/2 z-10">
+                View History
+              </span>
             </Link>
-            <Link to="/invite">
-              <button className="flex items-center px-4 py-2 text-white bg-purple-600 rounded-full hover:bg-purple-500 transition-all duration-200 shadow-md">
-                <FaUserPlus className="h-5 w-5 mr-2" />
+            <Link to="/invite" className="group relative">
+              <button className="flex items-center px-4 py-2 text-gray-700 hover:text-purple-600 rounded-lg hover:bg-purple-50 transition-all duration-200">
+                <UserPlus className="h-5 w-5 mr-2" />
                 Invites
               </button>
+              <span className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 -bottom-8 left-1/2 transform -translate-x-1/2 z-10">
+                Send Invites
+              </span>
             </Link>
           </nav>
+          <button className="md:hidden text-gray-700 hover:text-purple-600 focus:outline-none" onClick={toggleMenu} aria-label="Toggle menu">
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden bg-white shadow-lg px-4 py-6 animate-slide-in">
+            <nav className="flex flex-col space-y-4">
+              <Link to="/" onClick={toggleMenu}>
+                <button className="flex items-center px-4 py-2 text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-all duration-200 w-full text-left">
+                  <Users className="h-5 w-5 mr-2" />
+                  Track
+                </button>
+              </Link>
+              <Link to="/history" onClick={toggleMenu}>
+                <button className="flex items-center px-4 py-2 text-gray-700 hover:text-purple-600 rounded-lg hover:bg-purple-50 transition-all duration-200 w-full text-left">
+                  <FileText className="h-5 w-5 mr-2" />
+                  History
+                </button>
+              </Link>
+              <Link to="/invite" onClick={toggleMenu}>
+                <button className="flex items-center px-4 py-2 text-gray-700 hover:text-purple-600 rounded-lg hover:bg-purple-50 transition-all duration-200 w-full text-left">
+                  <UserPlus className="h-5 w-5 mr-2" />
+                  Invites
+                </button>
+              </Link>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
@@ -201,13 +240,18 @@ const MainContent = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-              className="w-full p-4 pl-12 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm transition-all duration-300 group-hover:shadow-md"
+              className="w-full p-4 pl-12 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm transition-all duration-300 group-hover:shadow-md bg-white/80"
               aria-label="Search candidate by email"
             />
-            <BiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 group-hover:text-purple-600 transition-colors duration-200" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 group-hover:text-purple-600 transition-colors duration-200" size={20} />
           </div>
-          <button onClick={handleSearch} className="px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium rounded-full hover:shadow-xl hover:scale-105 transition-all duration-300" aria-label="Search candidate">Check Status</button>
-
+          <button
+            onClick={handleSearch}
+            className="px-8 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 hover:shadow-xl hover:scale-105 transition-all duration-300"
+            aria-label="Search candidate"
+          >
+            Check Status
+          </button>
         </div>
         {isError && (
           <p className="mt-4 text-sm text-red-500 text-center animate-pulse">{isError}</p>

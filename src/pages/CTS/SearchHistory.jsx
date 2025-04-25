@@ -58,7 +58,7 @@ const SearchHistory = () => {
   return (
     <div className="min-h-screen  flex flex-col">
       {/* Navbar */}
-      <header className=" backdrop-blur-md shadow-sm z-50">
+      <header className="relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <button

@@ -28,7 +28,7 @@ const SignUpForm = () => {
   const [showEmailPopup, setShowEmailPopup] = useState(false);
   const [showDocumentPopup, setShowDocumentPopup] = useState(false);
 
-  const validateEmail = (email) => {
+  const validateEmailDomain = (email) => {
     const freeEmailDomains = [
       "gmail.com",
       "yahoo.com",
@@ -40,45 +40,63 @@ const SignUpForm = () => {
       "zoho.com",
     ];
     const emailDomain = email.split("@")[1]?.toLowerCase();
-    if (!emailDomain) return false;
-    return !freeEmailDomains.includes(emailDomain);
+    return emailDomain && !freeEmailDomains.includes(emailDomain);
+  };
+
+  const validateField = (name, value) => {
+    switch (name) {
+      case "fullname":
+        if (!value.trim()) return "Full name is required";
+        if (value.length < 2 || value.length > 50) return "Full name must be 2-50 characters";
+        if (!/^[a-zA-Z\s-]+$/.test(value)) return "Full name can only contain letters, spaces, and hyphens";
+        return "";
+      case "email":
+        if (!value) return "Email is required";
+        if (!/^\S+@\S+\.\S+$/.test(value)) return "Invalid email format";
+        if (!validateEmailDomain(value)) return "Please use a company email address (not Gmail, Yahoo, etc.)";
+        return "";
+      case "phone":
+        if (!value.trim()) return "Phone number is required";
+        if (!/^\d{10}$/.test(value)) return "Phone number must be exactly 10 digits";
+        return "";
+      case "company":
+        if (!value.trim()) return "Company name is required";
+        if (value.length < 2 || value.length > 100) return "Company name must be 2-100 characters";
+        if (!/^[a-zA-Z0-9\s&-]+$/.test(value)) return "Company name can only contain letters, numbers, spaces, &, and -";
+        return "";
+      case "role":
+        if (!value) return "Please select a role";
+        if (!["Corporate HR", "HR Agency", "Others"].includes(value)) return "Invalid role selected";
+        return "";
+      case "password":
+        if (!value) return "Password is required";
+        if (value.length < 8 || value.length > 50) return "Password must be 8-50 characters";
+        if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(value))
+          return "Password must include uppercase, lowercase, number, and special character";
+        return "";
+      case "termsAccepted":
+        return value ? "" : "You must accept the terms and conditions";
+      default:
+        return "";
+    }
   };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (name === "email") {
-      if (value && !validateEmail(value)) {
-        setErrors((prev) => ({
-          ...prev,
-          email: "Please use a company email address (not Gmail, Yahoo, etc.)",
-        }));
-      } else {
-        setErrors((prev) => ({ ...prev, email: "" }));
-      }
-    }
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
+    const newValue = type === "checkbox" ? checked : value;
+    setFormData({ ...formData, [name]: newValue });
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, newValue) }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = {};
-    if (!formData.fullname.trim()) newErrors.fullname = "Full name is required";
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = "Please use a company email address (not Gmail, Yahoo, etc.)";
-    }
-    if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
-    if (!formData.company.trim()) newErrors.company = "Company name is required";
-    if (!formData.role) newErrors.role = "Please select a role";
-    if (!formData.password) newErrors.password = "Password is required";
-    if (!formData.termsAccepted) newErrors.termsAccepted = "You must accept the terms and conditions";
+    Object.keys(formData).forEach((key) => {
+      newErrors[key] = validateField(key, formData[key]);
+    });
 
-    if (Object.keys(newErrors).length > 0) {
+    if (Object.values(newErrors).some((error) => error)) {
       setErrors(newErrors);
       return;
     }
@@ -97,7 +115,7 @@ const SignUpForm = () => {
           userId: response.data.data.userId,
           email: formData.email,
           emailVerified: false,
-          verifiedDocuments: false, // Initialize as false
+          verifiedDocuments: false,
         });
         setShowEmailPopup(true);
         setErrors({});
@@ -114,12 +132,12 @@ const SignUpForm = () => {
   const handleSkipOtp = () => {
     setShowEmailPopup(false);
     setUserData((prev) => ({ ...prev, emailVerified: false }));
-    setShowDocumentPopup(true); // Always show document popup after skipping OTP
+    setShowDocumentPopup(true);
   };
 
   const handleVerifyOtp = () => {
     setShowEmailPopup(false);
-    setShowDocumentPopup(true); // Always show document popup after verifying OTP
+    setShowDocumentPopup(true);
   };
 
   const handleResendOtp = () => {
@@ -164,7 +182,7 @@ const SignUpForm = () => {
           Sign Up
         </h2>
         <p className="text-center px-6 md:px-20 mb-4 text-sm md:text-base">
-          Let's get started. <br />
+          Lets get started. <br />
           Are you ready to be a part of something new?
         </p>
         {errors.general && (

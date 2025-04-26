@@ -18,6 +18,7 @@ const Job_Offer = () => {
   const [error, setError] = useState(null);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
   const token = useSelector((state) => state.user.data?.token);
+  const data = useSelector((state) => state.user.data);
 
   useEffect(() => {
     const fetchOffersData = async () => {
@@ -62,10 +63,8 @@ const Job_Offer = () => {
     "Pending",
     "Accepted",
     "Declined",
-    "OnBoarding",
     "Ghosted",
     "Expired",
-    "Offer letter released",
     "Retracted"
   ];
 
@@ -139,7 +138,7 @@ const Job_Offer = () => {
                       </td>
                       <td className="p-4">
                         <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
-                          {offer.offerLetterStatus}
+                          {data.company}
                         </span>
                       </td>
                       <td className="p-4 text-gray-700">{formateDate(offer.offerDate) || "N/A"}</td>

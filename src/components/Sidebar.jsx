@@ -48,12 +48,10 @@ const Sidebar = () => {
         } md:relative md:translate-x-0 rounded-r-xl flex flex-col justify-between`}
       >
         {/* Header */}
-        <div>
-          <div className="flex items-center justify-center py-6 border-b border-purple-400/30">
-            <h1 className="text-xl font-bold text-center tracking-wide">
+        <div className="">
+          <h1 className="flex items-center justify-center pb-5 pt-10 border-b border-purple-400/30 text-xl font-bold text-centerde">
               {selectedNav}
-            </h1>
-          </div>
+          </h1>
 
           {/* Navigation */}
           <nav className="mt-6 px-3 space-y-1">

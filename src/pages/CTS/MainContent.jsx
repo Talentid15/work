@@ -245,13 +245,8 @@ const MainContent = () => {
             />
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 group-hover:text-purple-600 transition-colors duration-200" size={20} />
           </div>
-          <button
-            onClick={handleSearch}
-            className="px-8 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 hover:shadow-xl hover:scale-105 transition-all duration-300"
-            aria-label="Search candidate"
-          >
-            Check Status
-          </button>
+          <button onClick={handleSearch} className="px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-all duration-300" aria-label="Search">Check</button>
+
         </div>
         {isError && (
           <p className="mt-4 text-sm text-red-500 text-center animate-pulse">{isError}</p>

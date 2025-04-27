@@ -12,7 +12,6 @@ const SubscriptionPage = () => {
       <div className="bg-white rounded-3xl shadow-2xl p-8 animate-fade-in">
 
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Subscriptions</h2>
-        <p className="text-gray-600 mb-8">Manage your subscription plan and usage</p>
 
         {/* Subscription Details Card */}
         <div className="bg-gray-50 rounded-2xl p-6 mb-8 shadow-md">

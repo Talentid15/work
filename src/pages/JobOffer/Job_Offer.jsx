@@ -16,7 +16,8 @@ const Job_Offer = () => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
   const token = useSelector((state) => state.user.data?.token);
   const data = useSelector((state) => state.user.data);
 
@@ -65,24 +66,36 @@ const Job_Offer = () => {
     "Declined",
     "Ghosted",
     "Expired",
-    "Retracted"
+    "Retracted",
   ];
 
-  const visibleOffers = offersData?.filter(offer => offer.showOffer !== false);
+  const visibleOffers = offersData?.filter((offer) => offer.showOffer !== false);
   const filteredOffers =
     statusFilter === "All"
       ? visibleOffers
       : visibleOffers?.filter((offer) => offer.status === statusFilter);
 
+  // Handle dropdown option selection
+  const handleReleaseOption = (option) => {
+    setIsDropdownOpen(false);
+    if (option === "release") {
+      navigate("/release-offer");
+    } else if (option === "release-with-prediction") {
+      navigate("/release-offer?prediction=true");
+    }
+  };
+
   return (
-    <div className="min-h-screen  py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-purple-800 mb-6">Job Offers Dashboard</h1>
-        
+        <h1 className="text-2xl sm:text-3xl font-bold text-purple-800 mb-6">
+          Job Offers Dashboard
+        </h1>
+
         {/* Header Controls */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <select
-            className="w-full sm:w-48 px-4 py-2  border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-700"
+            className="w-full sm:w-48 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-700"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -92,13 +105,32 @@ const Job_Offer = () => {
               </option>
             ))}
           </select>
-          <button
-            className="flex items-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto justify-center sm:justify-start"
-            onClick={() => navigate("/release-offer")}
-          >
-            <FaFileAlt />
-            Release an Offer
-          </button>
+          {/* Dropdown Menu */}
+          <div className="relative w-full sm:w-auto">
+            <button
+              className="flex items-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto justify-center sm:justify-start"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
+              <FaFileAlt />
+              Release Options
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                <button
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-purple-100 transition-all"
+                  onClick={() => handleReleaseOption("release")}
+                >
+                  Release Offer
+                </button>
+                <button
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-purple-100 transition-all"
+                  onClick={() => handleReleaseOption("release-with-prediction")}
+                >
+                  Release Offer with Prediction
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Content */}

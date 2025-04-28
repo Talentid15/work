@@ -111,7 +111,7 @@ const OfferPunch = () => {
 
     setIsSubmitting(true);
     try {
-       await api.post(
+      await api.post(
         `${API_URL}/api/offer/create-offer-punch`,
         formData,
         {
@@ -157,7 +157,7 @@ const OfferPunch = () => {
   const isFormValid = Object.keys(errors).length === 0 && Object.values(formData).every((val) => val !== "" && val !== null);
 
   return (
-    <div className="min-h-screen  flex flex-col items-center justify-start p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen flex flex-col items-center justify-start p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-5xl flex items-center justify-between mb-6 sticky top-0 bg-white/80 backdrop-blur-md p-4 rounded-xl shadow-sm z-10">
         <div className="flex items-center">
           <h1 className="ml-4 text-2xl font-bold text-gray-800">Offer Punch</h1>
@@ -258,7 +258,7 @@ const OfferPunch = () => {
               />
             </div>
             <div className="relative">
-              <label className="absolute -top-2.5 left-3 bg-white/50 px-2 text-sm text-gray-600 font-medium">
+              <label className=" px-2 text-sm text-gray-600 font-medium">
                 Status
               </label>
               <div className="relative">
@@ -282,10 +282,10 @@ const OfferPunch = () => {
                   ))}
                 </select>
                 {touched.offerLetterStatus && !errors.offerLetterStatus && formData.offerLetterStatus && (
-                  <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" size={20} />
+                  <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 pointer-events-none" size={20} />
                 )}
                 {touched.offerLetterStatus && errors.offerLetterStatus && (
-                  <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500" size={20} />
+                  <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 pointer-events-none" size={20} />
                 )}
               </div>
               {errors.offerLetterStatus && touched.offerLetterStatus && (
@@ -302,6 +302,7 @@ const OfferPunch = () => {
             <FileInput
               label="Offer Letter (PDF)"
               name="offerLetter"
+              value={formData.offerLetter}
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.offerLetter}
@@ -310,6 +311,7 @@ const OfferPunch = () => {
             <FileInput
               label="Resume (PDF)"
               name="candidateResume"
+              value={formData.candidateResume}
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.candidateResume}
@@ -359,10 +361,7 @@ const OfferPunch = () => {
 // Input Field Component
 const InputField = ({ label, type = "text", name, value, onChange, onBlur, error, touched }) => (
   <div className="relative">
-    <label
-      className=" bg-white/50 px-2 text-sm text-gray-600 font-medium"
-      htmlFor={name}
-    >
+    <label className=" px-2 text-sm text-gray-600 font-medium" htmlFor={name}>
       {label}
     </label>
     <div className="relative">
@@ -380,10 +379,10 @@ const InputField = ({ label, type = "text", name, value, onChange, onBlur, error
         aria-describedby={`${name}-error`}
       />
       {touched && !error && value && (
-        <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" size={20} />
+        <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 pointer-events-none" size={20} />
       )}
       {touched && error && (
-        <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500" size={20} />
+        <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 pointer-events-none" size={20} />
       )}
     </div>
     {error && touched && (
@@ -395,12 +394,9 @@ const InputField = ({ label, type = "text", name, value, onChange, onBlur, error
 );
 
 // File Input Component
-const FileInput = ({ label, name, onChange, onBlur, error, touched }) => (
+const FileInput = ({ label, name, value, onChange, onBlur, error, touched }) => (
   <div className="relative group">
-    <label
-      className="absolute -top-2.5 left-3 bg-white/50 px-2 text-sm text-gray-600 font-medium"
-      htmlFor={name}
-    >
+    <label className=" px-2 text-sm text-gray-600 font-medium" htmlFor={name}>
       {label}
     </label>
     <div className="relative">
@@ -417,11 +413,11 @@ const FileInput = ({ label, name, onChange, onBlur, error, touched }) => (
         aria-invalid={error && touched ? "true" : "false"}
         aria-describedby={`${name}-error`}
       />
-      {touched && !error && formData[name] && (
-        <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" size={20} />
+      {touched && !error && value && (
+        <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 pointer-events-none" size={20} />
       )}
       {touched && error && (
-        <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500" size={20} />
+        <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 pointer-events-none" size={20} />
       )}
     </div>
     <div className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 right-0 mt-1 z-10">

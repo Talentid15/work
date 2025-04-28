@@ -10,7 +10,6 @@ function OfferIntelligence() {
         🚀 This feature is launching soon. We are cooking up something awesome for you!
       </p>
       <span className="text-sm text-gray-400">Stay tuned for powerful insights and analytics 💡</span>
-
       {/* Uncomment this once routing is needed */}
       {/* <Outlet /> */}
     </div>

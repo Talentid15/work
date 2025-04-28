@@ -3,8 +3,6 @@ import { NavLink, Link } from "react-router-dom";
 import { MdOutlineSettings } from "react-icons/md";
 import { MdDashboard } from "react-icons/md";
 import { BiEdit } from "react-icons/bi";
-import { BiBriefcase } from "react-icons/bi";
-import { BsPersonBadge } from "react-icons/bs";
 import { BiSolidCheckShield } from "react-icons/bi";
 import { SiLens } from "react-icons/si";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
@@ -14,17 +12,16 @@ import { GiBackwardTime } from "react-icons/gi";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isCandidateTrackingOpen, setIsCandidateTrackingOpen] = useState(false);
-  const [selectedNav, setSelectedNav] = useState("Candidate Tracking");
+  const [isJobOffersOpen, setIsJobOffersOpen] = useState(false);
+  const [selectedNav, setSelectedNav] = useState("Dashboard");
   const location = useLocation();
-  const isOfferPunchActive = location.pathname === "/offer-punch";
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
 
-  const toggleCandidateTracking = () => {
-    setIsCandidateTrackingOpen(!isCandidateTrackingOpen);
+  const toggleJobOffers = () => {
+    setIsJobOffersOpen(!isJobOffersOpen);
   };
 
   return (
@@ -49,8 +46,8 @@ const Sidebar = () => {
       >
         {/* Header */}
         <div className="">
-          <h1 className="flex items-center justify-center pb-5 pt-10 border-b border-purple-400/30 text-xl font-bold text-centerde">
-              {selectedNav}
+          <h1 className="flex items-center justify-center pb-5 pt-10 border-b border-purple-400/30 text-xl font-bold text-center">
+            {selectedNav}
           </h1>
 
           {/* Navigation */}
@@ -68,48 +65,61 @@ const Sidebar = () => {
               <span className="text-sm">Dashboard</span>
             </NavLink>
 
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive
+                  ? "flex items-center space-x-3 px-4 py-3 bg-white/20 rounded-xl text-white font-medium shadow-md"
+                  : "flex items-center space-x-3 px-4 py-3 hover:bg-white/10 rounded-xl transition-all duration-200"
+              }
+              onClick={() => setSelectedNav("Candidate Search")}
+            >
+              <BiSolidCheckShield className="h-5 w-5" />
+              <span className="text-sm">Candidate Search</span>
+            </NavLink>
+
             <div className="rounded-xl overflow-hidden transition-all duration-300">
-              <NavLink
-                to="/"
-                onClick={(e) => {
-                  e.preventDefault();
-                  toggleCandidateTracking();
-                  setSelectedNav("Candidate Tracker");
+              <div
+                onClick={() => {
+                  toggleJobOffers();
+                  setSelectedNav("Job Offers");
                 }}
-                className={({ isActive }) =>
-                  isActive || isOfferPunchActive
-                    ? "flex items-center justify-between px-4 py-3 bg-white/20 text-white font-medium"
-                    : "flex items-center justify-between px-4 py-3 hover:bg-white/10 transition-all duration-200"
+                className={
+                  isJobOffersOpen ||
+                  location.pathname === "/joboffers" ||
+                  location.pathname === "/offer-punch"
+                    ? "flex items-center justify-between px-4 py-3 bg-white/20 text-white font-medium cursor-pointer"
+                    : "flex items-center justify-between px-4 py-3 hover:bg-white/10 transition-all duration-200 cursor-pointer"
                 }
               >
                 <div className="flex items-center space-x-3">
-                  <BiSolidCheckShield className="h-5 w-5" />
-                  <span className="text-sm">Candidate Search</span>
+                  <BiEdit className="h-5 w-5" />
+                  <span className="text-sm">Job Offers</span>
                 </div>
                 <FaChevronDown
                   className={`transition-transform duration-300 ${
-                    isCandidateTrackingOpen ? "rotate-180" : ""
+                    isJobOffersOpen ? "rotate-180" : ""
                   }`}
                 />
-              </NavLink>
+              </div>
 
-              {/* Sub-options for Candidate Tracking */}
+              {/* Sub-options for Job Offers */}
               <div
                 className={`transition-all duration-300 overflow-hidden ${
-                  isCandidateTrackingOpen ? "max-h-40" : "max-h-0"
+                  isJobOffersOpen ? "max-h-40" : "max-h-0"
                 }`}
               >
                 <NavLink
-                  to="/"
+                  to="/joboffers"
                   className={({ isActive }) =>
                     isActive
                       ? "flex items-center pl-12 pr-4 py-3 bg-white/15 border-l-2 border-white text-white"
                       : "flex items-center pl-12 pr-4 py-3 hover:bg-white/5 border-l-2 border-transparent hover:border-purple-300/50 transition-all duration-200"
                   }
-                  onClick={() => setSelectedNav("Candidate Tracker (Interview)")}
+                  onClick={() => setSelectedNav("Release Offers")}
                 >
-                  <BsPersonBadge className="h-4 w-4 mr-3" />
-                  <span className="text-sm">Interview</span>
+                  <BiEdit className="h-4 w-4 mr-3" />
+                  <span className="text-sm">Release Offers</span>
                 </NavLink>
                 <NavLink
                   to="/offer-punch"
@@ -118,26 +128,13 @@ const Sidebar = () => {
                       ? "flex items-center pl-12 pr-4 py-3 bg-white/15 border-l-2 border-white text-white"
                       : "flex items-center pl-12 pr-4 py-3 hover:bg-white/5 border-l-2 border-transparent hover:border-purple-300/50 transition-all duration-200"
                   }
-                  onClick={() => setSelectedNav("Candidate Tracker (Offer punch)")}
+                  onClick={() => setSelectedNav("Offer Punch")}
                 >
                   <BiEdit className="h-4 w-4 mr-3" />
                   <span className="text-sm">Offer Punch</span>
                 </NavLink>
               </div>
             </div>
-
-            <NavLink
-              to="/joboffers"
-              className={({ isActive }) =>
-                isActive
-                  ? "flex items-center space-x-3 px-4 py-3 bg-white/20 rounded-xl text-white font-medium shadow-md"
-                  : "flex items-center space-x-3 px-4 py-3 hover:bg-white/10 rounded-xl transition-all duration-200"
-              }
-              onClick={() => setSelectedNav("Job Offers")}
-            >
-              <BiBriefcase className="h-5 w-5" />
-              <span className="text-sm">Job Offers</span>
-            </NavLink>
 
             <NavLink
               to="/offerIntelligence"

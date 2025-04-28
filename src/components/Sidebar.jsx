@@ -158,7 +158,8 @@ const Sidebar = () => {
         <div className="px-6 pb-20 space-y-3 mt-auto">
           {/* Support Button */}
           <Link
-            to="/support"
+            to="https://talentid.tawk.help/"
+            target="_blank"
             className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all duration-200"
           >
             <GiBackwardTime className="h-5 w-5" />

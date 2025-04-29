@@ -93,7 +93,7 @@ const LoginForm = () => {
         <div className="w-full max-w-md px-6 py-12">
           {/* Logo area */}
           <div className="mb-10">
-            <img src={logo} alt="Logo" className="w-[50%] h-auto" />
+            <img src={logo} alt="Logo" className="w-[50%] h-auto mx-auto" />
           </div>
 
           {/* Login form */}

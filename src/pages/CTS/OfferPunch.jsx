@@ -1,15 +1,22 @@
-import { useState, useRef } from "react";
-import { CheckCircle, AlertTriangle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { FaFileAlt } from "react-icons/fa";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import api from "../../utils/api";
+import Loader from "../../components/common/Loader";
+import { AlertTriangle, CheckCircle } from "lucide-react";
 
 const OfferPunch = () => {
   const navigate = useNavigate();
   const token = useSelector((state) => state.user.data?.token);
   const formRef = useRef(null);
-
+  const [showForm, setShowForm] = useState(false);
+  const [offerPunches, setOfferPunches] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [formData, setFormData] = useState({
     jobTitle: "",
     candidateName: "",
@@ -22,12 +29,33 @@ const OfferPunch = () => {
     candidateResume: null,
     offerLetterStatus: "",
   });
-
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [touched, setTouched] = useState({});
-  const statusOptions = ["Offer letter released", "Candidate verbal commitment"];
+  const statusOptions = ["All", "Offer letter released", "Candidate verbal commitment"];
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
+
+  useEffect(() => {
+    const fetchOfferPunches = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const offerPunchesResponse = await api.get(`${API_URL}/api/offer/get-offer-punches`, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setOfferPunches(offerPunchesResponse.data || []);
+      } catch (error) {
+        console.error("Error fetching offer punches:", error);
+        setError("Failed to fetch offer punches. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOfferPunches();
+  }, [token]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -100,7 +128,7 @@ const OfferPunch = () => {
     validateForm();
   };
 
-  const formSubmitHandler = async (e) => {
+  const handleFormSubmit = (e) => {
     e.preventDefault();
     if (!validateForm()) {
       toast.error("Please fix the errors in the form");
@@ -108,7 +136,12 @@ const OfferPunch = () => {
       formRef.current.querySelector(`[name="${firstErrorField}"]`)?.focus();
       return;
     }
+    
+    // Show confirmation popup instead of submitting directly
+    setShowConfirmation(true);
+  };
 
+  const confirmSubmit = async () => {
     setIsSubmitting(true);
     try {
       await api.post(
@@ -122,14 +155,40 @@ const OfferPunch = () => {
           withCredentials: true,
         }
       );
-      toast.success("Offer submitted successfully!");
-      navigate(-1);
+      toast.success("Offer punch submitted successfully!");
+      setShowForm(false); // Hide form after successful submission
+      setShowConfirmation(false); // Hide confirmation popup
+      setFormData({
+        jobTitle: "",
+        candidateName: "",
+        candidateEmail: "",
+        candidatePhoneNo: "",
+        companyName: "",
+        joiningDate: "",
+        expiryDate: "",
+        offerLetter: null,
+        candidateResume: null,
+        offerLetterStatus: "",
+      });
+      setErrors({});
+      setTouched({});
+      const offerPunchesResponse = await api.get(`${API_URL}/api/offer/get-offer-punches`, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setOfferPunches(offerPunchesResponse.data || []);
     } catch (error) {
       console.error("Submission Error:", error.response?.data || error.message);
-      toast.error("Failed to submit offer. Please try again.");
+      toast.error("Failed to submit offer punch. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const cancelSubmit = () => {
+    setShowConfirmation(false);
   };
 
   const resetForm = () => {
@@ -156,204 +215,328 @@ const OfferPunch = () => {
 
   const isFormValid = Object.keys(errors).length === 0 && Object.values(formData).every((val) => val !== "" && val !== null);
 
+  const filteredPunches = statusFilter === "All"
+    ? offerPunches
+    : offerPunches.filter((punch) => punch.offerLetterStatus === statusFilter);
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start p-4 sm:p-6 lg:p-8">
-      <div className="w-full max-w-5xl flex items-center justify-between mb-6 sticky top-0 bg-white/80 backdrop-blur-md p-4 rounded-xl shadow-sm z-10">
-        <div className="flex items-center">
-          <h1 className="ml-4 text-2xl font-bold text-gray-800">Offer Punch</h1>
-        </div>
-        <div className="text-sm text-gray-600">
-          Completion: <span className="font-semibold text-purple-600">{completionPercentage}%</span>
-        </div>
-      </div>
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-purple-800 mb-6">
+          Offer Punch Dashboard
+        </h1>
 
-      {/* Form Card */}
-      <form
-        ref={formRef}
-        onSubmit={formSubmitHandler}
-        className="w-full max-w-5xl bg-white/30 backdrop-blur-lg rounded-2xl shadow-xl p-6 sm:p-8 lg:p-10 border border-white/50"
-      >
-        <h2 className="text-xl font-semibold text-gray-800 border-b border-gray-200 pb-4 mb-6">
-          Enter Candidate Details
-        </h2>
+        {/* Header Controls */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+          <select
+            className="w-full sm:w-48 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-700"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            {statusOptions.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+          <button
+            className="flex items-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto justify-center sm:justify-start"
+            onClick={() => setShowForm(true)}
+          >
+            <FaFileAlt />
+            Add Offer Punch
+          </button>
+        </div>
 
-        {/* Candidate Information Section */}
-        <div className="mb-8">
-          <h3 className="text-lg font-medium text-gray-700 mb-4">Candidate Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InputField
-              label="Candidate Name"
-              name="candidateName"
-              value={formData.candidateName}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.candidateName}
-              touched={touched.candidateName}
-            />
-            <InputField
-              label="Candidate Email"
-              type="email"
-              name="candidateEmail"
-              value={formData.candidateEmail}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.candidateEmail}
-              touched={touched.candidateEmail}
-            />
-            <InputField
-              label="Candidate Phone No"
-              type="tel"
-              name="candidatePhoneNo"
-              value={formData.candidatePhoneNo}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.candidatePhoneNo}
-              touched={touched.candidatePhoneNo}
-            />
+        {/* Content */}
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+            <Loader />
           </div>
-        </div>
+        ) : error ? (
+          <div className="text-center text-red-500 font-medium py-8">{error}</div>
+        ) : showForm ? (
+          <form
+            ref={formRef}
+            onSubmit={handleFormSubmit}
+            className="w-full space-y-6"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-700">Enter Candidate Details</h2>
+              <div className="text-sm text-gray-600">
+                Completion: <span className="font-semibold text-purple-600">{completionPercentage}%</span>
+              </div>
+            </div>
 
-        {/* Offer Details Section */}
-        <div className="mb-8">
-          <h3 className="text-lg font-medium text-gray-700 mb-4">Offer Details</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InputField
-              label="Job Title"
-              name="jobTitle"
-              value={formData.jobTitle}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.jobTitle}
-              touched={touched.jobTitle}
-            />
-            <InputField
-              label="Company Name"
-              name="companyName"
-              value={formData.companyName}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.companyName}
-              touched={touched.companyName}
-            />
-            <div className="grid grid-cols-2 gap-4">
+            {/* Candidate Information Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InputField
-                label="Joining Date"
-                type="date"
-                name="joiningDate"
-                value={formData.joiningDate}
+                label="Candidate Name"
+                name="candidateName"
+                value={formData.candidateName}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                error={errors.joiningDate}
-                touched={touched.joiningDate}
+                error={errors.candidateName}
+                touched={touched.candidateName}
               />
               <InputField
-                label="Expiry Date"
-                type="date"
-                name="expiryDate"
-                value={formData.expiryDate}
+                label="Candidate Email"
+                type="email"
+                name="candidateEmail"
+                value={formData.candidateEmail}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                error={errors.expiryDate}
-                touched={touched.expiryDate}
+                error={errors.candidateEmail}
+                touched={touched.candidateEmail}
+              />
+              <InputField
+                label="Candidate Phone No"
+                type="tel"
+                name="candidatePhoneNo"
+                value={formData.candidatePhoneNo}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={errors.candidatePhoneNo}
+                touched={touched.candidatePhoneNo}
               />
             </div>
-            <div className="relative">
-              <label className=" px-2 text-sm text-gray-600 font-medium">
-                Status
-              </label>
-              <div className="relative">
-                <select
-                  name="offerLetterStatus"
-                  value={formData.offerLetterStatus}
+
+            {/* Offer Details Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <InputField
+                label="Job Title"
+                name="jobTitle"
+                value={formData.jobTitle}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={errors.jobTitle}
+                touched={touched.jobTitle}
+              />
+              <InputField
+                label="Company Name"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={errors.companyName}
+                touched={touched.companyName}
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <InputField
+                  label="Joining Date"
+                  type="date"
+                  name="joiningDate"
+                  value={formData.joiningDate}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full p-3 pr-10 border rounded-lg focus:ring-2 focus:ring-purple-500 transition-all appearance-none ${
-                    errors.offerLetterStatus && touched.offerLetterStatus ? "border-red-500" : "border-gray-300"
-                  } bg-white/50`}
-                  aria-invalid={errors.offerLetterStatus && touched.offerLetterStatus ? "true" : "false"}
-                >
-                  <option value="" disabled>
-                    Select status
-                  </option>
-                  {statusOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
+                  error={errors.joiningDate}
+                  touched={touched.joiningDate}
+                />
+                <InputField
+                  label="Expiry Date"
+                  type="date"
+                  name="expiryDate"
+                  value={formData.expiryDate}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={errors.expiryDate}
+                  touched={touched.expiryDate}
+                />
+              </div>
+              <div className="relative">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Status
+                </label>
+                <div className="relative">
+                  <select
+                    name="offerLetterStatus"
+                    value={formData.offerLetterStatus}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className="w-full p-3 pr-10 border rounded-lg focus:ring-2 focus:ring-purple-500 transition-all appearance-none border-gray-300 bg-white"
+                    aria-invalid={errors.offerLetterStatus && touched.offerLetterStatus ? "true" : "false"}
+                  >
+                    <option value="" disabled>
+                      Select status
                     </option>
-                  ))}
-                </select>
-                {touched.offerLetterStatus && !errors.offerLetterStatus && formData.offerLetterStatus && (
-                  <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 pointer-events-none" size={20} />
-                )}
-                {touched.offerLetterStatus && errors.offerLetterStatus && (
-                  <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 pointer-events-none" size={20} />
+                    {statusOptions.filter(s => s !== "All").map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                  {touched.offerLetterStatus && !errors.offerLetterStatus && formData.offerLetterStatus && (
+                    <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 pointer-events-none" size={20} />
+                  )}
+                  {touched.offerLetterStatus && errors.offerLetterStatus && (
+                    <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 pointer-events-none" size={20} />
+                  )}
+                </div>
+                {errors.offerLetterStatus && touched.offerLetterStatus && (
+                  <p className="text-red-500 text-sm mt-1">{errors.offerLetterStatus}</p>
                 )}
               </div>
-              {errors.offerLetterStatus && touched.offerLetterStatus && (
-                <p className="text-red-500 text-sm mt-1">{errors.offerLetterStatus}</p>
-              )}
+            </div>
+
+            {/* Documents Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FileInput
+                label="Offer Letter (PDF)"
+                name="offerLetter"
+                value={formData.offerLetter}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={errors.offerLetter}
+                touched={touched.offerLetter}
+              />
+              <FileInput
+                label="Resume (PDF)"
+                name="candidateResume"
+                value={formData.candidateResume}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={errors.candidateResume}
+                touched={touched.candidateResume}
+              />
+            </div>
+
+            {/* Form Actions */}
+            <div className="mt-8 flex justify-between items-center">
+              <button
+                type="button"
+                onClick={resetForm}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all text-sm font-medium"
+                disabled={isSubmitting}
+              >
+                Reset Form
+              </button>
+              <button
+                type="submit"
+                disabled={!isFormValid || isSubmitting}
+                className="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all text-sm font-medium flex items-center gap-2"
+                aria-label="Submit offer punch"
+              >
+                {isSubmitting && (
+                  <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                )}
+                {isSubmitting ? "Submitting..." : "Submit"}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
+            {filteredPunches?.length > 0 ? (
+              <>
+                {/* Desktop Table View */}
+                <div className="hidden lg:block overflow-x-auto rounded-xl border border-gray-200 mb-6">
+                  <table className="w-full bg-white">
+                    <thead className="bg-purple-50 text-purple-800">
+                      <tr>
+                        <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Name</th>
+                        <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Role</th>
+                        <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Status</th>
+                        <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Offer Letter</th>
+                        <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Date Added</th>
+                        {/* Action column removed for list view */}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredPunches.map((punch) => (
+                        <tr
+                          key={punch._id}
+                          className="border-b hover:bg-purple-50 transition-all cursor-pointer"
+                          onClick={() => navigate(`/offer-punch/${punch._id}`)}
+                        >
+                          <td className="p-4 text-gray-700">{punch.candidateName || "N/A"}</td>
+                          <td className="p-4 text-gray-700">{punch.jobTitle || "N/A"}</td>
+                          <td className="p-4">
+                            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+                              {punch.offerLetterStatus || "N/A"}
+                            </span>
+                          </td>
+                          <td className="p-4">
+                            <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+                              {punch.companyName || "N/A"}
+                            </span>
+                          </td>
+                          <td className="p-4 text-gray-700">{punch.joiningDate ? new Date(punch.joiningDate).toLocaleDateString() : "N/A"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="lg:hidden space-y-4">
+                  {filteredPunches.map((punch) => (
+                    <div
+                      key={punch._id}
+                      className="p-6 bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer"
+                      onClick={() => navigate(`/offer-punch/${punch._id}`)}
+                    >
+                      <h3 className="text-lg font-semibold text-purple-800">
+                        {punch.candidateName || "N/A"}
+                      </h3>
+                      <p className="text-gray-600 mt-1">{punch.candidateEmail || "N/A"}</p>
+                      <div className="mt-3 flex items-center gap-2 flex-wrap">
+                        <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+                          {punch.offerLetterStatus || "N/A"}
+                        </span>
+                        <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+                          {punch.companyName || "N/A"}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500 mt-3">
+                        {punch.joiningDate ? new Date(punch.joiningDate).toLocaleDateString() : "N/A"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p className="text-center text-gray-500 font-medium py-8">No offer punches available.</p>
+            )}
+          </>
+        )}
+
+        {/* Confirmation Popup */}
+        {showConfirmation && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Confirmation</h3>
+              <p className="text-gray-700 mb-6">
+                Confirm that the data you punch is real and this action cannot be undone. Do you want to proceed?
+              </p>
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={cancelSubmit}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all text-sm font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmSubmit}
+                  className="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all text-sm font-medium"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Processing..." : "OK"}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Documents Section */}
-        <div className="mb-8">
-          <h3 className="text-lg font-medium text-gray-700 mb-4">Documents</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FileInput
-              label="Offer Letter (PDF)"
-              name="offerLetter"
-              value={formData.offerLetter}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.offerLetter}
-              touched={touched.offerLetter}
-            />
-            <FileInput
-              label="Resume (PDF)"
-              name="candidateResume"
-              value={formData.candidateResume}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.candidateResume}
-              touched={touched.candidateResume}
-            />
-          </div>
+        <div className="mt-8">
+          <Outlet />
         </div>
-
-        {/* Form Actions */}
-        <div className="mt-8 flex justify-between items-center">
-          <button
-            type="button"
-            onClick={resetForm}
-            className="py-2.5 px-6 rounded-full font-semibold text-gray-600 bg-gray-200 hover:bg-gray-300 transition-all duration-300"
-            disabled={isSubmitting}
-          >
-            Reset Form
-          </button>
-          <button
-            type="submit"
-            disabled={!isFormValid || isSubmitting}
-            className={`py-2.5 px-8 rounded-full font-semibold text-white transition-all duration-300 flex items-center justify-center ${
-              isFormValid && !isSubmitting
-                ? "bg-purple-600 hover:bg-purple-700"
-                : "bg-gray-400 cursor-not-allowed"
-            }`}
-            aria-label="Submit offer"
-          >
-            {isSubmitting ? (
-              <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-            ) : null}
-            {isSubmitting ? "Submitting..." : "Submit"}
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
   );
 };
@@ -361,18 +544,17 @@ const OfferPunch = () => {
 // Input Field Component
 const InputField = ({ label, type = "text", name, value, onChange, onBlur, error, touched }) => (
   <div className="relative">
-    <label className=" px-2 text-sm text-gray-600 font-medium" htmlFor={name}>
+    <label className="block text-sm font-semibold text-gray-700 mb-2">
       {label}
     </label>
     <div className="relative">
       <input
         type={type}
         name={name}
-        id={name}
         value={value}
         onChange={onChange}
         onBlur={onBlur}
-        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500 transition-all bg-white/50 ${
+        className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
           error && touched ? "border-red-500" : "border-gray-300"
         }`}
         aria-invalid={error && touched ? "true" : "false"}
@@ -386,28 +568,25 @@ const InputField = ({ label, type = "text", name, value, onChange, onBlur, error
       )}
     </div>
     {error && touched && (
-      <p id={`${name}-error`} className="text-red-500 text-sm mt-1">
-        {error}
-      </p>
+      <p id={`${name}-error`} className="text-red-500 text-sm mt-1">{error}</p>
     )}
   </div>
 );
 
 // File Input Component
 const FileInput = ({ label, name, value, onChange, onBlur, error, touched }) => (
-  <div className="relative group">
-    <label className=" px-2 text-sm text-gray-600 font-medium" htmlFor={name}>
+  <div className="relative">
+    <label className="block text-sm font-semibold text-gray-700 mb-2">
       {label}
     </label>
     <div className="relative">
       <input
         type="file"
         name={name}
-        id={name}
         accept="application/pdf"
         onChange={onChange}
         onBlur={onBlur}
-        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500 transition-all bg-white/50 ${
+        className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
           error && touched ? "border-red-500" : "border-gray-300"
         }`}
         aria-invalid={error && touched ? "true" : "false"}
@@ -420,13 +599,8 @@ const FileInput = ({ label, name, value, onChange, onBlur, error, touched }) => 
         <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 pointer-events-none" size={20} />
       )}
     </div>
-    <div className="absolute invisible group-hover:visible bg-gray-800 text-white text-xs rounded py-1 px-2 right-0 mt-1 z-10">
-      Upload a PDF file (max 5MB)
-    </div>
     {error && touched && (
-      <p id={`${name}-error`} className="text-red-500 text-sm mt-1">
-        {error}
-      </p>
+      <p id={`${name}-error`} className="text-red-500 text-sm mt-1">{error}</p>
     )}
   </div>
 );

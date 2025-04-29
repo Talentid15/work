@@ -32,8 +32,11 @@ const Job_Offer = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log("Fetched Offers Data:", response.data);
-        dispatch(setOfferData(response.data));
+        // console.log("Fetched Offers Data:", response.data);
+        const sortedData = response.data.sort((a,b) => {
+          return new Date(b.offerDate) - new Date(a.offerDate);
+        })
+        dispatch(setOfferData(sortedData));
       } catch (error) {
         console.error("Error fetching offers data:", error);
         setError("Failed to fetch offers. Please try again later.");

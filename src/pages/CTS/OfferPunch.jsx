@@ -46,7 +46,10 @@ const OfferPunch = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setOfferPunches(offerPunchesResponse.data || []);
+        const sortedData = offerPunchesResponse.data.sort((a,b) => {
+          return new Date(b.joiningDate) - new Date(a.joiningDate);
+        })
+        setOfferPunches(sortedData|| []);
       } catch (error) {
         console.error("Error fetching offer punches:", error);
         setError("Failed to fetch offer punches. Please try again later.");
@@ -178,7 +181,10 @@ const OfferPunch = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setOfferPunches(offerPunchesResponse.data || []);
+      const sortedData = offerPunchesResponse.data.sort((a,b) => {
+        return new Date(b.joiningDate) - new Date(a.joiningDate);
+      })
+      setOfferPunches(sortedData|| []);
     } catch (error) {
       console.error("Submission Error:", error.response?.data || error.message);
       toast.error("Failed to submit offer punch. Please try again.");

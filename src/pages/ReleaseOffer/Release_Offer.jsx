@@ -5,7 +5,6 @@ import toast from "react-hot-toast";
 import api from "../../utils/api";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { dateDifference } from "../../utils";
 import * as pdfjsLib from "pdfjs-dist";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
@@ -29,13 +28,11 @@ const parseResumeText = (text) => {
     about: "",
   };
 
-  // Regex patterns
   const emailRegex = /[\w.-]+@[\w.-]+\.\w+/;
   const phoneRegex = /(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/;
   const sectionHeaders = ["skills", "about", "summary", "profile"];
   let currentSection = "";
 
-  // List of recognized programming languages
   const programmingLanguages = [
     "javascript", "python", "java", "c++", "c#", "ruby", "php", "typescript",
     "go", "swift", "kotlin", "rust", "scala", "perl", "haskell", "lua",
@@ -45,22 +42,15 @@ const parseResumeText = (text) => {
   ].map(lang => lang.toLowerCase());
 
   lines.forEach((line, index) => {
-    // Extract name (assume first non-empty line or line before contact info)
     if (!resumeData.name && line && !emailRegex.test(line) && !phoneRegex.test(line) && index < 5) {
       resumeData.name = line;
     }
-
-    // Extract email
     if (emailRegex.test(line) && !resumeData.email) {
       resumeData.email = line.match(emailRegex)[0];
     }
-
-    // Extract phone
     if (phoneRegex.test(line) && !resumeData.phone) {
       resumeData.phone = line.match(phoneRegex)[0];
     }
-
-    // Detect section headers
     const lowerLine = line.toLowerCase();
     if (sectionHeaders.some((header) => lowerLine.includes(header))) {
       currentSection = lowerLine.includes("skills")
@@ -69,10 +59,8 @@ const parseResumeText = (text) => {
         ? "about"
         : "";
     } else if (currentSection) {
-      // Parse content based on section
       if (currentSection === "skills") {
         const skills = line.split(/[,;]/).map((s) => s.trim()).filter((s) => s);
-        // Filter only programming languages
         const filteredSkills = skills.filter((skill) => programmingLanguages.includes(skill.toLowerCase()));
         resumeData.skills.push(...filteredSkills);
       } else if (currentSection === "about") {
@@ -81,9 +69,7 @@ const parseResumeText = (text) => {
     }
   });
 
-  // Clean up skills (remove duplicates, filter out invalid entries)
   resumeData.skills = [...new Set(resumeData.skills.filter((skill) => skill.length > 2))];
-  // Trim and clean up about section
   resumeData.about = resumeData.about.trim();
 
   return resumeData;
@@ -98,6 +84,7 @@ const Release_Offer = () => {
   const [resumeData, setResumeData] = useState(null);
   const [resumeParseError, setResumeParseError] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [frequency, setFrequency] = useState("");
   const [form, setForm] = useState({
     jobTitle: "",
     joiningDate: "",
@@ -115,10 +102,7 @@ const Release_Offer = () => {
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
   const token = useSelector((state) => state.user.data?.token);
 
-  // Available tags
   const availableTags = ["Behavioral", "Technical", "Leadership", "Communication", "Problem-Solving"];
-
-  // Check if prediction mode is enabled
   const isPredictionMode = new URLSearchParams(location.search).get("prediction") === "true";
   const totalSteps = isPredictionMode ? 3 : 2;
 
@@ -127,6 +111,22 @@ const Release_Offer = () => {
       parseResume();
     }
   }, [step, form.candidateResume, isPredictionMode]);
+
+  const getFrequencyOptions = () => {
+    const currentDate = new Date();
+    const joiningDate = new Date(form.joiningDate);
+    const diffDays = Math.ceil((joiningDate - currentDate) / (1000 * 60 * 60 * 24));
+    if (diffDays <= 30) return { value: "Low (1-2 questions)", count: Math.floor(Math.random() * 2) + 1 };
+    if (diffDays <= 60) return { value: "Medium (3-4 questions)", count: Math.floor(Math.random() * 2) + 3 };
+    return { value: "High (5-6 questions)", count: Math.floor(Math.random() * 2) + 5 };
+  };
+
+  useEffect(() => {
+    if (step === 3 && form.joiningDate) {
+      const freq = getFrequencyOptions();
+      setFrequency(freq.value);
+    }
+  }, [step, form.joiningDate]);
 
   const validatePhoneNumber = (phoneNo) => {
     const phoneRegex = /^\d{10}$/;
@@ -159,7 +159,7 @@ const Release_Offer = () => {
     if (!joiningDate) return "Please enter the joining date first";
     const joining = new Date(joiningDate);
     if (expiry <= joining) return "Expiry date must be after the joining date";
-    const diffDays = dateDifference(joiningDate, expiryDate);
+    const diffDays = Math.ceil((expiry - joining) / (1000 * 60 * 60 * 24));
     if (diffDays > 90) return "Expiry date must be within 90 days of the joining date";
     return "";
   };
@@ -216,39 +216,8 @@ const Release_Offer = () => {
 
   const handleTagToggle = (tag) => {
     setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+      prev.includes(tag) ? prev.at(1) !== tag ? [prev.at(1)] : [] : [...prev, tag]
     );
-  };
-
-  const handleStartTest = () => {
-    // Placeholder for test logic
-    toast.success(`Starting test for ${form.candidateName} with tags: ${selectedTags.join(", ")}`);
-    console.log("Selected tags:", selectedTags);
-    // Add actual test logic here (e.g., navigate to a test page or trigger an API)
-  };
-
-  const validateFormStep1 = () => {
-    const newErrors = {
-      jobTitle: !form.jobTitle ? "Job title is required" : "",
-      candidateName: !form.candidateName ? "Candidate name is required" : "",
-      candidateEmail: validateEmail(form.candidateEmail),
-      candidatePhoneNo: validatePhoneNumber(form.candidatePhoneNo),
-      joiningDate: validateJoiningDate(form.joiningDate),
-      expiryDate: validateExpiryDate(form.expiryDate, form.joiningDate),
-    };
-    setErrors(newErrors);
-    return Object.values(newErrors).every((error) => error === "");
-  };
-
-  const validateFormStep2 = () => {
-    const newErrors = {
-      emailSubject: !form.emailSubject ? "Email subject is required" : "",
-      emailMessage: !form.emailMessage || form.emailMessage === "<p><br></p>" ? "Email message is required" : "",
-      offerLetter: validateFile(form.offerLetter, "Offer letter"),
-      candidateResume: validateFile(form.candidateResume, "Candidate resume"),
-    };
-    setErrors((prev) => ({ ...prev, ...newErrors }));
-    return Object.values(newErrors).every((error) => error === "");
   };
 
   const parseResume = async () => {
@@ -273,6 +242,30 @@ const Release_Offer = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const validateFormStep1 = () => {
+    const newErrors = {
+      jobTitle: !form.jobTitle ? "Job title is required" : "",
+      candidateName: !form.candidateName ? "Candidate name is required" : "",
+      candidateEmail: validateEmail(form.candidateEmail),
+      candidatePhoneNo: validatePhoneNumber(form.candidatePhoneNo),
+      joiningDate: validateJoiningDate(form.joiningDate),
+      expiryDate: validateExpiryDate(form.expiryDate, form.joiningDate),
+    };
+    setErrors(newErrors);
+    return Object.values(newErrors).every((error) => error === "");
+  };
+
+  const validateFormStep2 = () => {
+    const newErrors = {
+      emailSubject: !form.emailSubject ? "Email subject is required" : "",
+      emailMessage: !form.emailMessage || form.emailMessage === "<p><br></p>" ? "Email message is required" : "",
+      offerLetter: validateFile(form.offerLetter, "Offer letter"),
+      candidateResume: validateFile(form.candidateResume, "Candidate resume"),
+    };
+    setErrors((prev) => ({ ...prev, ...newErrors }));
+    return Object.values(newErrors).every((error) => error === "");
   };
 
   const formSubmitHandler = async (e) => {
@@ -331,7 +324,6 @@ const Release_Offer = () => {
 
       console.log("Release_Offer.jsx: API response:", response.data);
       toast.success("Offer released successfully!");
-      // Only navigate if not in prediction mode
       if (!isPredictionMode) {
         setTimeout(() => {
           navigate("/job-offers");
@@ -345,13 +337,56 @@ const Release_Offer = () => {
     }
   };
 
+  const handleStartTest = async () => {
+    if (!selectedTags.includes("Technical")) {
+      toast.error("Please select the Technical tag for assessment.");
+      return;
+    }
+    if (!frequency) {
+      toast.error("Frequency is not set. Please ensure joining date is valid.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const freq = getFrequencyOptions();
+      const testData = {
+        candidateEmail: form.candidateEmail,
+        candidateName: form.candidateName,
+        jobTitle: form.jobTitle,
+        skills: resumeData?.skills || [],
+        questionCount: freq.count,
+      };
+
+      const response = await api.post(
+        `${API_URL}/api/offer/generate-test`,
+        testData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      toast.success(`Test generated and emailed to ${form.candidateName}!`);
+      console.log("Test Link:", response.data.testLink);
+    } catch (error) {
+      console.error("Error generating test:", error);
+      toast.error("Failed to generate test. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleNextStep = () => {
     if (step === 1 && validateFormStep1()) {
       setStep(2);
     } else if (step === 2 && validateFormStep2()) {
-      formSubmitHandler(); // Submit offer in Step 2
+      formSubmitHandler();
       if (isPredictionMode) {
-        setStep(3); // Proceed to Step 3 for profile view
+        setStep(3);
       }
     } else {
       toast.error("Please fill in all required fields correctly");
@@ -382,14 +417,10 @@ const Release_Offer = () => {
             </div>
           )
         )}
-        <div
-          className={`absolute top-5 left-[10%] w-[80%] h-0.5 bg-gray-200`}
-        >
+        <div className="absolute top-5 left-[10%] w-[80%] h-0.5 bg-gray-200">
           <div
-            className={`h-full bg-indigo-600 transition-all duration-300`}
-            style={{
-              width: `${((step - 1) / (totalSteps - 1)) * 100}%`,
-            }}
+            className="h-full bg-indigo-600 transition-all duration-300"
+            style={{ width: `${((step - 1) / (totalSteps - 1)) * 100}%` }}
           ></div>
         </div>
       </div>
@@ -608,6 +639,18 @@ const Release_Offer = () => {
                     ))}
                   </div>
                 </div>
+
+                {/* Frequency Dropdown */}
+                <div>
+                  <h4 className="text-xl font-medium text-gray-700 mb-4">Test Frequency</h4>
+                  <select
+                    value={frequency}
+                    disabled
+                    className="w-full px-4 py-3 border rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed"
+                  >
+                    <option value={frequency}>{frequency}</option>
+                  </select>
+                </div>
               </div>
             </div>
           ) : (
@@ -623,7 +666,7 @@ const Release_Offer = () => {
             </button>
             <button
               type="button"
-              disabled={isLoading || !resumeData || selectedTags.length === 0}
+              disabled={isLoading || !resumeData || !selectedTags.includes("Technical") || !frequency}
               className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-all disabled:bg-green-400 disabled:cursor-not-allowed w-full sm:w-auto flex items-center justify-center"
               onClick={handleStartTest}
             >

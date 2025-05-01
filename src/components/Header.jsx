@@ -16,6 +16,7 @@ const Header = () => {
   const [showProfile, setShowProfile] = useState(false);
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
+  const data = useSelector((state) => state.user.data);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -23,7 +24,6 @@ const Header = () => {
   const { userId, verifiedDocuments } = useUserStore();
   const { setDocumentPopup } = useVerificationStore();
 
-  // Toggle notification dropdown
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
     setShowProfile(false);
@@ -177,6 +177,18 @@ const Header = () => {
                     >
                       <MdOutlineCurrencyExchange className="mr-3 text-purple-600" /> 
                       <span className="text-sm">Subscription</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button 
+                      className="w-full flex items-center px-5 py-3 text-gray-700 hover:bg-purple-50 transition-colors"
+                      onClick={() => {
+                        navigate(`/company/edit/${data?.company}`);
+                        setShowProfile(false);
+                      }}
+                    >
+                      <MdOutlineCurrencyExchange className="mr-3 text-purple-600" /> 
+                      <span className="text-sm">Company</span>
                     </button>
                   </li>
                   <li className="border-t border-gray-100 mt-1">

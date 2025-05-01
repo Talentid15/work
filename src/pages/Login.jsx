@@ -9,13 +9,11 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { setData } from "../redux/UserSlice";
-import { Turnstile } from "@marsidev/react-turnstile";
 import { useUserStore } from "../redux/userStore";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
   const { setVerifiedDocuments } = useUserStore();
-  const siteKey = import.meta.env.VITE_SITE_KEY;
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
 
   const [formData, setFormData] = useState({
@@ -23,8 +21,8 @@ const LoginForm = () => {
     password: "",
   });
 
-  const [token, setToken] = useState("");
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // New loading state
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
 
@@ -52,6 +50,7 @@ const LoginForm = () => {
     if (!formData.password) {
       newErrors.password = "Password is required.";
     }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -59,11 +58,12 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
+      setIsLoading(true); // Start loading
       try {
         const response = await axios.post(`${API_URL}/api/auth/login`, {
           email: formData.email,
           password: formData.password,
-          captchaValue: token
+          captchaValue: '',
         }, {
           withCredentials: true,
         });
@@ -72,16 +72,22 @@ const LoginForm = () => {
           return;
         }
         dispatch(setData(response.data));
-        setVerifiedDocuments(response.data.verifiedDocuments || false); // Sync verifiedDocuments
+        setVerifiedDocuments(response.data.verifiedDocuments || false);
         toast.success("Logged in successfully!");
         navigate("/");
       } catch (error) {
-        console.error("Error logging in:", error);
+        console.error("Error logging in:", {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status,
+        });
         if (error.response?.status === 202) {
           toast.info("Your documents are being verified. Please try again later.");
         } else {
-          toast.error(error.message || "Login failed. Please try again.");
+          toast.error(error.response?.data?.error || "Login failed. Please try again.");
         }
+      } finally {
+        setIsLoading(false); // Stop loading
       }
     }
   };
@@ -134,24 +140,47 @@ const LoginForm = () => {
               </div>
               
               <div className="mt-2">
-                <Turnstile 
-                  siteKey={siteKey} 
-                  onSuccess={(token) => setToken(token)} 
-                  className="mx-auto"
-                />
+
+                {errors.token && <p className="text-red-500 text-sm mt-2">{errors.token}</p>}
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-purple-600 text-white py-3 rounded-xl hover:bg-purple-700 transition-all duration-300 font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                className={`w-full bg-purple-600 text-white py-3 rounded-xl hover:bg-purple-700 transition-all duration-300 font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg ${isLoading ? "opacity-75 cursor-not-allowed" : ""}`}
+                disabled={isLoading}
               >
-                <span>Sign In</span>
-                <IoArrowForwardSharp />
+                {isLoading ? (
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                ) : (
+                  <>
+                    <span>Sign In</span>
+                    <IoArrowForwardSharp />
+                  </>
+                )}
               </button>
               
               <div className="text-center mt-6">
                 <p className="text-gray-600">
-                  Dont have an account?{" "}
+                  Don’t have an account?{" "}
                   <a
                     href="/signup"
                     className="text-purple-600 font-semibold hover:text-purple-800 transition-colors"

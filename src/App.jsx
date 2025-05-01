@@ -42,6 +42,7 @@ import OfferDetail from "./pages/JobOffer/Job_OfferDetails";
 import InvitePage from "./pages/CTS/InvitePage";
 import DocumentUploadPopup from "./pages/documentVerify";
 import OtpVerificationPopup from "./pages/OtpVerify";
+import CompanyForm from "./pages/CTS/CompanyForm";
 
 function App() {
   const { showOtpPopup, showDocumentPopup, failedRequest, setOtpPopup, setDocumentPopup } =
@@ -185,6 +186,7 @@ function App() {
           <Route path="/dashboard" element={<DashBoard />} />
           <Route path="/carrerpage" element={<CareerPage />} />
           <Route path="/joboffers" element={<Job_Offer />} />
+          <Route path="/company/edit/:companyName" element={<CompanyForm />} />
           <Route path="/release-offer" element={<Release_Offer />} />
           <Route path="/extractInfo" element={<ExtractDataFromPdf />} />
           <Route path="/joboffers/:id" element={<OfferDetail />} />

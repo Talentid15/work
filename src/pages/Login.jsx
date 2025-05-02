@@ -22,7 +22,7 @@ const LoginForm = () => {
   });
 
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // New loading state
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
 
@@ -58,7 +58,7 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      setIsLoading(true); // Start loading
+      setIsLoading(true); 
       try {
         const response = await axios.post(`${API_URL}/api/auth/login`, {
           email: formData.email,
@@ -74,7 +74,7 @@ const LoginForm = () => {
         dispatch(setData(response.data));
         setVerifiedDocuments(response.data.verifiedDocuments || false);
         toast.success("Logged in successfully!");
-        navigate("/");
+        navigate("/dashboard");
       } catch (error) {
         console.error("Error logging in:", {
           message: error.message,

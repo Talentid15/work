@@ -28,7 +28,6 @@ const DashBoard = () => {
           },
         });
 
-        // Fetch offer punches
         const offerPunchesResponse = await api.get(`${API_URL}/api/offer/get-offer-punches`, {
           withCredentials: true,
           headers: {
@@ -39,24 +38,23 @@ const DashBoard = () => {
         const offers = offerReleasesResponse.data;
         const offerPunches = offerPunchesResponse.data;
 
-        // Count only offers where showOffer is true
         const offerReleasesCount = offers.filter(offer => offer.showOffer === true).length;
-        const offerPunchCount = offerPunches.length; // Total number of offer punches
+        const offerPunchCount = offerPunches.length; 
+        const offerGhostedCount = offers.filter(offer => offer.status === "Ghosted").length;
 
         setUserStats({
           fullname: user?.fullname || "User",
           interviewTrackingCredits: user?.credits ? `${user.credits}` : "0",
-          offerPunchCount: `${offerPunchCount}`, // Dynamic value from API
-          offerReleases: `${offerReleasesCount}`, // Dynamic value from filtered API data
-          candidateGhosting: `${user?.ghostedCount || 0}`, // Replace with API data if available
+          offerPunchCount: `${offerPunchCount}`, 
+          offerReleases: `${offerReleasesCount}`, 
+          candidateGhosting:  `${offerGhostedCount}`, 
         });
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
-        // Fallback stats in case of error
         setUserStats({
           fullname: user?.fullname || "User",
           interviewTrackingCredits: user?.credits ? `${user.credits}` : "0",
-          offerPunchCount: "0", // Default to 0 if fetch fails
+          offerPunchCount: "0", 
           offerReleases: "0",
           candidateGhosting: "0",
         });

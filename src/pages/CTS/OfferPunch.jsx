@@ -27,7 +27,7 @@ const OfferPunch = () => {
     expiryDate: "",
     offerLetter: null,
     candidateResume: null,
-    offerLetterStatus: "",
+    offerLetterStatus: "Offer letter released",
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -234,17 +234,6 @@ const OfferPunch = () => {
 
         {/* Header Controls */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-          <select
-            className="w-full sm:w-48 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-700"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            {statusOptions.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
           <button
             className="flex items-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto justify-center sm:justify-start"
             onClick={() => setShowForm(true)}
@@ -254,7 +243,6 @@ const OfferPunch = () => {
           </button>
         </div>
 
-        {/* Content */}
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <Loader />
@@ -348,39 +336,6 @@ const OfferPunch = () => {
                   error={errors.expiryDate}
                   touched={touched.expiryDate}
                 />
-              </div>
-              <div className="relative">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Status
-                </label>
-                <div className="relative">
-                  <select
-                    name="offerLetterStatus"
-                    value={formData.offerLetterStatus}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    className="w-full p-3 pr-10 border rounded-lg focus:ring-2 focus:ring-purple-500 transition-all appearance-none border-gray-300 bg-white"
-                    aria-invalid={errors.offerLetterStatus && touched.offerLetterStatus ? "true" : "false"}
-                  >
-                    <option value="" disabled>
-                      Select status
-                    </option>
-                    {statusOptions.filter(s => s !== "All").map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                  {touched.offerLetterStatus && !errors.offerLetterStatus && formData.offerLetterStatus && (
-                    <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 pointer-events-none" size={20} />
-                  )}
-                  {touched.offerLetterStatus && errors.offerLetterStatus && (
-                    <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 pointer-events-none" size={20} />
-                  )}
-                </div>
-                {errors.offerLetterStatus && touched.offerLetterStatus && (
-                  <p className="text-red-500 text-sm mt-1">{errors.offerLetterStatus}</p>
-                )}
               </div>
             </div>
 

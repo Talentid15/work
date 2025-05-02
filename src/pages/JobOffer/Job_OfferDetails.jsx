@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { MdArrowBack, MdDownload } from "react-icons/md";
 import { format } from "date-fns";
 import api from "../../utils/api";
+import toast from "react-hot-toast";
 
 const OfferDetail = () => {
   const token = useSelector((state) => state.user.data?.token);
@@ -12,6 +13,7 @@ const OfferDetail = () => {
   const [viewing, setViewing] = useState("resume");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showRetractConfirm, setShowRetractConfirm] = useState(false);
+  const [showGhostedConfirm, setShowGhostedConfirm] = useState(false);
   const offersData = useSelector((state) => state.offer.data);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
 
@@ -40,14 +42,14 @@ const OfferDetail = () => {
         }
       );
       if (response.data) {
-        alert('Offer retracted successfully');
+        toast.success('Offer retracted successfully');
         navigate(0);
       } else {
         throw new Error('Failed to retract offer');
       }
     } catch (error) {
       console.error('Error retracting offer:', error);
-      alert(`Failed to retract offer: ${error.message}`);
+      toast.error(`Failed to retract offer: ${error.message}`);
     }
   };
 
@@ -62,14 +64,38 @@ const OfferDetail = () => {
         }
       );
       if (response.data) {
-        alert('Offer hidden successfully');
+        toast.success('Offer Deleted successfully');
         navigate('/joboffers');
       } else {
         throw new Error('Failed to Delete offer');
       }
     } catch (error) {
       console.error('Error hiding offer:', error);
-      alert(`Failed to Delete offer: ${error.message}`);
+      toast.error(`Failed to Delete offer: ${error.message}`);
+    }
+  };
+
+  const handleGhosted = async () => {
+    try {
+      const response = await api.post(
+        `${API_URL}/api/offer/offer/updateStatus`,
+        { offerId: id, status: "Ghosted" },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
+      );
+      if (response.data) {
+        toast.success('Offer marked as Ghosted successfully');
+        setTimeout(() => {
+          window.location.reload()
+        }, 300);
+      } else {
+        throw new Error('Failed to mark offer as Ghosted');
+      }
+    } catch (error) {
+      console.error('Error marking offer as Ghosted:', error);
+      toast.error(`Failed to mark offer as Ghosted: ${error.message}`);
     }
   };
 
@@ -81,24 +107,25 @@ const OfferDetail = () => {
     setShowRetractConfirm(true);
   };
 
+  const confirmGhosted = () => {
+    setShowGhostedConfirm(true);
+  };
+
   return (
-    <div className="min-h-screen  py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-8">
         {/* Back Button */}
         <button
-          onClick={() => {window.location.href = '/joboffers'}}
+          onClick={() => { window.location.href = '/joboffers' }}
           className="flex items-center gap-2 text-purple-700 hover:text-purple-800 mb-6 font-medium transition-all"
         >
           <MdArrowBack size={20} />
           Back to Offers
         </button>
 
-        {/* Title */}
         <h1 className="text-2xl sm:text-3xl font-bold text-purple-800 mb-8">Offer Details</h1>
 
-        {/* Main Content */}
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Candidate & Offer Info */}
           <div className="w-full lg:w-1/2 p-6 bg-gray-50 rounded-xl shadow-sm">
             <h2 className="text-lg font-semibold text-purple-800 mb-4">Candidate Information</h2>
             <div className="space-y-2 text-gray-700">
@@ -113,13 +140,14 @@ const OfferDetail = () => {
               <p>
                 <strong>Status:</strong>
                 <span
-                  className={`ml-2 px-3 py-1 rounded-full text-sm font-medium ${
-                    status === "Pending"
+                  className={`ml-2 px-3 py-1 rounded-full text-sm font-medium ${status === "Pending"
                       ? "bg-yellow-100 text-yellow-700"
                       : status === "Retracted"
-                      ? "bg-orange-100 text-orange-700"
-                      : "bg-green-100 text-green-700"
-                  }`}
+                        ? "bg-orange-100 text-orange-700"
+                        : status === "Ghosted"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-green-100 text-green-700"
+                    }`}
                 >
                   {status}
                 </span>
@@ -134,35 +162,31 @@ const OfferDetail = () => {
               </p>
             </div>
 
-            {/* Document Tabs */}
             <div className="mt-6 flex flex-wrap gap-3">
               <button
-                className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${
-                  viewing === "resume"
+                className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${viewing === "resume"
                     ? "bg-purple-700 text-white"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
+                  }`}
                 onClick={() => setViewing("resume")}
               >
                 Resume
               </button>
               <button
-                className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${
-                  viewing === "offer"
+                className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${viewing === "offer"
                     ? "bg-purple-700 text-white"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
+                  }`}
                 onClick={() => setViewing("offer")}
               >
                 Offer Letter
               </button>
               {acceptedLetter && (
                 <button
-                  className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${
-                    viewing === "accepted"
+                  className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${viewing === "accepted"
                       ? "bg-purple-700 text-white"
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
+                    }`}
                   onClick={() => setViewing("accepted")}
                 >
                   Accepted Letter
@@ -171,7 +195,6 @@ const OfferDetail = () => {
             </div>
           </div>
 
-          {/* Document Viewer */}
           <div className="w-full lg:w-1/2 bg-gray-100 p-6 rounded-xl shadow-md flex flex-col items-center">
             {viewing === "resume" && candidate?.resumeLink ? (
               <>
@@ -230,7 +253,6 @@ const OfferDetail = () => {
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="mt-8 flex flex-col sm:flex-row gap-4">
           <button
             onClick={confirmDelete}
@@ -239,12 +261,20 @@ const OfferDetail = () => {
             Delete Offer
           </button>
           {status === "Pending" && (
-            <button
-              onClick={confirmRetract}
-              className="px-6 py-2 bg-orange-600 text-white rounded-lg shadow-md hover:bg-orange-700 transition-all text-sm font-medium"
-            >
-              Retract Offer
-            </button>
+            <>
+              <button
+                onClick={confirmRetract}
+                className="px-6 py-2 bg-orange-600 text-white rounded-lg shadow-md hover:bg-orange-700 transition-all text-sm font-medium"
+              >
+                Retract Offer
+              </button>
+              <button
+                onClick={confirmGhosted}
+                className="px-6 py-2 bg-gray-600 text-white rounded-lg shadow-md hover:bg-gray-700 transition-all text-sm font-medium"
+              >
+                Mark as Ghosted
+              </button>
+            </>
           )}
         </div>
 
@@ -277,7 +307,6 @@ const OfferDetail = () => {
           </div>
         )}
 
-        {/* Retract Confirmation Popup */}
         {showRetractConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl max-w-md w-full">
@@ -300,6 +329,34 @@ const OfferDetail = () => {
                   className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all text-sm font-medium"
                 >
                   Yes, Retract Offer
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showGhostedConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl max-w-md w-full">
+              <h3 className="text-lg font-semibold text-purple-800 mb-4">Confirm Ghosted Status</h3>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to mark this offer as Ghosted? This action cannot be undone.
+              </p>
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={() => setShowGhostedConfirm(false)}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all text-sm font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    handleGhosted();
+                    setShowGhostedConfirm(false);
+                  }}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all text-sm font-medium"
+                >
+                  Yes, Mark as Ghosted
                 </button>
               </div>
             </div>

@@ -5,7 +5,6 @@ import toast from "react-hot-toast";
 import api from "../../utils/api";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { dateDifference } from "../../utils";
 import * as pdfjsLib from "pdfjs-dist";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
@@ -29,13 +28,11 @@ const parseResumeText = (text) => {
     about: "",
   };
 
-  // Regex patterns
   const emailRegex = /[\w.-]+@[\w.-]+\.\w+/;
   const phoneRegex = /(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/;
   const sectionHeaders = ["skills", "about", "summary", "profile"];
   let currentSection = "";
 
-  // List of recognized programming languages
   const programmingLanguages = [
     "javascript", "python", "java", "c++", "c#", "ruby", "php", "typescript",
     "go", "swift", "kotlin", "rust", "scala", "perl", "haskell", "lua",
@@ -45,22 +42,15 @@ const parseResumeText = (text) => {
   ].map(lang => lang.toLowerCase());
 
   lines.forEach((line, index) => {
-    // Extract name (assume first non-empty line or line before contact info)
     if (!resumeData.name && line && !emailRegex.test(line) && !phoneRegex.test(line) && index < 5) {
       resumeData.name = line;
     }
-
-    // Extract email
     if (emailRegex.test(line) && !resumeData.email) {
       resumeData.email = line.match(emailRegex)[0];
     }
-
-    // Extract phone
     if (phoneRegex.test(line) && !resumeData.phone) {
       resumeData.phone = line.match(phoneRegex)[0];
     }
-
-    // Detect section headers
     const lowerLine = line.toLowerCase();
     if (sectionHeaders.some((header) => lowerLine.includes(header))) {
       currentSection = lowerLine.includes("skills")
@@ -69,10 +59,8 @@ const parseResumeText = (text) => {
         ? "about"
         : "";
     } else if (currentSection) {
-      // Parse content based on section
       if (currentSection === "skills") {
         const skills = line.split(/[,;]/).map((s) => s.trim()).filter((s) => s);
-        // Filter only programming languages
         const filteredSkills = skills.filter((skill) => programmingLanguages.includes(skill.toLowerCase()));
         resumeData.skills.push(...filteredSkills);
       } else if (currentSection === "about") {
@@ -81,9 +69,7 @@ const parseResumeText = (text) => {
     }
   });
 
-  // Clean up skills (remove duplicates, filter out invalid entries)
   resumeData.skills = [...new Set(resumeData.skills.filter((skill) => skill.length > 2))];
-  // Trim and clean up about section
   resumeData.about = resumeData.about.trim();
 
   return resumeData;
@@ -98,6 +84,8 @@ const Release_Offer = () => {
   const [resumeData, setResumeData] = useState(null);
   const [resumeParseError, setResumeParseError] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [frequency, setFrequency] = useState("");
+  const [testSchedule, setTestSchedule] = useState(null);
   const [form, setForm] = useState({
     jobTitle: "",
     joiningDate: "",
@@ -107,7 +95,7 @@ const Release_Offer = () => {
     candidateEmail: "",
     candidateName: "",
     candidatePhoneNo: "",
-    companyName: data.company,
+    companyName: data?.company || "",
     offerLetter: null,
     candidateResume: null,
   });
@@ -115,12 +103,15 @@ const Release_Offer = () => {
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
   const token = useSelector((state) => state.user.data?.token);
 
-  // Available tags
   const availableTags = ["Behavioral", "Technical", "Leadership", "Communication", "Problem-Solving"];
-
-  // Check if prediction mode is enabled
   const isPredictionMode = new URLSearchParams(location.search).get("prediction") === "true";
   const totalSteps = isPredictionMode ? 3 : 2;
+
+  const frequencyOptions = [
+    { value: "Low", label: "Low (1 test)", count: 1 },
+    { value: "Medium", label: "Medium (3 tests)", count: 3 },
+    { value: "High", label: "High (5 tests)", count: 5 },
+  ];
 
   useEffect(() => {
     if (step === 3 && isPredictionMode && form.candidateResume) {
@@ -159,7 +150,7 @@ const Release_Offer = () => {
     if (!joiningDate) return "Please enter the joining date first";
     const joining = new Date(joiningDate);
     if (expiry <= joining) return "Expiry date must be after the joining date";
-    const diffDays = dateDifference(joiningDate, expiryDate);
+    const diffDays = Math.ceil((expiry - joining) / (1000 * 60 * 60 * 24));
     if (diffDays > 90) return "Expiry date must be within 90 days of the joining date";
     return "";
   };
@@ -195,6 +186,8 @@ const Release_Offer = () => {
       newErrors.jobTitle = value ? "" : "Job title is required";
     } else if (name === "candidateName") {
       newErrors.candidateName = value ? "" : "Candidate name is required";
+    } else if (name === "emailSubject") {
+      newErrors.emailSubject = value ? "" : "Email subject is required";
     }
     setErrors(newErrors);
   };
@@ -220,37 +213,6 @@ const Release_Offer = () => {
     );
   };
 
-  const handleStartTest = () => {
-    // Placeholder for test logic
-    toast.success(`Starting test for ${form.candidateName} with tags: ${selectedTags.join(", ")}`);
-    console.log("Selected tags:", selectedTags);
-    // Add actual test logic here (e.g., navigate to a test page or trigger an API)
-  };
-
-  const validateFormStep1 = () => {
-    const newErrors = {
-      jobTitle: !form.jobTitle ? "Job title is required" : "",
-      candidateName: !form.candidateName ? "Candidate name is required" : "",
-      candidateEmail: validateEmail(form.candidateEmail),
-      candidatePhoneNo: validatePhoneNumber(form.candidatePhoneNo),
-      joiningDate: validateJoiningDate(form.joiningDate),
-      expiryDate: validateExpiryDate(form.expiryDate, form.joiningDate),
-    };
-    setErrors(newErrors);
-    return Object.values(newErrors).every((error) => error === "");
-  };
-
-  const validateFormStep2 = () => {
-    const newErrors = {
-      emailSubject: !form.emailSubject ? "Email subject is required" : "",
-      emailMessage: !form.emailMessage || form.emailMessage === "<p><br></p>" ? "Email message is required" : "",
-      offerLetter: validateFile(form.offerLetter, "Offer letter"),
-      candidateResume: validateFile(form.candidateResume, "Candidate resume"),
-    };
-    setErrors((prev) => ({ ...prev, ...newErrors }));
-    return Object.values(newErrors).every((error) => error === "");
-  };
-
   const parseResume = async () => {
     setIsLoading(true);
     setResumeParseError(null);
@@ -266,13 +228,41 @@ const Release_Offer = () => {
       }
 
       const parsedData = parseResumeText(text);
+      if (!parsedData.email || !parsedData.name) {
+        throw new Error("Resume must contain a valid email and name.");
+      }
       setResumeData(parsedData);
     } catch (error) {
       console.error("Error parsing resume:", error);
-      setResumeParseError("Failed to parse resume. Please ensure the file is a valid PDF.");
+      setResumeParseError("Failed to parse resume. Please ensure the file is a valid PDF containing a name and email.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const validateFormStep1 = () => {
+    const newErrors = {
+      jobTitle: !form.jobTitle ? "Job title is required" : "",
+      candidateName: !form.candidateName ? "Candidate name is required" : "",
+      candidateEmail: validateEmail(form.candidateEmail),
+      candidatePhoneNo: validatePhoneNumber(form.candidatePhoneNo),
+      joiningDate: validateJoiningDate(form.joiningDate),
+      expiryDate: validateExpiryDate(form.expiryDate, form.joiningDate),
+      companyName: !form.companyName ? "Company name is required" : "",
+    };
+    setErrors(newErrors);
+    return Object.values(newErrors).every((error) => error === "");
+  };
+
+  const validateFormStep2 = () => {
+    const newErrors = {
+      emailSubject: !form.emailSubject ? "Email subject is required" : "",
+      emailMessage: !form.emailMessage || form.emailMessage === "<p><br></p>" ? "Email message is required" : "",
+      offerLetter: validateFile(form.offerLetter, "Offer letter"),
+      candidateResume: validateFile(form.candidateResume, "Candidate resume"),
+    };
+    setErrors((prev) => ({ ...prev, ...newErrors }));
+    return Object.values(newErrors).every((error) => error === "");
   };
 
   const formSubmitHandler = async (e) => {
@@ -292,7 +282,7 @@ const Release_Offer = () => {
         signers: [
           {
             identifier: form.candidateEmail,
-            reason: "for sign the offer letter",
+            reason: "for signing the offer letter",
             sign_type: "electronic",
           },
         ],
@@ -331,15 +321,72 @@ const Release_Offer = () => {
 
       console.log("Release_Offer.jsx: API response:", response.data);
       toast.success("Offer released successfully!");
-      // Only navigate if not in prediction mode
       if (!isPredictionMode) {
         setTimeout(() => {
           navigate("/job-offers");
         }, 2000);
+      } else {
+        setStep(3);
       }
     } catch (error) {
       console.error("Release_Offer.jsx: Error submitting form:", error);
-      toast.error("Failed to release offer. Please try again.");
+      const errorMessage = error.response?.data?.error || "Failed to release offer. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleScheduleTests = async () => {
+    if (!selectedTags.includes("Technical")) {
+      toast.error("Please select the Technical tag for assessment.");
+      return;
+    }
+    if (!frequency) {
+      toast.error("Please select a test frequency.");
+      return;
+    }
+    if (!resumeData) {
+      toast.error("Resume data is not available. Please ensure the resume is uploaded and parsed.");
+      return;
+    }
+    if (!resumeData.skills || resumeData.skills.length === 0) {
+      toast.error("No technical skills found in the resume. Please upload a resume with relevant skills.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const selectedFreq = frequencyOptions.find((opt) => opt.value === frequency);
+      const testData = {
+        candidateEmail: form.candidateEmail,
+        candidateName: form.candidateName,
+        jobTitle: form.jobTitle,
+        skills: resumeData.skills,
+        questionCount: 5,
+        frequency: selectedFreq.count,
+        joiningDate: form.joiningDate,
+      };
+
+      const response = await api.post(
+        `${API_URL}/api/offer/schedule-tests`,
+        testData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      setTestSchedule(response.data);
+      toast.success(`Scheduled ${selectedFreq.count} tests for ${form.candidateName}! Tests have been emailed to the candidate.`);
+      console.log("Scheduled Tests Response:", response.data);
+    } catch (error) {
+      console.error("Error scheduling tests:", error);
+      const errorMessage = error.response?.data?.error || "Failed to schedule tests. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -348,11 +395,8 @@ const Release_Offer = () => {
   const handleNextStep = () => {
     if (step === 1 && validateFormStep1()) {
       setStep(2);
-    } else if (step === 2 && validateFormStep2()) {
-      formSubmitHandler(); // Submit offer in Step 2
-      if (isPredictionMode) {
-        setStep(3); // Proceed to Step 3 for profile view
-      }
+    } else if (step === 2) {
+      formSubmitHandler();
     } else {
       toast.error("Please fill in all required fields correctly");
     }
@@ -382,14 +426,10 @@ const Release_Offer = () => {
             </div>
           )
         )}
-        <div
-          className={`absolute top-5 left-[10%] w-[80%] h-0.5 bg-gray-200`}
-        >
+        <div className="absolute top-5 left-[10%] w-[80%] h-0.5 bg-gray-200">
           <div
-            className={`h-full bg-indigo-600 transition-all duration-300`}
-            style={{
-              width: `${((step - 1) / (totalSteps - 1)) * 100}%`,
-            }}
+            className="h-full bg-indigo-600 transition-all duration-300"
+            style={{ width: `${((step - 1) / (totalSteps - 1)) * 100}%` }}
           ></div>
         </div>
       </div>
@@ -430,6 +470,7 @@ const Release_Offer = () => {
               type="button"
               className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-all disabled:bg-indigo-400 disabled:cursor-not-allowed"
               onClick={handleNextStep}
+              disabled={isLoading}
             >
               Next
             </button>
@@ -502,6 +543,7 @@ const Release_Offer = () => {
               type="button"
               className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all w-full sm:w-auto"
               onClick={() => setStep(1)}
+              disabled={isLoading}
             >
               Back
             </button>
@@ -509,8 +551,9 @@ const Release_Offer = () => {
               type="button"
               className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-all w-full sm:w-auto"
               onClick={handleNextStep}
+              disabled={isLoading}
             >
-              Release Offer
+              {isPredictionMode ? "Next" : "Release Offer"}
             </button>
           </div>
         </form>
@@ -519,7 +562,7 @@ const Release_Offer = () => {
       {/* Step 3 - Candidate Profile (Prediction Mode) */}
       {step === 3 && isPredictionMode && (
         <div className="w-full space-y-8">
-          <h2 className="text-3xl font-bold text-indigo-600">Candidate Profile</h2>
+          <h2 className="text-3xl font-bold text-indigo-600">Candidate Profile & Test Scheduling</h2>
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
               <svg
@@ -575,7 +618,9 @@ const Release_Offer = () => {
                         </span>
                       ))
                     ) : (
-                      <p className="text-gray-500 text-sm">No programming languages listed</p>
+                      <p className="text-red-500 text-sm">
+                        No programming languages listed. Please upload a resume with relevant skills.
+                      </p>
                     )}
                   </div>
                 </div>
@@ -607,27 +652,117 @@ const Release_Offer = () => {
                       </button>
                     ))}
                   </div>
+                  {!selectedTags.includes("Technical") && (
+                    <p className="text-red-500 text-xs mt-2">
+                      Technical tag is required for test scheduling.
+                    </p>
+                  )}
                 </div>
+
+                {/* Frequency Dropdown */}
+                <div>
+                  <h4 className="text-xl font-medium text-gray-700 mb-4">Test Frequency</h4>
+                  <select
+                    value={frequency}
+                    onChange={(e) => setFrequency(e.target.value)}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
+                      !form.joiningDate ? "bg-gray-100 cursor-not-allowed" : ""
+                    }`}
+                    disabled={!form.joiningDate}
+                  >
+                    <option value="">Select Frequency</option>
+                    {frequencyOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  {!form.joiningDate && (
+                    <p className="text-red-500 text-xs mt-1">
+                      Please set a joining date in Step 1 to enable frequency selection.
+                    </p>
+                  )}
+                  {frequency && (
+                    <p className="text-gray-600 text-sm mt-2">
+                      {frequencyOptions.find((opt) => opt.value === frequency)?.count} tests will be scheduled between today and the joining date.
+                    </p>
+                  )}
+                </div>
+
+                {/* Test Schedule Display */}
+                {testSchedule && (
+                  <div>
+                    <h4 className="text-xl font-medium text-gray-700 mb-4">Scheduled Tests</h4>
+                    <p className="text-gray-600 text-sm mb-4">
+                      The following tests have been scheduled and emailed to {form.candidateName}. Each test link will only be active during its scheduled time window (60 minutes from the start time).
+                    </p>
+                    <ul className="space-y-4">
+                      {testSchedule.testDates.map((date, index) => (
+                        <li
+                          key={index}
+                          className="p-4 bg-indigo-50 rounded-lg border border-indigo-200"
+                        >
+                          <p className="text-gray-800 font-medium">
+                            Test {index + 1}:{" "}
+                            {new Date(date).toLocaleString("en-US", {
+                              weekday: "long",
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                              hour: "numeric",
+                              minute: "numeric",
+                              hour12: true,
+                            })}
+                          </p>
+                          <p className="text-gray-600 text-sm">
+                            Duration: 60 minutes | Questions: 5
+                          </p>
+                          <a
+                            href={testSchedule.testLinks[index]}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                          >
+                            Test Link {index + 1}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="text-gray-600 text-sm mt-4">
+                      Note: Test links are for preview only. Candidates must use the links sent via email, which are active only during the scheduled time.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           ) : (
-            <p className="text-center text-gray-500 font-medium py-8">No resume data available.</p>
+            <p className="text-center text-gray-500 font-medium py-8">
+              No resume data available. Please upload a valid resume.
+            </p>
           )}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <button
               type="button"
               className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all w-full sm:w-auto"
               onClick={() => setStep(2)}
+              disabled={isLoading}
             >
               Back
             </button>
             <button
               type="button"
-              disabled={isLoading || !resumeData || selectedTags.length === 0}
+              disabled={
+                isLoading ||
+                !resumeData ||
+                !resumeData.skills ||
+                resumeData.skills.length === 0 ||
+                !selectedTags.includes("Technical") ||
+                !frequency
+              }
               className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-all disabled:bg-green-400 disabled:cursor-not-allowed w-full sm:w-auto flex items-center justify-center"
-              onClick={handleStartTest}
+              onClick={handleScheduleTests}
             >
-              Start Test
+              Schedule Tests
             </button>
           </div>
         </div>

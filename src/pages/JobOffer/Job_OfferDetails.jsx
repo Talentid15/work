@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { MdArrowBack, MdDownload } from "react-icons/md";
 import { format } from "date-fns";
 import api from "../../utils/api";
 import toast from "react-hot-toast";
+
+export const company_size_value = {
+  Startup: "1-10",
+  Small: "11-50",
+  Medium: "51-200",
+  Large: "201+",
+};
 
 const OfferDetail = () => {
   const token = useSelector((state) => state.user.data?.token);
@@ -15,9 +22,103 @@ const OfferDetail = () => {
   const [showRetractConfirm, setShowRetractConfirm] = useState(false);
   const [showGhostedConfirm, setShowGhostedConfirm] = useState(false);
   const offersData = useSelector((state) => state.offer.data);
-  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
+  const [formulaData, setFormulaData] = useState(null);
+  const [intentScore, setIntentScore] = useState(null);
+  const [companyData, setCompanyData] = useState(null); // Store localStorage data
 
   const offer = offersData?.find((offer) => offer._id === id);
+
+  useEffect(() => {
+    if (offer) {
+      // Load company data from localStorage
+      const storedData = localStorage.getItem(`company_${offer.companyName}`);
+      if (storedData) {
+        setCompanyData(JSON.parse(storedData));
+      }
+    }
+  }, [offer]);
+
+  useEffect(() => {
+    const fetchFormulaData = async () => {
+      if (!offer) return;
+      try {
+        const response = await api.get(
+          `http://localhost:4000/api/formula/formula/status/${offer.candidate._id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            withCredentials: true,
+          }
+        );
+        setFormulaData(response.data);
+      } catch (error) {
+        console.error("Error fetching formula data:", error);
+        toast.error("Failed to load candidate preferences");
+        setFormulaData(null);
+      }
+    };
+    fetchFormulaData();
+  }, [offer, token, API_URL]);
+
+  const calculateIntentScore = () => {
+    if (!offer || !formulaData?.formulaData) return 0;
+
+    const { status, jobTitle, offeredCTC = 0 } = offer;
+    const { hasSubmitted, assessmentScore, formulaData: fData } = formulaData;
+    const { locationPreferences, expectedCTC, companySizePreferences, rolePreferences } = fData;
+
+    const jobLocation = offer.jobLocation || companyData?.address || "Unknown";
+    const companySize = companyData?.companySize || "Unknown";
+
+    // 1. Location Score (LS)
+    let LS = 20; // Default: no match
+    if (locationPreferences[0] === jobLocation) LS = 95;
+    else if (locationPreferences[1] === jobLocation) LS = 75;
+    else if (locationPreferences[2] === jobLocation) LS = 50;
+    else if (locationPreferences[3] === jobLocation) LS = 25;
+
+    // 2. Salary Score (SS)
+    let SS = 20; // Default: minimum score
+    if (offeredCTC === 0) {
+      SS = 20; // Not mentioned
+    } else if (offeredCTC >= expectedCTC) {
+      SS = 95;
+    } else {
+      SS = Math.max(20, Math.min(95, (offeredCTC / expectedCTC) * 95));
+    }
+
+    // 3. Company Size Score (CS)
+    let CS = 20; // Default: no match
+    if (companySizePreferences[0] === companySize) CS = 95;
+    else if (companySizePreferences[1] === companySize) CS = 75;
+    else if (companySizePreferences[2] === companySize) CS = 50;
+    else if (companySizePreferences[3] === companySize) CS = 25;
+
+    // 4. Role Score (RS)
+    let RS = 20; // Default: no match
+    if (rolePreferences[0] === jobTitle) RS = 95;
+    else if (rolePreferences[1] === jobTitle) RS = 75;
+    else if (rolePreferences[2] === jobTitle) RS = 50;
+    else if (rolePreferences[3] === jobTitle) RS = 25;
+
+    // 5. Quiz Score (QS)
+    const QS = hasSubmitted ? assessmentScore : 0;
+
+    // Check offer status
+    if (status === "Rejected") {
+      return 0; // If offer is rejected, intent is 0%
+    }
+
+    // Final Intent Score
+    const intent = (LS + SS + CS + RS + QS) / 5;
+    return Math.round(intent * 100) / 100; // Round to 2 decimal places
+  };
+
+  // Compute intent score when offer, formulaData, or companyData changes
+  useEffect(() => {
+    const score = calculateIntentScore();
+    setIntentScore(score);
+  }, [offer, formulaData, companyData]);
 
   if (!offer) {
     return (
@@ -42,13 +143,13 @@ const OfferDetail = () => {
         }
       );
       if (response.data) {
-        toast.success('Offer retracted successfully');
+        toast.success("Offer retracted successfully");
         navigate(0);
       } else {
-        throw new Error('Failed to retract offer');
+        throw new Error("Failed to retract offer");
       }
     } catch (error) {
-      console.error('Error retracting offer:', error);
+      console.error("Error retracting offer:", error);
       toast.error(`Failed to retract offer: ${error.message}`);
     }
   };
@@ -64,14 +165,14 @@ const OfferDetail = () => {
         }
       );
       if (response.data) {
-        toast.success('Offer Deleted successfully');
-        navigate('/joboffers');
+        toast.success("Offer deleted successfully");
+        navigate("/joboffers");
       } else {
-        throw new Error('Failed to Delete offer');
+        throw new Error("Failed to delete offer");
       }
     } catch (error) {
-      console.error('Error hiding offer:', error);
-      toast.error(`Failed to Delete offer: ${error.message}`);
+      console.error("Error hiding offer:", error);
+      toast.error(`Failed to delete offer: ${error.message}`);
     }
   };
 
@@ -86,16 +187,16 @@ const OfferDetail = () => {
         }
       );
       if (response.data) {
-        toast.success('Offer marked as Ghosted successfully');
+        toast.success("Offer marked as ghosted successfully");
         setTimeout(() => {
-          window.location.reload()
+          window.location.reload();
         }, 300);
       } else {
-        throw new Error('Failed to mark offer as Ghosted');
+        throw new Error("Failed to mark offer as ghosted");
       }
     } catch (error) {
-      console.error('Error marking offer as Ghosted:', error);
-      toast.error(`Failed to mark offer as Ghosted: ${error.message}`);
+      console.error("Error marking offer as ghosted:", error);
+      toast.error(`Failed to mark offer as ghosted: ${error.message}`);
     }
   };
 
@@ -116,7 +217,9 @@ const OfferDetail = () => {
       <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-8">
         {/* Back Button */}
         <button
-          onClick={() => { window.location.href = '/joboffers' }}
+          onClick={() => {
+            window.location.href = "/joboffers";
+          }}
           className="flex items-center gap-2 text-purple-700 hover:text-purple-800 mb-6 font-medium transition-all"
         >
           <MdArrowBack size={20} />
@@ -129,25 +232,41 @@ const OfferDetail = () => {
           <div className="w-full lg:w-1/2 p-6 bg-gray-50 rounded-xl shadow-sm">
             <h2 className="text-lg font-semibold text-purple-800 mb-4">Candidate Information</h2>
             <div className="space-y-2 text-gray-700">
-              <p><strong>Name:</strong> {candidate?.name || "N/A"}</p>
-              <p><strong>Email:</strong> {candidate?.email || "N/A"}</p>
-              <p><strong>Phone:</strong> {candidate?.phoneNo || "N/A"}</p>
+              <p>
+                <strong>Name:</strong> {candidate?.name || "N/A"}
+              </p>
+              <p>
+                <strong>Email:</strong> {candidate?.email || "N/A"}
+              </p>
+              <p>
+                <strong>Phone:</strong> {candidate?.phoneNo || "N/A"}
+              </p>
             </div>
 
             <h2 className="text-lg font-semibold text-purple-800 mt-6 mb-4">Offer Details</h2>
             <div className="space-y-2 text-gray-700">
-              <p><strong>Job Title:</strong> {jobTitle || "N/A"}</p>
+              <p>
+                <strong>Job Title:</strong> {jobTitle || "N/A"}
+              </p>
+              <p>
+                <strong>Company Size:</strong> {companyData?.companySize || "N/A"} (
+                {company_size_value[companyData?.companySize] || "N/A"})
+              </p>
+              <p>
+                <strong>Address:</strong> {companyData?.address || "N/A"}
+              </p>
               <p>
                 <strong>Status:</strong>
                 <span
-                  className={`ml-2 px-3 py-1 rounded-full text-sm font-medium ${status === "Pending"
+                  className={`ml-2 px-3 py-1 rounded-full text-sm font-medium ${
+                    status === "Pending"
                       ? "bg-yellow-100 text-yellow-700"
                       : status === "Retracted"
-                        ? "bg-orange-100 text-orange-700"
-                        : status === "Ghosted"
-                          ? "bg-red-100 text-red-700"
-                          : "bg-green-100 text-green-700"
-                    }`}
+                      ? "bg-orange-100 text-orange-700"
+                      : status === "Ghosted"
+                      ? "bg-red-100 text-red-700"
+                      : "bg-green-100 text-green-700"
+                  }`}
                 >
                   {status}
                 </span>
@@ -160,33 +279,40 @@ const OfferDetail = () => {
                 <strong>Expiration Date:</strong>{" "}
                 {expirationDate ? format(new Date(expirationDate), "PPP") : "N/A"}
               </p>
+              <p>
+                <strong>Joining Intent (OfferLens):</strong>{" "}
+                {intentScore !== null ? `${intentScore}%` : "Calculating..."}
+              </p>
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
               <button
-                className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${viewing === "resume"
+                className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${
+                  viewing === "resume"
                     ? "bg-purple-700 text-white"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
+                }`}
                 onClick={() => setViewing("resume")}
               >
                 Resume
               </button>
               <button
-                className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${viewing === "offer"
+                className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${
+                  viewing === "offer"
                     ? "bg-purple-700 text-white"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
+                }`}
                 onClick={() => setViewing("offer")}
               >
                 Offer Letter
               </button>
               {acceptedLetter && (
                 <button
-                  className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${viewing === "accepted"
+                  className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${
+                    viewing === "accepted"
                       ? "bg-purple-700 text-white"
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
+                  }`}
                   onClick={() => setViewing("accepted")}
                 >
                   Accepted Letter
@@ -340,7 +466,7 @@ const OfferDetail = () => {
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl max-w-md w-full">
               <h3 className="text-lg font-semibold text-purple-800 mb-4">Confirm Ghosted Status</h3>
               <p className="text-gray-600 mb-6">
-                Are you sure you want to mark this offer as Ghosted? This action cannot be undone.
+                Are you sure you want to mark this offer as ghosted? This action cannot be undone.
               </p>
               <div className="flex justify-end gap-4">
                 <button

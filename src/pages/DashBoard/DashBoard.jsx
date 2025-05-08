@@ -20,7 +20,6 @@ const DashBoard = () => {
     const fetchDashboardData = async () => {
       setIsLoading(true);
       try {
-        // Fetch offer releases
         const offerReleasesResponse = await api.get(`${API_URL}/api/offer/get-all-offers`, {
           withCredentials: true,
           headers: {
@@ -152,12 +151,10 @@ const DashBoard = () => {
           </div>
         </div>
 
-        {/* Chart Section */}
         <div className="mt-6">
           <MultiLineChart />
         </div>
 
-        {/* Outlet for nested routes */}
         <div className="mt-6">
           <Outlet />
         </div>

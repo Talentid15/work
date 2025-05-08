@@ -112,12 +112,13 @@ const Job_Offer = () => {
           <div className="relative w-full sm:w-auto">
             <button
               className="flex items-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto justify-center sm:justify-start"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              // onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              onClick={() => navigate("/release-offer")}
             >
               <FaFileAlt />
               Release Offer
             </button>
-            {isDropdownOpen && (
+            {/* {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-purple-100 transition-all"
@@ -132,7 +133,7 @@ const Job_Offer = () => {
                   Release Offer with Prediction
                 </button>
               </div>
-            )}
+            )} */}
           </div>
         </div>
 

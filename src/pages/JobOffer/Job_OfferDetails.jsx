@@ -258,15 +258,14 @@ const OfferDetail = () => {
               <p>
                 <strong>Status:</strong>
                 <span
-                  className={`ml-2 px-3 py-1 rounded-full text-sm font-medium ${
-                    status === "Pending"
+                  className={`ml-2 px-3 py-1 rounded-full text-sm font-medium ${status === "Pending"
                       ? "bg-yellow-100 text-yellow-700"
                       : status === "Retracted"
-                      ? "bg-orange-100 text-orange-700"
-                      : status === "Ghosted"
-                      ? "bg-red-100 text-red-700"
-                      : "bg-green-100 text-green-700"
-                  }`}
+                        ? "bg-orange-100 text-orange-700"
+                        : status === "Ghosted"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-green-100 text-green-700"
+                    }`}
                 >
                   {status}
                 </span>
@@ -287,32 +286,29 @@ const OfferDetail = () => {
 
             <div className="mt-6 flex flex-wrap gap-3">
               <button
-                className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${
-                  viewing === "resume"
+                className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${viewing === "resume"
                     ? "bg-purple-700 text-white"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
+                  }`}
                 onClick={() => setViewing("resume")}
               >
                 Resume
               </button>
               <button
-                className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${
-                  viewing === "offer"
+                className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${viewing === "offer"
                     ? "bg-purple-700 text-white"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
+                  }`}
                 onClick={() => setViewing("offer")}
               >
                 Offer Letter
               </button>
               {acceptedLetter && (
                 <button
-                  className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${
-                    viewing === "accepted"
+                  className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${viewing === "accepted"
                       ? "bg-purple-700 text-white"
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
+                    }`}
                   onClick={() => setViewing("accepted")}
                 >
                   Accepted Letter

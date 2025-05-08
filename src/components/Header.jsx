@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaBell, FaUserCircle, FaSignOutAlt, FaTimes } from 'react-icons/fa';
+import { FaBell, FaUserCircle, FaSignOutAlt, FaTimes, FaBuilding } from 'react-icons/fa';
 import { MdOutlineCurrencyExchange } from "react-icons/md";
 import { GiRingingBell } from "react-icons/gi";
 import { ImInfo } from 'react-icons/im';
@@ -70,7 +70,7 @@ const Header = () => {
         <div className="flex items-center">
           <img src={logo} alt="TalentID Logo" className="h-8 w-32" />
         </div>
-        
+
         <div className="flex items-center space-x-5">
           {/* Info Button */}
           <div className="relative group">
@@ -81,10 +81,10 @@ const Header = () => {
               Need help? Click here for information
             </div>
           </div>
-          
+
           {/* Notifications */}
           <div className="relative" ref={notificationRef}>
-            <button 
+            <button
               className={`p-2 rounded-full ${showNotifications ? 'bg-purple-100 text-purple-700' : 'bg-gray-50 text-gray-600 hover:bg-purple-50 hover:text-purple-700'} transition-all duration-300 shadow-sm`}
               onClick={toggleNotifications}
             >
@@ -93,12 +93,12 @@ const Header = () => {
                 5
               </span>
             </button>
-            
+
             {showNotifications && (
               <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden transition-all duration-300 transform origin-top-right">
                 <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-white">
                   <p className="text-gray-800 font-semibold">Notifications</p>
-                  <button 
+                  <button
                     className="text-gray-500 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-gray-100"
                     onClick={() => setShowNotifications(false)}
                   >
@@ -122,10 +122,10 @@ const Header = () => {
               </div>
             )}
           </div>
-          
+
           {/* User Profile */}
           <div className="relative" ref={profileRef}>
-            <button 
+            <button
               className={`flex items-center space-x-2 py-1.5 px-3 rounded-full ${showProfile ? 'bg-purple-100 text-purple-700' : 'bg-gray-50 text-gray-600 hover:bg-purple-50 hover:text-purple-700'} transition-all duration-300 shadow-sm`}
               onClick={toggleProfile}
             >
@@ -138,68 +138,68 @@ const Header = () => {
                 {user.fullname || "Profile"}
               </span>
             </button>
-            
+
             {showProfile && (
               <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden transition-all duration-300 transform origin-top-right">
                 <div className="p-5 text-center border-b border-gray-100 bg-gradient-to-r from-purple-50 to-white">
                   <div className="relative mx-auto w-16 h-16 mb-3">
-                    <img 
-                      src={user.userImage || "https://via.placeholder.com/150"} 
-                      alt="User" 
-                      className="w-16 h-16 rounded-full object-cover border-2 border-purple-200" 
+                    <img
+                      src={user.userImage || "https://via.placeholder.com/150"}
+                      alt="User"
+                      className="w-16 h-16 rounded-full object-cover border-2 border-purple-200"
                     />
                     <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>
                   </div>
                   <p className="text-gray-800 font-semibold">{user.fullname || "User Name"}</p>
                   <p className="text-gray-500 text-xs mt-1">{user.email || "user@example.com"}</p>
                 </div>
-                
+
                 <ul className="py-2">
                   <li>
-                    <button 
+                    <button
                       className="w-full flex items-center px-5 py-3 text-gray-700 hover:bg-purple-50 transition-colors"
                       onClick={() => {
                         navigate("/settings");
                         setShowProfile(false);
                       }}
                     >
-                      <FaUserCircle className="mr-3 text-purple-600" /> 
+                      <FaUserCircle className="mr-3 text-purple-600" />
                       <span className="text-sm">My Profile</span>
                     </button>
                   </li>
                   <li>
-                    <button 
+                    <button
                       className="w-full flex items-center px-5 py-3 text-gray-700 hover:bg-purple-50 transition-colors"
                       onClick={() => {
                         navigate("/settings/subscription");
                         setShowProfile(false);
                       }}
                     >
-                      <MdOutlineCurrencyExchange className="mr-3 text-purple-600" /> 
+                      <MdOutlineCurrencyExchange className="mr-3 text-purple-600" />
                       <span className="text-sm">Subscription</span>
                     </button>
                   </li>
                   <li>
-                    <button 
+                    <button
                       className="w-full flex items-center px-5 py-3 text-gray-700 hover:bg-purple-50 transition-colors"
                       onClick={() => {
                         navigate(`/company/edit/${data?.company}`);
                         setShowProfile(false);
                       }}
                     >
-                      <MdOutlineCurrencyExchange className="mr-3 text-purple-600" /> 
+                      <FaBuilding className="mr-3 text-purple-600" />
                       <span className="text-sm">Company</span>
                     </button>
                   </li>
                   <li className="border-t border-gray-100 mt-1">
-                    <button 
+                    <button
                       className="w-full flex items-center px-5 py-3 text-red-600 hover:bg-red-50 transition-colors"
                       onClick={() => {
                         dispatch(logout());
                         navigate("/login");
                       }}
                     >
-                      <FaSignOutAlt className="mr-3" /> 
+                      <FaSignOutAlt className="mr-3" />
                       <span className="text-sm font-medium">Logout</span>
                     </button>
                   </li>
@@ -209,10 +209,10 @@ const Header = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Verification Banner */}
       {!isDocumentVerified && (isDocumentPending || isDocumentNotUploaded) && (
-        <div 
+        <div
           className="mt-3 bg-gradient-to-r from-amber-50 to-yellow-50 border-l-4 border-yellow-400 rounded-r-lg p-3 flex items-center justify-between cursor-pointer transition-all hover:from-amber-100 hover:to-yellow-100"
           onClick={handleVerificationClick}
         >

@@ -13,7 +13,7 @@ const OfferPunch = () => {
   const formRef = useRef(null);
   const [showForm, setShowForm] = useState(false);
   const [offerPunches, setOfferPunches] = useState([]);
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [statusFilter] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -159,8 +159,8 @@ const OfferPunch = () => {
         }
       );
       toast.success("Offer punch submitted successfully!");
-      setShowForm(false); // Hide form after successful submission
-      setShowConfirmation(false); // Hide confirmation popup
+      setShowForm(false); 
+      setShowConfirmation(false); 
       setFormData({
         jobTitle: "",
         candidateName: "",
@@ -262,7 +262,6 @@ const OfferPunch = () => {
               </div>
             </div>
 
-            {/* Candidate Information Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InputField
                 label="Candidate Name"
@@ -295,7 +294,6 @@ const OfferPunch = () => {
               />
             </div>
 
-            {/* Offer Details Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InputField
                 label="Job Title"
@@ -361,7 +359,6 @@ const OfferPunch = () => {
               />
             </div>
 
-            {/* Form Actions */}
             <div className="mt-8 flex justify-between items-center">
               <button
                 type="button"
@@ -395,13 +392,11 @@ const OfferPunch = () => {
           <>
             {filteredPunches?.length > 0 ? (
               <>
-                {/* Desktop Table View */}
                 <div className="hidden lg:block overflow-x-auto rounded-xl border border-gray-200 mb-6">
                   <table className="w-full bg-white">
                     <thead className="bg-purple-50 text-purple-800">
                       <tr>
                         <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Name</th>
-                        <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Role</th>
                         <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Status</th>
                         <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Offer Letter</th>
                         <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Date Added</th>
@@ -413,15 +408,10 @@ const OfferPunch = () => {
                         <tr
                           key={punch._id}
                           className="border-b hover:bg-purple-50 transition-all cursor-pointer"
-                          onClick={() => navigate(`/offer-punch/${punch._id}`)}
                         >
                           <td className="p-4 text-gray-700">{punch.candidateName || "N/A"}</td>
                           <td className="p-4 text-gray-700">{punch.jobTitle || "N/A"}</td>
-                          <td className="p-4">
-                            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-                              {punch.offerLetterStatus || "N/A"}
-                            </span>
-                          </td>
+          
                           <td className="p-4">
                             <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
                               {punch.companyName || "N/A"}

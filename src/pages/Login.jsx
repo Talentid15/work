@@ -67,10 +67,6 @@ const LoginForm = () => {
         }, {
           withCredentials: true,
         });
-        if (response.status === 202) {
-          toast.error("Your documents are being verified. Please try again later.");
-          return;
-        }
         dispatch(setData(response.data));
         setVerifiedDocuments(response.data.verifiedDocuments || false);
         toast.success("Logged in successfully!");
@@ -81,13 +77,8 @@ const LoginForm = () => {
           response: error.response?.data,
           status: error.response?.status,
         });
-        if (error.response?.status === 202) {
-          toast.info("Your documents are being verified. Please try again later.");
-        } else {
-          toast.error(error.response?.data?.error || "Login failed. Please try again.");
-        }
       } finally {
-        setIsLoading(false); // Stop loading
+        setIsLoading(false); 
       }
     }
   };

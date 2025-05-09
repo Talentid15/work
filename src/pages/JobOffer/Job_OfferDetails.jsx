@@ -442,13 +442,12 @@ const OfferDetail = () => {
               </button>
             </>
           ) : (
-            // <button
-            //   onClick={() => setShowFeedbackPopup(true)}
-            //   className="px-6 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition-all text-sm font-medium"
-            // >
-            //   Write Feedback
-            // </button>
-            <div className=""></div>
+            <button
+              onClick={() => setShowFeedbackPopup(true)}
+              className="px-6 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition-all text-sm font-medium"
+            >
+              Write Feedback
+            </button>
           )}
         </div>
 

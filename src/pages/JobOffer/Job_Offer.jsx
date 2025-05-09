@@ -8,6 +8,7 @@ import { setOfferData } from "../../redux/offerSlice";
 import { formateDate } from "../../utils";
 import api from "../../utils/api";
 import Loader from "../../components/common/Loader";
+import toast from "react-hot-toast";
 
 const Job_Offer = () => {
   const offersData = useSelector((state) => state.offer.data);
@@ -55,10 +56,10 @@ const Job_Offer = () => {
         {},
         { withCredentials: true }
       );
-      alert(response.data.message);
+      toast.success(response.data.message);
     } catch (error) {
       console.error("Error sending email:", error);
-      alert("Failed to send email");
+      toast.error("Failed to send email");
     }
   };
 

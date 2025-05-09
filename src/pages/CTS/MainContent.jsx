@@ -1,25 +1,43 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Search, Users, FileText, UserPlus, Menu, X, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { PipelineContext } from "../../context/PipelineContext";
 import PopUps from "../../components/PopUps";
+import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 const StatusCard = ({ company, status, offerDate, statusColor, iconColor }) => {
   return (
     <div className="flex flex-col items-center p-6 bg-white/30 backdrop-blur-lg rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-white/50">
       <div
-        className="flex items-center justify-center w-12 h-12 rounded-full mb-4"
-        style={{ backgroundColor: `${iconColor}20` }}
+        className="flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-purple-600"
+        // style={{ backgroundColor: `pu` }}
       >
         <Users className="h-6 w-6" style={{ color: iconColor }} />
       </div>
       <h3 className="text-lg font-semibold text-gray-800 text-center truncate w-full">
-        {company || "N/A"}
+        {company || "Unknown Company"}
       </h3>
       <p className={`text-sm font-medium ${statusColor} mt-2`}>{status || "Unknown"}</p>
       {offerDate && (
         <p className="text-xs text-gray-500 mt-2">Offer Date: {offerDate}</p>
       )}
+    </div>
+  );
+};
+
+const FeedbackCard = ({ rating, comment, createdAt }) => {
+  return (
+    <div className="flex flex-col p-6 bg-white/30 backdrop-blur-lg rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-white/50">
+      <div className="flex items-center mb-4">
+        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-purple-100">
+          <span className="text-lg font-semibold text-purple-600">{rating}/5</span>
+        </div>
+      </div>
+      <p className="text-sm text-gray-700">{comment || "No comment provided."}</p>
+      <p className="text-xs text-gray-500 mt-2">
+        Received: {createdAt ? new Date(createdAt).toLocaleDateString() : "N/A"}
+      </p>
     </div>
   );
 };
@@ -68,7 +86,68 @@ const MainContent = () => {
   const { searchedResponseData, setSearchedResponseData } = useContext(PipelineContext);
   const [isError, setError] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [feedbackData, setFeedbackData] = useState([]);
+  const [offerDetails, setOfferDetails] = useState([]); // New state for offer details
   const navigate = useNavigate();
+  const token = useSelector((state) => state.user.data?.token);
+  const user = useSelector((state) => state.user.data);
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
+
+  const fetchFeedback = async (candidateId) => {
+    try {
+      const response = await fetch(`${API_URL}/api/feedback/received/${candidateId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch feedback.");
+      }
+      const data = await response.json();
+      setFeedbackData(data.data || []);
+    } catch (error) {
+      console.error("Error fetching feedback:", error);
+      // toast.error("Failed to load candidate feedback.");
+      setFeedbackData([]);
+    }
+  };
+
+  // New function to fetch offer details
+  const fetchOfferDetails = async (offerIds) => {
+    try {
+      const offerPromises = offerIds.map(async (offerId) => {
+        const response = await fetch(`${API_URL}/api/offer/offer/${offerId}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch offer ${offerId}`);
+        }
+        return response.json();
+      });
+      const offers = await Promise.all(offerPromises);
+      setOfferDetails(offers.map((offer) => offer.data)); // Adjust based on actual response structure
+    } catch (error) {
+      console.error("Error fetching offer details:", error);
+      toast.error("Failed to load offer details.");
+      setOfferDetails([]);
+    }
+  };
+
+  useEffect(() => {
+    if (searchedResponseData?.hiringCandidateData?._id) {
+      fetchFeedback(searchedResponseData.hiringCandidateData._id);
+      // Fetch offer details if offers exist
+      if (searchedResponseData.hiringCandidateData?.offers?.length > 0) {
+        fetchOfferDetails(searchedResponseData.hiringCandidateData.offers);
+      }
+    }
+  }, [searchedResponseData, token]);
 
   const handleSearch = () => {
     if (!email) {
@@ -88,7 +167,11 @@ const MainContent = () => {
   };
 
   const renderContent = () => {
-    if (!searchedResponseData) return null;
+    if (!searchedResponseData) {
+      return (
+        <p className="text-gray-500 text-center">No candidate data available. Please perform a search.</p>
+      );
+    }
 
     return (
       <div className="w-full space-y-12">
@@ -96,64 +179,59 @@ const MainContent = () => {
           <HiringCandidateDetails data={searchedResponseData.hiringCandidateData} />
         )}
 
-        {searchedResponseData.filteredAppliedCompanies?.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Applied Companies</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {searchedResponseData.filteredAppliedCompanies.map((resData, index) => (
-                <StatusCard
-                  key={`applied-${index}`}
-                  company={resData.companyName}
-                  status={resData.currentStatus}
-                  statusColor="text-green-600"
-                  iconColor="#3DBF28"
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {searchedResponseData.signedOfferData?.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Signed Offers</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {searchedResponseData.signedOfferData.map((offer, index) => (
-                <StatusCard
-                  key={`signed-${index}`}
-                  company={offer.jobTitle || "Unknown Position"}
-                  status={offer.status || "Offer Signed"}
-                  offerDate={offer.offerDate && new Date(offer.offerDate).toLocaleDateString()}
-                  statusColor="text-blue-600"
-                  iconColor="#803CD8"
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {searchedResponseData.hiringCandidateData?.allOfferData?.length > 0 && (
+        {offerDetails.length > 0 ? (
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">All Offers</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {searchedResponseData.hiringCandidateData.allOfferData.map((offer, index) => (
+              {offerDetails.map((offer, index) => (
                 <StatusCard
                   key={`offer-${index}`}
                   company={offer.jobTitle || "Unknown Position"}
                   status={offer.status || "Offer Received"}
                   offerDate={offer.offerDate && new Date(offer.offerDate).toLocaleDateString()}
-                  statusColor="text-orange-600"
-                  iconColor="#FF9800"
+                  statusColor="text-purple-600"
+                  iconColor="#fff"
                 />
               ))}
             </div>
           </div>
+        ) : (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">All Offers</h2>
+            <p className="text-gray-500 text-center">
+              {searchedResponseData.hiringCandidateData?.offers?.length > 0
+                ? "Loading offer details..."
+                : "No offers found for this candidate."}
+            </p>
+          </div>
         )}
+{/* 
+        {feedbackData.length > 0 ? (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Candidate Feedback</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {feedbackData.map((feedback, index) => (
+                <FeedbackCard
+                  key={`feedback-${index}`}
+                  rating={feedback.rating}
+                  comment={feedback.comment}
+                  createdAt={feedback.createdAt}
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Candidate Feedback</h2>
+            <p className="text-gray-500 text-center">No feedback available for this candidate.</p>
+          </div>
+        )} */}
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen  flex flex-col relative">
+    <div className="min-h-screen flex flex-col relative">
       {/* Navbar */}
       <header className="relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
@@ -196,7 +274,11 @@ const MainContent = () => {
               </span>
             </Link>
           </nav>
-          <button className="md:hidden text-gray-700 hover:text-purple-600 focus:outline-none" onClick={toggleMenu} aria-label="Toggle menu">
+          <button
+            className="md:hidden text-gray-700 hover:text-purple-600 focus:outline-none"
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -243,10 +325,18 @@ const MainContent = () => {
               className="w-full p-4 pl-12 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm transition-all duration-300 group-hover:shadow-md bg-white/80"
               aria-label="Search candidate by email"
             />
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 group-hover:text-purple-600 transition-colors duration-200" size={20} />
+            <Search
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 group-hover:text-purple-600 transition-colors duration-200"
+              size={20}
+            />
           </div>
-          <button onClick={handleSearch} className="px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-all duration-300" aria-label="Search">Check</button>
-
+          <button
+            onClick={handleSearch}
+            className="px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-all duration-300"
+            aria-label="Search"
+          >
+            Check
+          </button>
         </div>
         {isError && (
           <p className="mt-4 text-sm text-red-500 text-center animate-pulse">{isError}</p>
@@ -258,9 +348,7 @@ const MainContent = () => {
       {showPopups && (
         <PopUps
           setshowPopUps={setShowPopups}
-          showPopups={showPopups}
           emailSearch={email}
-          searchedResponseData={searchedResponseData}
           setSearchedResponseData={setSearchedResponseData}
           setError={setError}
         />

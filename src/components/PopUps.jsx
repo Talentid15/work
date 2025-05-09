@@ -48,6 +48,8 @@ function PopUps({ setshowPopUps, emailSearch, setSearchedResponseData, setError 
         }
       );
 
+      console.log(response.data.data)
+
       toast.success("Data fetched successfully");
       setSearchedResponseData(response.data.data);
 
@@ -56,6 +58,7 @@ function PopUps({ setshowPopUps, emailSearch, setSearchedResponseData, setError 
         createdAt: new Date().toISOString(),
         appliedCompanies: response.data.data?.filteredAppliedCompanies || [],
       };
+      console.log(temp)
       dispatch(setUserHistory(temp));
       setError("");
     } catch (error) {

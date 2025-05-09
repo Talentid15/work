@@ -15,17 +15,23 @@ export const company_size_value = {
 
 const OfferDetail = () => {
   const token = useSelector((state) => state.user.data?.token);
+  const user = useSelector((state) => state.user.data); // Get user data for reviewerId
   const navigate = useNavigate();
   const { id } = useParams();
   const [viewing, setViewing] = useState("resume");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showRetractConfirm, setShowRetractConfirm] = useState(false);
   const [showGhostedConfirm, setShowGhostedConfirm] = useState(false);
+  const [showFeedbackPopup, setShowFeedbackPopup] = useState(false);
+  const [feedbackRating, setFeedbackRating] = useState(1);
+  const [feedbackComment, setFeedbackComment] = useState("");
+  const [feedbackError, setFeedbackError] = useState(null);
+  const [feedbackSuccess, setFeedbackSuccess] = useState(null);
   const offersData = useSelector((state) => state.offer.data);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
   const [formulaData, setFormulaData] = useState(null);
   const [intentScore, setIntentScore] = useState(null);
-  const [companyData, setCompanyData] = useState(null); // Store localStorage data
+  const [companyData, setCompanyData] = useState(null);
 
   const offer = offersData?.find((offer) => offer._id === id);
 
@@ -53,7 +59,7 @@ const OfferDetail = () => {
         setFormulaData(response.data);
       } catch (error) {
         console.error("Error fetching formula data:", error);
-        toast.error("Failed to load candidate preferences");
+        // toast.error("Failed to load candidate preferences");
         setFormulaData(null);
       }
     };
@@ -70,67 +76,93 @@ const OfferDetail = () => {
     const jobLocation = offer.jobLocation || companyData?.address || "Unknown";
     const companySize = companyData?.companySize || "Unknown";
 
-    // 1. Location Score (LS)
-    let LS = 20; // Default: no match
+    let LS = 20;
     if (locationPreferences[0] === jobLocation) LS = 95;
     else if (locationPreferences[1] === jobLocation) LS = 75;
     else if (locationPreferences[2] === jobLocation) LS = 50;
     else if (locationPreferences[3] === jobLocation) LS = 25;
 
-    // 2. Salary Score (SS)
-    let SS = 20; // Default: minimum score
+    let SS = 20;
     if (offeredCTC === 0) {
-      SS = 20; // Not mentioned
+      SS = 20;
     } else if (offeredCTC >= expectedCTC) {
       SS = 95;
     } else {
       SS = Math.max(20, Math.min(95, (offeredCTC / expectedCTC) * 95));
     }
 
-    // 3. Company Size Score (CS)
-    let CS = 20; // Default: no match
+    let CS = 20;
     if (companySizePreferences[0] === companySize) CS = 95;
     else if (companySizePreferences[1] === companySize) CS = 75;
     else if (companySizePreferences[2] === companySize) CS = 50;
     else if (companySizePreferences[3] === companySize) CS = 25;
 
-    // 4. Role Score (RS)
-    let RS = 20; // Default: no match
+    let RS = 20;
     if (rolePreferences[0] === jobTitle) RS = 95;
     else if (rolePreferences[1] === jobTitle) RS = 75;
     else if (rolePreferences[2] === jobTitle) RS = 50;
     else if (rolePreferences[3] === jobTitle) RS = 25;
 
-    // 5. Quiz Score (QS)
     const QS = hasSubmitted ? assessmentScore : 0;
 
-    // Check offer status
     if (status === "Rejected") {
-      return 0; // If offer is rejected, intent is 0%
+      return 0;
     }
 
-    // Final Intent Score
     const intent = (LS + SS + CS + RS + QS) / 5;
-    return Math.round(intent * 100) / 100; // Round to 2 decimal places
+    return Math.round(intent * 100) / 100;
   };
 
-  // Compute intent score when offer, formulaData, or companyData changes
   useEffect(() => {
     const score = calculateIntentScore();
     setIntentScore(score);
   }, [offer, formulaData, companyData]);
 
-  if (!offer) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center text-red-500 font-medium text-lg bg-white p-6 rounded-xl shadow-md">
-          Offer not found.
-        </div>
-      </div>
-    );
-  }
-
-  const { candidate, jobTitle, status, offerDate, expirationDate, offerLetterLink, acceptedLetter } = offer;
+  const handleSubmitFeedback = async () => {
+    if (!token) {
+      toast.error("No token found. Please log in again.");
+      navigate("/login", { replace: true });
+      return;
+    }
+    if (!offer?.candidate?._id) {
+      setFeedbackError("Candidate information not available.");
+      return;
+    }
+    setFeedbackError(null);
+    setFeedbackSuccess(null);
+    try {
+       await api.post(
+        `http://localhost:4000/api/feedback/submit`,
+        {
+          reviewerId: user._id,
+          reviewerModel: "User",
+          recipientId: offer.candidate._id,
+          recipientModel: "HiringCandidate",
+          rating: feedbackRating,
+          comment: feedbackComment,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
+      );
+      setFeedbackSuccess("Feedback submitted successfully!");
+      toast.success("Feedback submitted successfully!");
+      setTimeout(() => {
+        setShowFeedbackPopup(false);
+        setFeedbackRating(1);
+        setFeedbackComment("");
+      }, 1500);
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      const errorMessage = error.response?.data?.message || "Failed to submit feedback.";
+      setFeedbackError(errorMessage);
+      toast.error(errorMessage);
+      if (error.response?.status === 401) {
+        navigate("/login", { replace: true });
+      }
+    }
+  };
 
   const handleRetract = async () => {
     try {
@@ -212,10 +244,21 @@ const OfferDetail = () => {
     setShowGhostedConfirm(true);
   };
 
+  if (!offer) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center text-red-500 font-medium text-lg bg-white p-6 rounded-xl shadow-md">
+          Offer not found.
+        </div>
+      </div>
+    );
+  }
+
+  const { candidate, jobTitle, status, offerDate, expirationDate, offerLetterLink, acceptedLetter } = offer;
+
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-8">
-        {/* Back Button */}
         <button
           onClick={() => {
             window.location.href = "/joboffers";
@@ -244,7 +287,8 @@ const OfferDetail = () => {
             </div>
 
             <h2 className="text-lg font-semibold text-purple-800 mt-6 mb-4">Offer Details</h2>
-            <div className="space-y-2 text-gray-700">
+            <div className="space-y-2 text-gray-7
+00">
               <p>
                 <strong>Job Title:</strong> {jobTitle || "N/A"}
               </p>
@@ -278,10 +322,10 @@ const OfferDetail = () => {
                 <strong>Expiration Date:</strong>{" "}
                 {expirationDate ? format(new Date(expirationDate), "PPP") : "N/A"}
               </p>
-              <p>
+              {/* <p>
                 <strong>Joining Intent (OfferLens):</strong>{" "}
                 {intentScore !== null ? `${intentScore}%` : "Calculating..."}
-              </p>
+              </p> */}
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
@@ -382,7 +426,7 @@ const OfferDetail = () => {
           >
             Delete Offer
           </button>
-          {status === "Pending" && (
+          {status === "Pending" ? (
             <>
               <button
                 onClick={confirmRetract}
@@ -397,6 +441,14 @@ const OfferDetail = () => {
                 Mark as Ghosted
               </button>
             </>
+          ) : (
+            // <button
+            //   onClick={() => setShowFeedbackPopup(true)}
+            //   className="px-6 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition-all text-sm font-medium"
+            // >
+            //   Write Feedback
+            // </button>
+            <div className=""></div>
           )}
         </div>
 
@@ -429,6 +481,7 @@ const OfferDetail = () => {
           </div>
         )}
 
+        {/* Retract Confirmation Popup */}
         {showRetractConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl max-w-md w-full">
@@ -457,6 +510,7 @@ const OfferDetail = () => {
           </div>
         )}
 
+        {/* Ghosted Confirmation Popup */}
         {showGhostedConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl max-w-md w-full">
@@ -480,6 +534,66 @@ const OfferDetail = () => {
                 >
                   Yes, Mark as Ghosted
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Feedback Submission Popup */}
+        {showFeedbackPopup && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl max-w-md w-full">
+              <h3 className="text-lg font-semibold text-purple-800 mb-4">Submit Feedback</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Rating (1–5)</label>
+                  <select
+                    value={feedbackRating}
+                    onChange={(e) => setFeedbackRating(Number(e.target.value))}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  >
+                    {[1, 2, 3, 4, 5].map((num) => (
+                      <option key={num} value={num}>{num}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Comment (optional)</label>
+                  <textarea
+                    value={feedbackComment}
+                    onChange={(e) => setFeedbackComment(e.target.value)}
+                    maxLength={500}
+                    rows={4}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                    placeholder="Share your feedback about the candidate..."
+                  />
+                </div>
+                {feedbackError && (
+                  <p className="text-red-500 text-sm">{feedbackError}</p>
+                )}
+                {feedbackSuccess && (
+                  <p className="text-green-500 text-sm">{feedbackSuccess}</p>
+                )}
+                <div className="flex justify-end gap-4">
+                  <button
+                    onClick={() => {
+                      setShowFeedbackPopup(false);
+                      setFeedbackRating(1);
+                      setFeedbackComment("");
+                      setFeedbackError(null);
+                      setFeedbackSuccess(null);
+                    }}
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all text-sm font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSubmitFeedback}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all text-sm font-medium"
+                  >
+                    Submit
+                  </button>
+                </div>
               </div>
             </div>
           </div>

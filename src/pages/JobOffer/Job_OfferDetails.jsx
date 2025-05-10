@@ -15,7 +15,7 @@ export const company_size_value = {
 
 const OfferDetail = () => {
   const token = useSelector((state) => state.user.data?.token);
-  const user = useSelector((state) => state.user.data); // Get user data for reviewerId
+  const user = useSelector((state) => state.user.data);
   const navigate = useNavigate();
   const { id } = useParams();
   const [viewing, setViewing] = useState("resume");
@@ -37,7 +37,6 @@ const OfferDetail = () => {
 
   useEffect(() => {
     if (offer) {
-      // Load company data from localStorage
       const storedData = localStorage.getItem(`company_${offer.companyName}`);
       if (storedData) {
         setCompanyData(JSON.parse(storedData));
@@ -59,7 +58,6 @@ const OfferDetail = () => {
         setFormulaData(response.data);
       } catch (error) {
         console.error("Error fetching formula data:", error);
-        // toast.error("Failed to load candidate preferences");
         setFormulaData(null);
       }
     };
@@ -131,8 +129,8 @@ const OfferDetail = () => {
     setFeedbackError(null);
     setFeedbackSuccess(null);
     try {
-       await api.post(
-        `http://localhost:4000/api/feedback/submit`,
+      await api.post(
+        `${API_URL}/api/feedback/submit`,
         {
           reviewerId: user._id,
           reviewerModel: "User",
@@ -232,21 +230,9 @@ const OfferDetail = () => {
     }
   };
 
-  const confirmDelete = () => {
-    setShowDeleteConfirm(true);
-  };
-
-  const confirmRetract = () => {
-    setShowRetractConfirm(true);
-  };
-
-  const confirmGhosted = () => {
-    setShowGhostedConfirm(true);
-  };
-
   if (!offer) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center text-red-500 font-medium text-lg bg-white p-6 rounded-xl shadow-md">
           Offer not found.
         </div>
@@ -257,347 +243,310 @@ const OfferDetail = () => {
   const { candidate, jobTitle, status, offerDate, expirationDate, offerLetterLink, acceptedLetter } = offer;
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-8">
-        <button
-          onClick={() => {
-            window.location.href = "/joboffers";
-          }}
-          className="flex items-center gap-2 text-purple-700 hover:text-purple-800 mb-6 font-medium transition-all"
-        >
-          <MdArrowBack size={20} />
-          Back to Offers
-        </button>
+    <div className="h-screen flex flex-col overflow-hidden bg-gray-50">
+      {/* Header with back button */}
+      <div className="bg-white shadow-sm p-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <button
+            onClick={() => navigate("/joboffers")}
+            className="flex items-center gap-2 text-purple-700 hover:text-purple-800 font-medium transition-all"
+          >
+            <MdArrowBack size={18} />
+            Back to Offers
+          </button>
+          <h1 className="text-xl font-bold text-purple-800">Offer Details</h1>
+          <div className="w-24"></div> {/* Spacer for alignment */}
+        </div>
+      </div>
 
-        <h1 className="text-2xl sm:text-3xl font-bold text-purple-800 mb-8">Offer Details</h1>
-
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="w-full lg:w-1/2 p-6 bg-gray-50 rounded-xl shadow-sm">
-            <h2 className="text-lg font-semibold text-purple-800 mb-4">Candidate Information</h2>
-            <div className="space-y-2 text-gray-700">
+      {/* Main content */}
+      <div className="flex-1 overflow-hidden p-3">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 h-full">
+          {/* Left panel - Candidate info */}
+          <div className="bg-white rounded-lg shadow-sm p-4 lg:col-span-2 overflow-y-auto">
+            <h2 className="text-base font-semibold text-purple-800 mb-2">Candidate Information</h2>
+            <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
+              <p><strong>Name:</strong> {candidate?.name || "N/A"}</p>
+              <p><strong>Email:</strong> {candidate?.email || "N/A"}</p>
+              <p><strong>Phone:</strong> {candidate?.phoneNo || "N/A"}</p>
+              <p><strong>Job Title:</strong> {jobTitle || "N/A"}</p>
               <p>
-                <strong>Name:</strong> {candidate?.name || "N/A"}
-              </p>
-              <p>
-                <strong>Email:</strong> {candidate?.email || "N/A"}
-              </p>
-              <p>
-                <strong>Phone:</strong> {candidate?.phoneNo || "N/A"}
-              </p>
-            </div>
-
-            <h2 className="text-lg font-semibold text-purple-800 mt-6 mb-4">Offer Details</h2>
-            <div className="space-y-2 text-gray-7
-00">
-              <p>
-                <strong>Job Title:</strong> {jobTitle || "N/A"}
-              </p>
-              <p>
-                <strong>Company Size:</strong> {companyData?.companySize || "N/A"} (
-                {company_size_value[companyData?.companySize] || "N/A"})
-              </p>
-              <p>
-                <strong>Address:</strong> {companyData?.address || "N/A"}
-              </p>
-              <p>
-                <strong>Status:</strong>
-                <span
-                  className={`ml-2 px-3 py-1 rounded-full text-sm font-medium ${status === "Pending"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : status === "Retracted"
-                        ? "bg-orange-100 text-orange-700"
-                        : status === "Ghosted"
-                          ? "bg-red-100 text-red-700"
-                          : "bg-green-100 text-green-700"
-                    }`}
-                >
+                <strong>Status:</strong>{" "}
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                  status === "Pending" ? "bg-yellow-100 text-yellow-700" :
+                  status === "Retracted" ? "bg-orange-100 text-orange-700" :
+                  status === "Ghosted" ? "bg-red-100 text-red-700" :
+                  "bg-green-100 text-green-700"
+                }`}>
                   {status}
                 </span>
               </p>
-              <p>
-                <strong>Offer Date:</strong>{" "}
-                {offerDate ? format(new Date(offerDate), "PPP") : "N/A"}
-              </p>
-              <p>
-                <strong>Expiration Date:</strong>{" "}
-                {expirationDate ? format(new Date(expirationDate), "PPP") : "N/A"}
-              </p>
-              {/* <p>
-                <strong>Joining Intent (OfferLens):</strong>{" "}
-                {intentScore !== null ? `${intentScore}%` : "Calculating..."}
-              </p> */}
+              <p><strong>Company Size:</strong> {companyData?.companySize || "N/A"}</p>
+              <p className="col-span-2"><strong>Address:</strong> {companyData?.address || "N/A"}</p>
+              <p><strong>Offer Date:</strong> {offerDate ? format(new Date(offerDate), "PP") : "N/A"}</p>
+              <p><strong>Expiration:</strong> {expirationDate ? format(new Date(expirationDate), "PP") : "N/A"}</p>
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            {/* Document tabs */}
+            <div className="mt-4 flex gap-2">
               <button
-                className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${viewing === "resume"
-                    ? "bg-purple-700 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
+                className={`px-3 py-1 rounded text-xs font-medium ${viewing === "resume" 
+                  ? "bg-purple-700 text-white" 
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
                 onClick={() => setViewing("resume")}
               >
                 Resume
               </button>
               <button
-                className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${viewing === "offer"
-                    ? "bg-purple-700 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
+                className={`px-3 py-1 rounded text-xs font-medium ${viewing === "offer" 
+                  ? "bg-purple-700 text-white" 
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
                 onClick={() => setViewing("offer")}
               >
-                Offer Letter
+                Offer
               </button>
               {acceptedLetter && (
                 <button
-                  className={`px-4 py-2 rounded-lg shadow-md transition-all text-sm font-medium ${viewing === "accepted"
-                      ? "bg-purple-700 text-white"
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
+                  className={`px-3 py-1 rounded text-xs font-medium ${viewing === "accepted" 
+                    ? "bg-purple-700 text-white" 
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
                   onClick={() => setViewing("accepted")}
                 >
-                  Accepted Letter
+                  Accepted
+                </button>
+              )}
+            </div>
+
+            {/* Action buttons */}
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="px-3 py-1.5 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700"
+              >
+                Delete Offer
+              </button>
+              {status === "Pending" ? (
+                <>
+                  <button
+                    onClick={() => setShowRetractConfirm(true)}
+                    className="px-3 py-1.5 bg-orange-600 text-white rounded text-xs font-medium hover:bg-orange-700"
+                  >
+                    Retract Offer
+                  </button>
+                  <button
+                    onClick={() => setShowGhostedConfirm(true)}
+                    className="px-3 py-1.5 bg-gray-600 text-white rounded text-xs font-medium hover:bg-gray-700 col-span-2"
+                  >
+                    Mark as Ghosted
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setShowFeedbackPopup(true)}
+                  className="px-3 py-1.5 bg-purple-600 text-white rounded text-xs font-medium hover:bg-purple-700"
+                >
+                  Write Feedback
                 </button>
               )}
             </div>
           </div>
 
-          <div className="w-full lg:w-1/2 bg-gray-100 p-6 rounded-xl shadow-md flex flex-col items-center">
-            {viewing === "resume" && candidate?.resumeLink ? (
-              <>
-                <h2 className="text-lg font-semibold text-purple-800 mb-4">Candidate Resume</h2>
+          {/* Right panel - Document viewer */}
+          <div className="bg-white rounded-lg shadow-sm lg:col-span-3 flex flex-col h-full">
+            <div className="p-3 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="text-base font-semibold text-purple-800">
+                {viewing === "resume" ? "Candidate Resume" : 
+                 viewing === "offer" ? "Offer Letter" : "Accepted Letter"}
+              </h2>
+                 {/* <a href={candidate?.resumeLink}>ss</a> */}
+              {(viewing === "resume" && candidate?.resumeLink) || 
+               (viewing === "offer" && offerLetterLink) ||
+               (viewing === "accepted" && acceptedLetter) ? (
+                <a
+                  href={
+                    viewing === "resume" ? candidate?.resumeLink :
+                    viewing === "offer" ? offerLetterLink : acceptedLetter
+                  }
+                  download
+                  className="flex items-center gap-1 px-2 py-1 bg-purple-700 text-white rounded text-xs font-medium hover:bg-purple-800"
+                >
+                  <MdDownload size={14} />
+                  Download
+                </a>
+              ) : null}
+            </div>
+
+            <div className="flex-1 p-2">
+              {(viewing === "resume" && candidate?.resumeLink) ? (
                 <iframe
                   src={candidate.resumeLink}
-                  className="w-full h-[400px] sm:h-[500px] rounded-lg border border-gray-200"
+                  className="w-full h-full rounded border border-gray-200"
                   title="Resume"
                 ></iframe>
-                <a
-                  href={candidate.resumeLink}
-                  download
-                  className="mt-4 flex items-center gap-2 px-4 py-2 bg-purple-700 text-white rounded-lg shadow-md hover:bg-purple-800 transition-all text-sm font-medium"
-                >
-                  <MdDownload size={18} />
-                  Download Resume
-                </a>
-              </>
-            ) : viewing === "offer" && offerLetterLink ? (
-              <>
-                <h2 className="text-lg font-semibold text-purple-800 mb-4">Offer Letter</h2>
+              ) : (viewing === "offer" && offerLetterLink) ? (
                 <iframe
                   src={offerLetterLink}
-                  className="w-full h-[400px] sm:h-[500px] rounded-lg border border-gray-200"
+                  className="w-full h-full rounded border border-gray-200"
                   title="Offer Letter"
                 ></iframe>
-                <a
-                  href={offerLetterLink}
-                  download
-                  className="mt-4 flex items-center gap-2 px-4 py-2 bg-purple-700 text-white rounded-lg shadow-md hover:bg-purple-800 transition-all text-sm font-medium"
-                >
-                  <MdDownload size={18} />
-                  Download Offer Letter
-                </a>
-              </>
-            ) : viewing === "accepted" && acceptedLetter ? (
-              <>
-                <h2 className="text-lg font-semibold text-purple-800 mb-4">Accepted Letter</h2>
+              ) : (viewing === "accepted" && acceptedLetter) ? (
                 <iframe
                   src={acceptedLetter}
-                  className="w-full h-[400px] sm:h-[500px] rounded-lg border border-gray-200"
+                  className="w-full h-full rounded border border-gray-200"
                   title="Accepted Letter"
                 ></iframe>
-                <a
-                  href={acceptedLetter}
-                  className="mt-4 flex items-center gap-2 px-4 py-2 bg-purple-700 text-white rounded-lg shadow-md hover:bg-purple-800 transition-all text-sm font-medium"
-                  download
-                >
-                  <MdDownload size={18} />
-                  Download Accepted Letter
-                </a>
-              </>
-            ) : (
-              <p className="text-gray-500 font-medium py-8">No document available.</p>
-            )}
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500 font-medium">
+                  No document available.
+                </div>
+              )}
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="mt-8 flex flex-col sm:flex-row gap-4">
-          <button
-            onClick={confirmDelete}
-            className="px-6 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition-all text-sm font-medium"
-          >
-            Delete Offer
-          </button>
-          {status === "Pending" ? (
-            <>
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-lg shadow-xl max-w-sm w-full">
+            <h3 className="text-base font-semibold text-purple-800 mb-2">Confirm Deletion</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete this offer? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-2">
               <button
-                onClick={confirmRetract}
-                className="px-6 py-2 bg-orange-600 text-white rounded-lg shadow-md hover:bg-orange-700 transition-all text-sm font-medium"
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded text-xs font-medium hover:bg-gray-300"
               >
-                Retract Offer
+                Cancel
               </button>
               <button
-                onClick={confirmGhosted}
-                className="px-6 py-2 bg-gray-600 text-white rounded-lg shadow-md hover:bg-gray-700 transition-all text-sm font-medium"
+                onClick={() => {
+                  handleDelete();
+                  setShowDeleteConfirm(false);
+                }}
+                className="px-3 py-1.5 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Retract Confirmation Modal */}
+      {showRetractConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-lg shadow-xl max-w-sm w-full">
+            <h3 className="text-base font-semibold text-purple-800 mb-2">Confirm Retraction</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to retract this offer? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowRetractConfirm(false)}
+                className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded text-xs font-medium hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  handleRetract();
+                  setShowRetractConfirm(false);
+                }}
+                className="px-3 py-1.5 bg-orange-600 text-white rounded text-xs font-medium hover:bg-orange-700"
+              >
+                Retract
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Ghosted Confirmation Modal */}
+      {showGhostedConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-lg shadow-xl max-w-sm w-full">
+            <h3 className="text-base font-semibold text-purple-800 mb-2">Confirm Ghosted Status</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to mark this offer as ghosted? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowGhostedConfirm(false)}
+                className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded text-xs font-medium hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  handleGhosted();
+                  setShowGhostedConfirm(false);
+                }}
+                className="px-3 py-1.5 bg-gray-600 text-white rounded text-xs font-medium hover:bg-gray-700"
               >
                 Mark as Ghosted
               </button>
-            </>
-          ) : (
-            <button
-              onClick={() => setShowFeedbackPopup(true)}
-              className="px-6 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition-all text-sm font-medium"
-            >
-              Write Feedback
-            </button>
-          )}
+            </div>
+          </div>
         </div>
+      )}
 
-        {/* Delete Confirmation Popup */}
-        {showDeleteConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl max-w-md w-full">
-              <h3 className="text-lg font-semibold text-purple-800 mb-4">Confirm Deletion</h3>
-              <p className="text-gray-600 mb-6">
-                Are you sure you want to delete this offer? This action cannot be undone.
-              </p>
-              <div className="flex justify-end gap-4">
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all text-sm font-medium"
+      {/* Feedback Modal */}
+      {showFeedbackPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-lg shadow-xl max-w-sm w-full">
+            <h3 className="text-base font-semibold text-purple-800 mb-2">Submit Feedback</h3>
+            <div className="space-y-3 mb-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Rating (1–5)</label>
+                <select
+                  value={feedbackRating}
+                  onChange={(e) => setFeedbackRating(Number(e.target.value))}
+                  className="block w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
                 >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    handleDelete();
-                    setShowDeleteConfirm(false);
-                  }}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-sm font-medium"
-                >
-                  Yes, Delete Offer
-                </button>
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <option key={num} value={num}>{num}</option>
+                  ))}
+                </select>
               </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Comment (optional)</label>
+                <textarea
+                  value={feedbackComment}
+                  onChange={(e) => setFeedbackComment(e.target.value)}
+                  maxLength={500}
+                  rows={3}
+                  className="block w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  placeholder="Share your feedback about the candidate..."
+                ></textarea>
+              </div>
+              {feedbackError && <p className="text-red-500 text-xs">{feedbackError}</p>}
+              {feedbackSuccess && <p className="text-green-500 text-xs">{feedbackSuccess}</p>}
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setShowFeedbackPopup(false);
+                  setFeedbackRating(1);
+                  setFeedbackComment("");
+                  setFeedbackError(null);
+                  setFeedbackSuccess(null);
+                }}
+                className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded text-xs font-medium hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitFeedback}
+                className="px-3 py-1.5 bg-purple-600 text-white rounded text-xs font-medium hover:bg-purple-700"
+              >
+                Submit
+              </button>
             </div>
           </div>
-        )}
-
-        {/* Retract Confirmation Popup */}
-        {showRetractConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl max-w-md w-full">
-              <h3 className="text-lg font-semibold text-purple-800 mb-4">Confirm Retraction</h3>
-              <p className="text-gray-600 mb-6">
-                Are you sure you want to retract this offer? This action cannot be undone.
-              </p>
-              <div className="flex justify-end gap-4">
-                <button
-                  onClick={() => setShowRetractConfirm(false)}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all text-sm font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    handleRetract();
-                    setShowRetractConfirm(false);
-                  }}
-                  className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all text-sm font-medium"
-                >
-                  Yes, Retract Offer
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Ghosted Confirmation Popup */}
-        {showGhostedConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl max-w-md w-full">
-              <h3 className="text-lg font-semibold text-purple-800 mb-4">Confirm Ghosted Status</h3>
-              <p className="text-gray-600 mb-6">
-                Are you sure you want to mark this offer as ghosted? This action cannot be undone.
-              </p>
-              <div className="flex justify-end gap-4">
-                <button
-                  onClick={() => setShowGhostedConfirm(false)}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all text-sm font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    handleGhosted();
-                    setShowGhostedConfirm(false);
-                  }}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all text-sm font-medium"
-                >
-                  Yes, Mark as Ghosted
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Feedback Submission Popup */}
-        {showFeedbackPopup && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-xl max-w-md w-full">
-              <h3 className="text-lg font-semibold text-purple-800 mb-4">Submit Feedback</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Rating (1–5)</label>
-                  <select
-                    value={feedbackRating}
-                    onChange={(e) => setFeedbackRating(Number(e.target.value))}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                  >
-                    {[1, 2, 3, 4, 5].map((num) => (
-                      <option key={num} value={num}>{num}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Comment (optional)</label>
-                  <textarea
-                    value={feedbackComment}
-                    onChange={(e) => setFeedbackComment(e.target.value)}
-                    maxLength={500}
-                    rows={4}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                    placeholder="Share your feedback about the candidate..."
-                  />
-                </div>
-                {feedbackError && (
-                  <p className="text-red-500 text-sm">{feedbackError}</p>
-                )}
-                {feedbackSuccess && (
-                  <p className="text-green-500 text-sm">{feedbackSuccess}</p>
-                )}
-                <div className="flex justify-end gap-4">
-                  <button
-                    onClick={() => {
-                      setShowFeedbackPopup(false);
-                      setFeedbackRating(1);
-                      setFeedbackComment("");
-                      setFeedbackError(null);
-                      setFeedbackSuccess(null);
-                    }}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all text-sm font-medium"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSubmitFeedback}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all text-sm font-medium"
-                  >
-                    Submit
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -302,6 +302,8 @@ const Release_Offer = () => {
       formData.append("companyName", form.companyName);
       formData.append("offerLetter", form.offerLetter, form.offerLetter.name);
       formData.append("candidateResume", form.candidateResume, form.candidateResume.name);
+      console.log(form.candidateResume.name)
+      console.log(form.offerLetter.name)
       formData.append("digioReqBody", JSON.stringify(digioRequestBody));
       if (isPredictionMode && resumeData) {
         formData.append("resumeData", JSON.stringify(resumeData));
@@ -323,7 +325,7 @@ const Release_Offer = () => {
       toast.success("Offer released successfully!");
       if (!isPredictionMode) {
         setTimeout(() => {
-          navigate("/job-offers");
+          navigate("/joboffers");
         }, 2000);
       } else {
         setStep(3);

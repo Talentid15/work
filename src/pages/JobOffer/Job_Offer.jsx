@@ -33,7 +33,7 @@ const Job_Offer = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        // console.log("Fetched Offers Data:", response.data);
+        console.log("Fetched Offers Data:", response.data);
         const sortedData = response.data.sort((a,b) => {
           return new Date(b.offerDate) - new Date(a.offerDate);
         })
@@ -79,7 +79,6 @@ const Job_Offer = () => {
       ? visibleOffers
       : visibleOffers?.filter((offer) => offer.status === statusFilter);
 
-  // Handle dropdown option selection
   const handleReleaseOption = (option) => {
     setIsDropdownOpen(false);
     if (option === "release") {
@@ -96,7 +95,6 @@ const Job_Offer = () => {
           Job Offers Dashboard
         </h1>
 
-        {/* Header Controls */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <select
             className="w-full sm:w-48 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-700"

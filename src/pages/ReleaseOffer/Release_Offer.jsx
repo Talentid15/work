@@ -162,6 +162,7 @@ const Release_Offer = () => {
     if (!allowedTypes.includes(file.type)) {
       return `${fieldName} must be a PDF file`;
     }
+    toast.error(`${fieldName} must be less than 5MB`)
     if (file.size > maxSize) return `${fieldName} must be less than 5MB`;
     return "";
   };

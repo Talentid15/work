@@ -241,6 +241,7 @@ const OfferDetail = () => {
   }
 
   const { candidate, jobTitle, status, offerDate, expirationDate, offerLetterLink, acceptedLetter } = offer;
+  console.log('dd'+offerLetterLink ,  candidate?.resumeLink)
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-gray-50">

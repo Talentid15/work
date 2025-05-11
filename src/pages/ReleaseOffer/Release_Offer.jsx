@@ -56,8 +56,8 @@ const parseResumeText = (text) => {
       currentSection = lowerLine.includes("skills")
         ? "skills"
         : lowerLine.includes("about") || lowerLine.includes("summary") || lowerLine.includes("profile")
-        ? "about"
-        : "";
+          ? "about"
+          : "";
     } else if (currentSection) {
       if (currentSection === "skills") {
         const skills = line.split(/[,;]/).map((s) => s.trim()).filter((s) => s);
@@ -157,13 +157,15 @@ const Release_Offer = () => {
 
   const validateFile = (file, fieldName) => {
     if (!file) return `${fieldName} is required`;
-    const maxSize = 5 * 1024 * 1024;
+    const maxSize = 100 * 1024 * 1024;
     const allowedTypes = ["application/pdf"];
     if (!allowedTypes.includes(file.type)) {
       return `${fieldName} must be a PDF file`;
     }
-    toast.error(`${fieldName} must be less than 5MB`)
-    if (file.size > maxSize) return `${fieldName} must be less than 5MB`;
+    if (file.size > maxSize) {
+      toast.error(`${fieldName} must be less than 100MB`)
+      return `${fieldName} must be less than 100MB`;
+    }
     return "";
   };
 
@@ -413,16 +415,14 @@ const Release_Offer = () => {
           (label, index) => (
             <div key={index} className="flex flex-col items-center z-10">
               <div
-                className={`w-10 h-10 flex items-center justify-center rounded-full text-white text-base font-semibold transition-all duration-300 ${
-                  step >= index + 1 ? "bg-indigo-600" : "bg-gray-300"
-                }`}
+                className={`w-10 h-10 flex items-center justify-center rounded-full text-white text-base font-semibold transition-all duration-300 ${step >= index + 1 ? "bg-indigo-600" : "bg-gray-300"
+                  }`}
               >
                 {index + 1}
               </div>
               <p
-                className={`text-xs mt-2 font-medium text-center max-w-[100px] ${
-                  step >= index + 1 ? "text-indigo-600" : "text-gray-500"
-                }`}
+                className={`text-xs mt-2 font-medium text-center max-w-[100px] ${step >= index + 1 ? "text-indigo-600" : "text-gray-500"
+                  }`}
               >
                 {label}
               </p>
@@ -458,9 +458,8 @@ const Release_Offer = () => {
                 name={name}
                 value={form[name]}
                 onChange={handleChange}
-                className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
-                  name === "companyName" ? "bg-gray-100 cursor-not-allowed" : ""
-                } ${errors[name] ? "border-red-500" : "border-gray-300"}`}
+                className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${name === "companyName" ? "bg-gray-100 cursor-not-allowed" : ""
+                  } ${errors[name] ? "border-red-500" : "border-gray-300"}`}
                 readOnly={name === "companyName"}
               />
               {errors[name] && (
@@ -491,9 +490,8 @@ const Release_Offer = () => {
               name="emailSubject"
               value={form.emailSubject}
               onChange={handleChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
-                errors.emailSubject ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${errors.emailSubject ? "border-red-500" : "border-gray-300"
+                }`}
             />
             {errors.emailSubject && (
               <p className="text-red-500 text-xs mt-1">{errors.emailSubject}</p>
@@ -505,9 +503,8 @@ const Release_Offer = () => {
               theme="snow"
               value={form.emailMessage}
               onChange={(value) => setForm((prev) => ({ ...prev, emailMessage: value }))}
-              className={`w-full border rounded-lg ${
-                errors.emailMessage ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`w-full border rounded-lg ${errors.emailMessage ? "border-red-500" : "border-gray-300"
+                }`}
               modules={{
                 toolbar: [
                   [{ header: [1, 2, false] }],
@@ -532,9 +529,8 @@ const Release_Offer = () => {
                 name={name}
                 accept=".pdf"
                 onChange={handleFileChange}
-                className={`w-full border rounded-lg p-3 text-gray-700 ${
-                  errors[name] ? "border-red-500" : "border-gray-300"
-                }`}
+                className={`w-full border rounded-lg p-3 text-gray-700 ${errors[name] ? "border-red-500" : "border-gray-300"
+                  }`}
               />
               {errors[name] && (
                 <p className="text-red-500 text-xs mt-1">{errors[name]}</p>
@@ -644,11 +640,10 @@ const Release_Offer = () => {
                       <button
                         key={index}
                         type="button"
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                          selectedTags.includes(tag)
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedTags.includes(tag)
                             ? "bg-indigo-600 text-white"
                             : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                        }`}
+                          }`}
                         onClick={() => handleTagToggle(tag)}
                       >
                         {tag}
@@ -668,9 +663,8 @@ const Release_Offer = () => {
                   <select
                     value={frequency}
                     onChange={(e) => setFrequency(e.target.value)}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
-                      !form.joiningDate ? "bg-gray-100 cursor-not-allowed" : ""
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${!form.joiningDate ? "bg-gray-100 cursor-not-allowed" : ""
+                      }`}
                     disabled={!form.joiningDate}
                   >
                     <option value="">Select Frequency</option>

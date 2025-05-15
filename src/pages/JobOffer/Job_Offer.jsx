@@ -117,7 +117,7 @@ const Job_Offer = () => {
               <FaFileAlt />
               Release Offer
             </button>
-            {/* {isDropdownOpen && (
+            {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-purple-100 transition-all"
@@ -132,7 +132,7 @@ const Job_Offer = () => {
                   Release Offer with Prediction
                 </button>
               </div>
-            )} */}
+            )}
           </div>
         </div>
 

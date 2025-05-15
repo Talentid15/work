@@ -245,7 +245,6 @@ const OfferDetail = () => {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-gray-50">
-      {/* Header with back button */}
       <div className="bg-white shadow-sm p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <button
@@ -256,14 +255,12 @@ const OfferDetail = () => {
             Back to Offers
           </button>
           <h1 className="text-xl font-bold text-purple-800">Offer Details</h1>
-          <div className="w-24"></div> {/* Spacer for alignment */}
+          <div className="w-24"></div> 
         </div>
       </div>
 
-      {/* Main content */}
       <div className="flex-1 overflow-hidden p-3">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 h-full">
-          {/* Left panel - Candidate info */}
           <div className="bg-white rounded-lg shadow-sm p-4 lg:col-span-2 overflow-y-auto">
             <h2 className="text-base font-semibold text-purple-800 mb-2">Candidate Information</h2>
             <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
@@ -288,7 +285,6 @@ const OfferDetail = () => {
               <p><strong>Expiration:</strong> {expirationDate ? format(new Date(expirationDate), "PP") : "N/A"}</p>
             </div>
 
-            {/* Document tabs */}
             <div className="mt-4 flex gap-2">
               <button
                 className={`px-3 py-1 rounded text-xs font-medium ${viewing === "resume" 
@@ -318,7 +314,6 @@ const OfferDetail = () => {
               )}
             </div>
 
-            {/* Action buttons */}
             <div className="mt-4 grid grid-cols-2 gap-2">
               <button
                 onClick={() => setShowDeleteConfirm(true)}

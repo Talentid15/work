@@ -98,6 +98,7 @@ const Release_Offer = () => {
     companyName: data?.company || "",
     offerLetter: null,
     candidateResume: null,
+    currentCTC: "", // Added currentCTC to form state
   });
   const [errors, setErrors] = useState({});
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
@@ -155,6 +156,13 @@ const Release_Offer = () => {
     return "";
   };
 
+  const validateCurrentCTC = (currentCTC) => {
+    if (!currentCTC) return ""; // Optional field, default to 0 on server
+    const ctc = parseFloat(currentCTC);
+    if (isNaN(ctc) || ctc < 0) return "Current CTC must be a positive number";
+    return "";
+  };
+
   const validateFile = (file, fieldName) => {
     if (!file) return `${fieldName} is required`;
     const maxSize = 100 * 1024 * 1024;
@@ -163,7 +171,7 @@ const Release_Offer = () => {
       return `${fieldName} must be a PDF file`;
     }
     if (file.size > maxSize) {
-      toast.error(`${fieldName} must be less than 100MB`)
+      toast.error(`${fieldName} must be less than 100MB`);
       return `${fieldName} must be less than 100MB`;
     }
     return "";
@@ -191,6 +199,8 @@ const Release_Offer = () => {
       newErrors.candidateName = value ? "" : "Candidate name is required";
     } else if (name === "emailSubject") {
       newErrors.emailSubject = value ? "" : "Email subject is required";
+    } else if (name === "currentCTC") {
+      newErrors.currentCTC = validateCurrentCTC(value);
     }
     setErrors(newErrors);
   };
@@ -252,6 +262,7 @@ const Release_Offer = () => {
       joiningDate: validateJoiningDate(form.joiningDate),
       expiryDate: validateExpiryDate(form.expiryDate, form.joiningDate),
       companyName: !form.companyName ? "Company name is required" : "",
+      currentCTC: validateCurrentCTC(form.currentCTC),
     };
     setErrors(newErrors);
     return Object.values(newErrors).every((error) => error === "");
@@ -305,9 +316,8 @@ const Release_Offer = () => {
       formData.append("companyName", form.companyName);
       formData.append("offerLetter", form.offerLetter, form.offerLetter.name);
       formData.append("candidateResume", form.candidateResume, form.candidateResume.name);
-      console.log(form.candidateResume.name)
-      console.log(form.offerLetter.name)
       formData.append("digioReqBody", JSON.stringify(digioRequestBody));
+      formData.append("currentCTC", form.currentCTC || "0"); // Send currentCTC, default to 0 if not provided
       if (isPredictionMode && resumeData) {
         formData.append("resumeData", JSON.stringify(resumeData));
       }
@@ -448,19 +458,30 @@ const Release_Offer = () => {
             "companyName",
             "joiningDate",
             "expiryDate",
+            "currentCTC", // Added currentCTC field to form
           ].map((name, index) => (
             <div key={index}>
               <label className="block text-sm font-semibold text-gray-700 capitalize mb-2">
-                {name.replace(/([A-Z])/g, " $1")}
+                {name === "currentCTC" ? "Current CTC (Optional)" : name.replace(/([A-Z])/g, " $1")}
               </label>
               <input
-                type={name.includes("Date") ? "date" : name === "candidateEmail" ? "email" : "text"}
+                type={
+                  name.includes("Date")
+                    ? "date"
+                    : name === "candidateEmail"
+                      ? "email"
+                      : name === "currentCTC"
+                        ? "number"
+                        : "text"
+                }
                 name={name}
                 value={form[name]}
                 onChange={handleChange}
                 className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${name === "companyName" ? "bg-gray-100 cursor-not-allowed" : ""
                   } ${errors[name] ? "border-red-500" : "border-gray-300"}`}
                 readOnly={name === "companyName"}
+                min={name === "currentCTC" ? "0" : undefined} // Ensure non-negative CTC
+                step={name === "currentCTC" ? "0.01" : undefined} // Allow decimal values for CTC
               />
               {errors[name] && (
                 <p className="text-red-500 text-xs mt-1">{errors[name]}</p>

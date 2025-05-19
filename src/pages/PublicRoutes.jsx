@@ -13,7 +13,7 @@ const PublicRoute = ({ children }) => {
     }
 
     // If the user is logged in, redirect them to the desired route, like home or profile
-    return <Navigate to="/" />;
+    return <Navigate to="/dashboard" />;
 };
 
 export default PublicRoute;

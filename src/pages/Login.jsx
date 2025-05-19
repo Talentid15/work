@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Added useEffect
 import { IoArrowForwardSharp } from "react-icons/io5";
 import backgroundImage2 from "../assets/rb_24598.png";
 import logo from "../assets/logo.png";
@@ -7,14 +7,16 @@ import ForgotPasswordCard from "../components/ForgotPasswordCard";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux"; // Added useSelector
 import { setData } from "../redux/UserSlice";
 import { useUserStore } from "../redux/userStore";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
   const { setVerifiedDocuments } = useUserStore();
+  const { loggedIn } = useSelector((state) => state.user); // Check loggedIn state
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -23,8 +25,16 @@ const LoginForm = () => {
 
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState("");
   const [errors, setErrors] = useState({});
+
+  // Redirect to /dashboard if already logged in
+  useEffect(() => {
+    if (loggedIn) {
+      console.log("User already logged in, redirecting to /dashboard");
+      navigate("/dashboard", { replace: true });
+    }
+  }, [loggedIn, navigate]);
 
   const handleForgotPasswordClick = () => {
     setShowForgotPassword(true);
@@ -40,12 +50,16 @@ const LoginForm = () => {
       ...formData,
       [name]: value,
     });
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+    setErrorMessage("");
   };
 
   const validateForm = () => {
     const newErrors = {};
     if (!formData.email) {
       newErrors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Invalid email format.";
     }
     if (!formData.password) {
       newErrors.password = "Password is required.";
@@ -57,49 +71,65 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
     if (validateForm()) {
-      setIsLoading(true); 
+      setIsLoading(true);
       try {
-        const response = await axios.post(`${API_URL}/api/auth/login`, {
-          email: formData.email,
-          password: formData.password,
-          captchaValue: '',
-        }, {
-          withCredentials: true,
-        });
+        const response = await axios.post(
+          `${API_URL}/api/auth/login`,
+          {
+            email: formData.email,
+            password: formData.password,
+            captchaValue: '',
+          },
+          {
+            withCredentials: true,
+          }
+        );
+        console.log("Login response:", response.data);
         dispatch(setData(response.data));
         setVerifiedDocuments(response.data.verifiedDocuments || false);
         toast.success("Logged in successfully!");
-        navigate("/dashboard");
+        console.log("Navigating to /dashboard");
+        navigate("/dashboard", { replace: true });
       } catch (error) {
         console.error("Error logging in:", {
           message: error.message,
           response: error.response?.data,
           status: error.response?.status,
         });
+        let errorMsg = "Failed to log in. Please try again.";
+        if (error.response?.status === 401) {
+          errorMsg = "Invalid email or password.";
+        } else if (error.response?.status === 403) {
+          errorMsg = "Account not verified or access denied.";
+        } else if (error.response?.data?.message) {
+          errorMsg = error.response.data.message;
+        }
+        setErrorMessage(errorMsg);
+        toast.error(errorMsg);
       } finally {
-        setIsLoading(false); 
+        setIsLoading(false);
       }
     }
   };
 
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-gray-50">
-      {/* Left Section */}
-      <div className={`w-full lg:w-[50%] bg-white flex items-center justify-center relative transition-transform duration-300 ${showForgotPassword ? "blur-sm" : ""}`}>
+      <div
+        className={`w-full lg:w-[50%] bg-white flex items-center justify-center relative transition-transform duration-300 ${
+          showForgotPassword ? "blur-sm" : ""
+        }`}
+      >
         <div className="w-full max-w-md px-6 py-12">
-          {/* Logo area */}
           <div className="mb-10">
             <img src={logo} alt="Logo" className="w-[50%] h-auto mx-auto" />
           </div>
-
-          {/* Login form */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <h2 className="text-purple-700 text-3xl font-bold mb-2 text-center">Welcome Back</h2>
             <p className="text-gray-500 text-center mb-8">
               Sign in to continue your journey
             </p>
-            
             <form onSubmit={handleSubmit} className="space-y-6">
               <InputField
                 type="email"
@@ -110,7 +140,6 @@ const LoginForm = () => {
                 error={errors.email}
                 className="focus:ring-purple-500 focus:border-purple-500"
               />
-              
               <InputField
                 type="password"
                 name="password"
@@ -120,7 +149,6 @@ const LoginForm = () => {
                 error={errors.password}
                 className="focus:ring-purple-500 focus:border-purple-500"
               />
-              
               <div className="flex justify-end">
                 <p
                   className="text-sm text-purple-600 font-medium cursor-pointer hover:text-purple-800"
@@ -129,15 +157,14 @@ const LoginForm = () => {
                   Forgot Password?
                 </p>
               </div>
-              
-              <div className="mt-2">
-
-                {errors.token && <p className="text-red-500 text-sm mt-2">{errors.token}</p>}
-              </div>
-
+              {errorMessage && (
+                <p className="text-red-500 text-sm mt-2 text-center">{errorMessage}</p>
+              )}
               <button
                 type="submit"
-                className={`w-full bg-purple-600 text-white py-3 rounded-xl hover:bg-purple-700 transition-all duration-300 font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg ${isLoading ? "opacity-75 cursor-not-allowed" : ""}`}
+                className={`w-full bg-purple-600 text-white py-3 rounded-xl hover:bg-purple-700 transition-all duration-300 font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg ${
+                  isLoading ? "opacity-75 cursor-not-allowed" : ""
+                }`}
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -168,7 +195,6 @@ const LoginForm = () => {
                   </>
                 )}
               </button>
-              
               <div className="text-center mt-6">
                 <p className="text-gray-600">
                   Don’t have an account?{" "}
@@ -184,15 +210,11 @@ const LoginForm = () => {
           </div>
         </div>
       </div>
-
-      {/* Forgot Password Modal */}
       {showForgotPassword && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
           <ForgotPasswordCard onClose={handleCloseForgotPassword} />
         </div>
       )}
-
-      {/* Right Section */}
       <div className="hidden lg:flex lg:w-[50%] bg-gradient-to-b from-purple-900 via-purple-700 to-purple-400 text-white rounded-l-3xl overflow-hidden relative">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-purple-700/30"></div>
         <div className="relative z-10 flex flex-col items-center justify-center w-full h-full p-12 text-center">

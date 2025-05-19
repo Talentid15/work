@@ -17,7 +17,7 @@ const CompanyForm = () => {
     about: "",
     contactPhone: "",
     contactEmail: "",
-    companySize: "", // Added companySize
+    companySize: "", 
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -127,7 +127,6 @@ const CompanyForm = () => {
           }
         );
         console.log(`✅ Save response:`, response.data);
-        // Store companySize and address in localStorage
         localStorage.setItem(
           `company_${companyName}`,
           JSON.stringify({

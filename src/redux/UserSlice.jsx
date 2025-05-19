@@ -17,14 +17,11 @@ const userSlice = createSlice({
     initialState,
     reducers: {
         setData: (state, action) => {
-            // Directly assign the payload properties to state
             state.data = { ...action.payload };
             console.log('ddata: '+state.data)
             
-            // Extract and store nested properties
             if (action.payload.additionalDetails) {
                 state.additionalDetails = action.payload.additionalDetails;
-                // Remove from main data object to avoid duplication
                 delete state.data.additionalDetails;
             }
             

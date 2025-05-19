@@ -57,15 +57,13 @@ function App() {
     console.log("App.jsx: Initial verification state:", { showOtpPopup, showDocumentPopup, failedRequest });
     setupAxiosInterceptors();
 
-    // Sync verifiedDocuments with backend on user data update
     if (user?.verifiedDocuments === true) {
       setVerifiedDocuments(true);
-      setDocumentPopup(false); // Ensure popup is hidden if backend verifies documents
+      setDocumentPopup(false); 
     } else if (user?.verifiedDocuments === false && verifiedDocuments) {
       toast("Verifying documents...", { id: "document-verifying" });
     }
 
-    // Subscribe to verification store changes
     const unsubscribe = useVerificationStore.subscribe((state) => {
       console.log("App.jsx: Verification store updated:", {
         showOtpPopup: state.showOtpPopup,
@@ -102,14 +100,12 @@ function App() {
       }
     );
 
-    // Clean up interceptor and subscriber on unmount
     return () => {
       api.interceptors.response.eject(responseInterceptor);
       unsubscribe();
     };
   }, [emailVerified, verifiedDocuments, user, dispatch, setUserData, setVerifiedDocuments, setDocumentPopup]);
 
-  // OTP popup handlers
   const handleOtpVerify = async () => {
     console.log("App.jsx: OTP Verified, retrying request:", failedRequest);
     setOtpPopup(false);
@@ -141,7 +137,6 @@ function App() {
     setOtpPopup(false);
   };
 
-  // Document popup handlers
   const handleDocumentSubmit = async () => {
     console.log("App.jsx: Document submitted, retrying request:", failedRequest);
     setDocumentPopup(false);

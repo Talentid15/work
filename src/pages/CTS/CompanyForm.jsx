@@ -189,7 +189,7 @@ const CompanyForm = () => {
           />
           {errors.companyName && <p className="text-red-500 text-sm mt-1">{errors.companyName}</p>}
         </div>
-
+        
         <div>
           <label className="block text-sm font-medium text-gray-700">Logo</label>
           {formData.logo && (

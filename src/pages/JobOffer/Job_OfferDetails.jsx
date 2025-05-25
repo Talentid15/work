@@ -49,7 +49,7 @@ const OfferDetail = () => {
       if (!offer) return;
       try {
         const response = await api.get(
-          `http://localhost:4000/api/formula/formula/status/${offer.candidate._id}`,
+          `${API_URL}/api/formula/formula/status/${offer.candidate._id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
             withCredentials: true,
@@ -62,7 +62,7 @@ const OfferDetail = () => {
       }
     };
     fetchFormulaData();
-  }, [offer, token, API_URL]);
+  }, [offer, token]);
 
   const calculateIntentScore = () => {
     if (!offer || !formulaData?.formulaData) return 0;
@@ -122,6 +122,10 @@ const OfferDetail = () => {
       navigate("/login", { replace: true });
       return;
     }
+    if (!user?._id) {
+      setFeedbackError("User information not available.");
+      return;
+    }
     if (!offer?.candidate?._id) {
       setFeedbackError("Candidate information not available.");
       return;
@@ -136,6 +140,7 @@ const OfferDetail = () => {
           reviewerModel: "User",
           recipientId: offer.candidate._id,
           recipientModel: "HiringCandidate",
+          companyId: user.companyId || null,
           rating: feedbackRating,
           comment: feedbackComment,
         },
@@ -506,7 +511,7 @@ const OfferDetail = () => {
       {showFeedbackPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-lg shadow-xl max-w-sm w-full">
-            <h3 className="text-base font-semibold text-purple-800 mb-2">Submit Feedback</h3>
+            <h3 className="text-base font-semibold text-purple-800 mb-2">Submit Candidate Feedback</h3>
             <div className="space-y-3 mb-4">
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Rating (1–5)</label>

@@ -23,13 +23,16 @@ const StatusCard = ({ company, status, offerDate, statusColor, iconColor }) => {
   );
 };
 
-const FeedbackCard = ({ rating, comment, createdAt }) => {
+const FeedbackCard = ({ rating, comment, createdAt, reviewer }) => {
   return (
     <div className="flex flex-col p-6 bg-white/30 backdrop-blur-lg rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-white/50">
       <div className="flex items-center mb-4">
         <div className="flex items-center justify-center w-12 h-12 rounded-full bg-purple-100">
           <span className="text-lg font-semibold text-purple-600">{rating}/5</span>
         </div>
+        <p className="ml-4 text-sm font-medium text-gray-700">
+          From: {reviewer?.name || "Anonymous"}
+        </p>
       </div>
       <p className="text-sm text-gray-700">{comment || "No comment provided."}</p>
       <p className="text-xs text-gray-500 mt-2">
@@ -85,25 +88,26 @@ const MainContent = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [feedbackData, setFeedbackData] = useState([]);
   const [offerDetails, setOfferDetails] = useState([]);
-  const [isLoadingOffers, setIsLoadingOffers] = useState(false); // New state for offer loading
+  const [isLoadingOffers, setIsLoadingOffers] = useState(false);
   const navigate = useNavigate();
   const token = useSelector((state) => state.user.data?.token);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
 
   const fetchFeedback = async (candidateId) => {
     try {
-      const response = await fetch(`${API_URL}/api/feedback/HiringCandidate/${candidateId}`, {
+      const response = await fetch(`${API_URL}/api/feedback/received/HiringCandidate/${candidateId}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
         credentials: "include",
       });
       if (!response.ok) {
-        throw new Error("Failed to fetch feedback.");
+        throw new Error(`Failed to fetch feedback: ${response.statusText}`);
       }
       const data = await response.json();
-      setFeedbackData(data.feedback || []); // Adjusted to match backend response structure
+      setFeedbackData(data.feedback || []);
     } catch (error) {
       console.error("Error fetching feedback:", error);
       toast.error("Failed to load candidate feedback.");
@@ -124,6 +128,7 @@ const MainContent = () => {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
           credentials: "include",
         });
@@ -137,7 +142,7 @@ const MainContent = () => {
           results
             .filter((result) => result.status === "fulfilled")
             .map((result) => result.value.data)
-            .filter((offer) => offer.status?.toLowerCase() !== "pending") // Filter out Pending offers
+            .filter((offer) => offer.status?.toLowerCase() !== "pending")
         );
       setOfferDetails(offers);
     } catch (error) {
@@ -249,6 +254,7 @@ const MainContent = () => {
                   rating={feedback.rating}
                   comment={feedback.comment}
                   createdAt={feedback.createdAt}
+                  reviewer={feedback.reviewerId}
                 />
               ))}
             </div>
@@ -262,7 +268,6 @@ const MainContent = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative">
-      {/* Navbar */}
       <header className="relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">

@@ -76,7 +76,7 @@ function App() {
     const responseInterceptor = api.interceptors.response.use(
       (response) => {
         if (!emailVerified || (emailVerified && !user?.isEmailVerified)) {
-          toast("Verifying email...", { id: "email-verifying" });
+          // toast("Verifying email...", { id: "email-verifying" });
         }
         if (user?.verifiedDocuments === true) {
           setVerifiedDocuments(true);
@@ -88,7 +88,7 @@ function App() {
       },
       (error) => {
         if (!emailVerified || (emailVerified && !user?.isEmailVerified)) {
-          toast("Verifying email...", { id: "email-verifying" });
+          // toast("Verifying email...", { id: "email-verifying" });
         }
         if (user?.verifiedDocuments === true) {
           setVerifiedDocuments(true);

@@ -9,10 +9,7 @@ import toast from "react-hot-toast";
 const StatusCard = ({ company, status, offerDate, statusColor, iconColor }) => {
   return (
     <div className="flex flex-col items-center p-6 bg-white/30 backdrop-blur-lg rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-white/50">
-      <div
-        className="flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-purple-600"
-        // style={{ backgroundColor: `pu` }}
-      >
+      <div className="flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-purple-600">
         <Users className="h-6 w-6" style={{ color: iconColor }} />
       </div>
       <h3 className="text-lg font-semibold text-gray-800 text-center truncate w-full">
@@ -87,15 +84,15 @@ const MainContent = () => {
   const [isError, setError] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [feedbackData, setFeedbackData] = useState([]);
-  const [offerDetails, setOfferDetails] = useState([]); // New state for offer details
+  const [offerDetails, setOfferDetails] = useState([]);
+  const [isLoadingOffers, setIsLoadingOffers] = useState(false); // New state for offer loading
   const navigate = useNavigate();
   const token = useSelector((state) => state.user.data?.token);
-  const user = useSelector((state) => state.user.data);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
 
   const fetchFeedback = async (candidateId) => {
     try {
-      const response = await fetch(`${API_URL}/api/feedback/received/${candidateId}`, {
+      const response = await fetch(`${API_URL}/api/feedback/HiringCandidate/${candidateId}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -106,17 +103,22 @@ const MainContent = () => {
         throw new Error("Failed to fetch feedback.");
       }
       const data = await response.json();
-      setFeedbackData(data.data || []);
+      setFeedbackData(data.feedback || []); // Adjusted to match backend response structure
     } catch (error) {
       console.error("Error fetching feedback:", error);
-      // toast.error("Failed to load candidate feedback.");
+      toast.error("Failed to load candidate feedback.");
       setFeedbackData([]);
     }
   };
 
-  // New function to fetch offer details
   const fetchOfferDetails = async (offerIds) => {
+    if (!offerIds || offerIds.length === 0) {
+      setOfferDetails([]);
+      setIsLoadingOffers(false);
+      return;
+    }
     try {
+      setIsLoadingOffers(true);
       const offerPromises = offerIds.map(async (offerId) => {
         const response = await fetch(`${API_URL}/api/offer/offer/${offerId}`, {
           method: "GET",
@@ -130,21 +132,31 @@ const MainContent = () => {
         }
         return response.json();
       });
-      const offers = await Promise.all(offerPromises);
-      setOfferDetails(offers.map((offer) => offer.data)); // Adjust based on actual response structure
+      const offers = await Promise.allSettled(offerPromises)
+        .then((results) =>
+          results
+            .filter((result) => result.status === "fulfilled")
+            .map((result) => result.value.data)
+            .filter((offer) => offer.status?.toLowerCase() !== "pending") // Filter out Pending offers
+        );
+      setOfferDetails(offers);
     } catch (error) {
       console.error("Error fetching offer details:", error);
       toast.error("Failed to load offer details.");
       setOfferDetails([]);
+    } finally {
+      setIsLoadingOffers(false);
     }
   };
 
   useEffect(() => {
     if (searchedResponseData?.hiringCandidateData?._id) {
       fetchFeedback(searchedResponseData.hiringCandidateData._id);
-      // Fetch offer details if offers exist
       if (searchedResponseData.hiringCandidateData?.offers?.length > 0) {
         fetchOfferDetails(searchedResponseData.hiringCandidateData.offers);
+      } else {
+        setOfferDetails([]);
+        setIsLoadingOffers(false);
       }
     }
   }, [searchedResponseData, token]);
@@ -179,9 +191,33 @@ const MainContent = () => {
           <HiringCandidateDetails data={searchedResponseData.hiringCandidateData} />
         )}
 
-        {offerDetails.length > 0 ? (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">All Offers</h2>
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">All Offers</h2>
+          {isLoadingOffers ? (
+            <div className="flex items-center justify-center h-32">
+              <svg
+                className="animate-spin h-8 w-8 text-purple-600"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              <span className="ml-3 text-gray-600 text-lg">Loading offers...</span>
+            </div>
+          ) : offerDetails.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {offerDetails.map((offer, index) => (
                 <StatusCard
@@ -194,21 +230,18 @@ const MainContent = () => {
                 />
               ))}
             </div>
-          </div>
-        ) : (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">All Offers</h2>
+          ) : (
             <p className="text-gray-500 text-center">
               {searchedResponseData.hiringCandidateData?.offers?.length > 0
-                ? "Loading offer details..."
+                ? "No non-pending offers found for this candidate."
                 : "No offers found for this candidate."}
             </p>
-          </div>
-        )}
-{/* 
-        {feedbackData.length > 0 ? (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Candidate Feedback</h2>
+          )}
+        </div>
+
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Candidate Feedback</h2>
+          {feedbackData.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {feedbackData.map((feedback, index) => (
                 <FeedbackCard
@@ -219,13 +252,10 @@ const MainContent = () => {
                 />
               ))}
             </div>
-          </div>
-        ) : (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Candidate Feedback</h2>
+          ) : (
             <p className="text-gray-500 text-center">No feedback available for this candidate.</p>
-          </div>
-        )} */}
+          )}
+        </div>
       </div>
     );
   };
@@ -282,7 +312,6 @@ const MainContent = () => {
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
-        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden bg-white shadow-lg px-4 py-6 animate-slide-in">
             <nav className="flex flex-col space-y-4">
@@ -309,7 +338,6 @@ const MainContent = () => {
         )}
       </header>
 
-      {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
         <h1 className="text-4xl font-extrabold text-gray-900 mb-8 text-center animate-fade-in">
           Search Candidate Pipeline
@@ -344,7 +372,6 @@ const MainContent = () => {
         <div className="w-full max-w-7xl mx-auto px-4 py-12">{renderContent()}</div>
       </main>
 
-      {/* Popup */}
       {showPopups && (
         <PopUps
           setshowPopUps={setShowPopups}

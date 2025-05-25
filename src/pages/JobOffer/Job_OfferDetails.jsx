@@ -241,7 +241,6 @@ const OfferDetail = () => {
   }
 
   const { candidate, jobTitle, status, offerDate, expirationDate, offerLetterLink, acceptedLetter } = offer;
-  console.log('dd'+offerLetterLink ,  candidate?.resumeLink)
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-gray-50">
@@ -255,7 +254,7 @@ const OfferDetail = () => {
             Back to Offers
           </button>
           <h1 className="text-xl font-bold text-purple-800">Offer Details</h1>
-          <div className="w-24"></div> 
+          <div className="w-24"></div>
         </div>
       </div>
 
@@ -270,43 +269,59 @@ const OfferDetail = () => {
               <p><strong>Job Title:</strong> {jobTitle || "N/A"}</p>
               <p>
                 <strong>Status:</strong>{" "}
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  status === "Pending" ? "bg-yellow-100 text-yellow-700" :
-                  status === "Retracted" ? "bg-orange-100 text-orange-700" :
-                  status === "Ghosted" ? "bg-red-100 text-red-700" :
-                  "bg-green-100 text-green-700"
-                }`}>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                    status === "Pending"
+                      ? "bg-yellow-100 text-yellow-700"
+                      : status === "Retracted"
+                      ? "bg-orange-100 text-orange-700"
+                      : status === "Ghosted"
+                      ? "bg-red-100 text-red-700"
+                      : "bg-green-100 text-green-700"
+                  }`}
+                >
                   {status}
                 </span>
               </p>
               <p><strong>Company Size:</strong> {companyData?.companySize || "N/A"}</p>
               <p className="col-span-2"><strong>Address:</strong> {companyData?.address || "N/A"}</p>
-              <p><strong>Offer Date:</strong> {offerDate ? format(new Date(offerDate), "PP") : "N/A"}</p>
-              <p><strong>Expiration:</strong> {expirationDate ? format(new Date(expirationDate), "PP") : "N/A"}</p>
+              <p>
+                <strong>Offer Date:</strong> {offerDate ? format(new Date(offerDate), "PP") : "N/A"}
+              </p>
+              <p>
+                <strong>Expiration:</strong>{" "}
+                {expirationDate ? format(new Date(expirationDate), "PP") : "N/A"}
+              </p>
             </div>
 
             <div className="mt-4 flex gap-2">
               <button
-                className={`px-3 py-1 rounded text-xs font-medium ${viewing === "resume" 
-                  ? "bg-purple-700 text-white" 
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+                className={`px-3 py-1 rounded text-xs font-medium ${
+                  viewing === "resume"
+                    ? "bg-purple-700 text-white"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
                 onClick={() => setViewing("resume")}
               >
                 Resume
               </button>
               <button
-                className={`px-3 py-1 rounded text-xs font-medium ${viewing === "offer" 
-                  ? "bg-purple-700 text-white" 
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+                className={`px-3 py-1 rounded text-xs font-medium ${
+                  viewing === "offer"
+                    ? "bg-purple-700 text-white"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
                 onClick={() => setViewing("offer")}
               >
                 Offer
               </button>
               {acceptedLetter && (
                 <button
-                  className={`px-3 py-1 rounded text-xs font-medium ${viewing === "accepted" 
-                    ? "bg-purple-700 text-white" 
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+                  className={`px-3 py-1 rounded text-xs font-medium ${
+                    viewing === "accepted"
+                      ? "bg-purple-700 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
                   onClick={() => setViewing("accepted")}
                 >
                   Accepted
@@ -321,7 +336,13 @@ const OfferDetail = () => {
               >
                 Delete Offer
               </button>
-              {status === "Pending" ? (
+              <button
+                onClick={() => setShowFeedbackPopup(true)}
+                className="px-3 py-1.5 bg-purple-600 text-white rounded text-xs font-medium hover:bg-purple-700"
+              >
+                Write Feedback
+              </button>
+              {status === "Pending" && (
                 <>
                   <button
                     onClick={() => setShowRetractConfirm(true)}
@@ -331,37 +352,34 @@ const OfferDetail = () => {
                   </button>
                   <button
                     onClick={() => setShowGhostedConfirm(true)}
-                    className="px-3 py-1.5 bg-gray-600 text-white rounded text-xs font-medium hover:bg-gray-700 col-span-2"
+                    className="px-3 py-1.5 bg-gray-600 text-white rounded text-xs font-medium hover:bg-gray-700"
                   >
                     Mark as Ghosted
                   </button>
                 </>
-              ) : (
-                <button
-                  onClick={() => setShowFeedbackPopup(true)}
-                  className="px-3 py-1.5 bg-purple-600 text-white rounded text-xs font-medium hover:bg-purple-700"
-                >
-                  Write Feedback
-                </button>
               )}
             </div>
           </div>
 
-          {/* Right panel - Document viewer */}
           <div className="bg-white rounded-lg shadow-sm lg:col-span-3 flex flex-col h-full">
             <div className="p-3 border-b border-gray-200 flex justify-between items-center">
               <h2 className="text-base font-semibold text-purple-800">
-                {viewing === "resume" ? "Candidate Resume" : 
-                 viewing === "offer" ? "Offer Letter" : "Accepted Letter"}
+                {viewing === "resume"
+                  ? "Candidate Resume"
+                  : viewing === "offer"
+                  ? "Offer Letter"
+                  : "Accepted Letter"}
               </h2>
-                 {/* <a href={candidate?.resumeLink}>ss</a> */}
-              {(viewing === "resume" && candidate?.resumeLink) || 
-               (viewing === "offer" && offerLetterLink) ||
-               (viewing === "accepted" && acceptedLetter) ? (
+              {(viewing === "resume" && candidate?.resumeLink) ||
+              (viewing === "offer" && offerLetterLink) ||
+              (viewing === "accepted" && acceptedLetter) ? (
                 <a
                   href={
-                    viewing === "resume" ? candidate?.resumeLink :
-                    viewing === "offer" ? offerLetterLink : acceptedLetter
+                    viewing === "resume"
+                      ? candidate?.resumeLink
+                      : viewing === "offer"
+                      ? offerLetterLink
+                      : acceptedLetter
                   }
                   download
                   className="flex items-center gap-1 px-2 py-1 bg-purple-700 text-white rounded text-xs font-medium hover:bg-purple-800"
@@ -401,7 +419,6 @@ const OfferDetail = () => {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-lg shadow-xl max-w-sm w-full">
@@ -430,7 +447,6 @@ const OfferDetail = () => {
         </div>
       )}
 
-      {/* Retract Confirmation Modal */}
       {showRetractConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-lg shadow-xl max-w-sm w-full">
@@ -459,7 +475,6 @@ const OfferDetail = () => {
         </div>
       )}
 
-      {/* Ghosted Confirmation Modal */}
       {showGhostedConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-lg shadow-xl max-w-sm w-full">
@@ -488,7 +503,6 @@ const OfferDetail = () => {
         </div>
       )}
 
-      {/* Feedback Modal */}
       {showFeedbackPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-lg shadow-xl max-w-sm w-full">
@@ -507,7 +521,9 @@ const OfferDetail = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Comment (optional)</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Comment (optional)
+                </label>
                 <textarea
                   value={feedbackComment}
                   onChange={(e) => setFeedbackComment(e.target.value)}

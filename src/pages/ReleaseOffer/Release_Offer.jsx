@@ -501,85 +501,142 @@ const Release_Offer = () => {
         </form>
       )}
 
-      {/* Step 2 - Release Offer */}
       {step === 2 && (
-        <form className="w-full space-y-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Email Subject</label>
-            <input
-              type="text"
-              name="emailSubject"
-              value={form.emailSubject}
-              onChange={handleChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${errors.emailSubject ? "border-red-500" : "border-gray-300"
-                }`}
-            />
-            {errors.emailSubject && (
-              <p className="text-red-500 text-xs mt-1">{errors.emailSubject}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Email Message</label>
-            <ReactQuill
-              theme="snow"
-              value={form.emailMessage}
-              onChange={(value) => setForm((prev) => ({ ...prev, emailMessage: value }))}
-              className={`w-full border rounded-lg ${errors.emailMessage ? "border-red-500" : "border-gray-300"
-                }`}
-              modules={{
-                toolbar: [
-                  [{ header: [1, 2, false] }],
-                  ["bold", "italic", "underline"],
-                  ["link"],
-                  [{ list: "ordered" }, { list: "bullet" }],
-                  ["clean"],
-                ],
-              }}
-            />
-            {errors.emailMessage && (
-              <p className="text-red-500 text-xs mt-1">{errors.emailMessage}</p>
-            )}
-          </div>
-          {["candidateResume", "offerLetter"].map((name, index) => (
-            <div key={index}>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Upload {name.replace(/([A-Z])/g, " $1")} (PDF, Max 5MB)
-              </label>
-              <input
-                type="file"
-                name={name}
-                accept=".pdf"
-                onChange={handleFileChange}
-                className={`w-full border rounded-lg p-3 text-gray-700 ${errors[name] ? "border-red-500" : "border-gray-300"
-                  }`}
-              />
-              {errors[name] && (
-                <p className="text-red-500 text-xs mt-1">{errors[name]}</p>
-              )}
+        <div className="w-full space-y-6">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <svg
+                className="animate-spin h-8 w-8 text-indigo-600"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              <span className="ml-3 text-gray-600 text-lg">Releasing Offer...</span>
             </div>
-          ))}
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <button
-              type="button"
-              className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all w-full sm:w-auto"
-              onClick={() => setStep(1)}
-              disabled={isLoading}
-            >
-              Back
-            </button>
-            <button
-              type="button"
-              className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-all w-full sm:w-auto"
-              onClick={handleNextStep}
-              disabled={isLoading}
-            >
-              {isPredictionMode ? "Next" : "Release Offer"}
-            </button>
-          </div>
-        </form>
+          ) : (
+            <form className="w-full space-y-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Email Subject</label>
+                <input
+                  type="text"
+                  name="emailSubject"
+                  value={form.emailSubject}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${errors.emailSubject ? "border-red-500" : "border-gray-300"
+                    }`}
+                  disabled={isLoading}
+                />
+                {errors.emailSubject && (
+                  <p className="text-red-500 text-xs mt-1">{errors.emailSubject}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Email Message</label>
+                <ReactQuill
+                  theme="snow"
+                  value={form.emailMessage}
+                  onChange={(value) => setForm((prev) => ({ ...prev, emailMessage: value }))}
+                  className={`w-full border rounded-lg ${errors.emailMessage ? "border-red-500" : "border-gray-300"
+                    }`}
+                  modules={{
+                    toolbar: [
+                      [{ header: [1, 2, false] }],
+                      ["bold", "italic", "underline"],
+                      ["link"],
+                      [{ list: "ordered" }, { list: "bullet" }],
+                      ["clean"],
+                    ],
+                  }}
+                  readOnly={isLoading}
+                />
+                {errors.emailMessage && (
+                  <p className="text-red-500 text-xs mt-1">{errors.emailMessage}</p>
+                )}
+              </div>
+              {["candidateResume", "offerLetter"].map((name, index) => (
+                <div key={index}>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Upload {name.replace(/([A-Z])/g, " $1")} (PDF, Max 5MB)
+                  </label>
+                  <input
+                    type="file"
+                    name={name}
+                    accept=".pdf"
+                    onChange={handleFileChange}
+                    className={`w-full border rounded-lg p-3 text-gray-700 ${errors[name] ? "border-red-500" : "border-gray-300"
+                      }`}
+                    disabled={isLoading}
+                  />
+                  {errors[name] && (
+                    <p className="text-red-500 text-xs mt-1">{errors[name]}</p>
+                  )}
+                </div>
+              ))}
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <button
+                  type="button"
+                  className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all w-full sm:w-auto disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  onClick={() => setStep(1)}
+                  disabled={isLoading}
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-all disabled:bg-indigo-400 disabled:cursor-not-allowed w-full sm:w-auto flex items-center justify-center"
+                  onClick={handleNextStep}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Releasing...
+                    </>
+                  ) : isPredictionMode ? (
+                    "Next"
+                  ) : (
+                    "Release Offer"
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
       )}
 
-      {/* Step 3 - Candidate Profile (Prediction Mode) */}
       {step === 3 && isPredictionMode && (
         <div className="w-full space-y-8">
           <h2 className="text-3xl font-bold text-indigo-600">Candidate Profile & Test Scheduling</h2>
@@ -610,7 +667,6 @@ const Release_Offer = () => {
             <div className="text-center text-red-500 font-medium py-8">{resumeParseError}</div>
           ) : resumeData ? (
             <div className="bg-gray-50 p-8 rounded-xl shadow-lg border border-gray-200 space-y-8">
-              {/* Profile Header */}
               <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
                 <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-4xl font-bold shrink-0">
                   {resumeData.name ? resumeData.name[0].toUpperCase() : "C"}
@@ -662,8 +718,8 @@ const Release_Offer = () => {
                         key={index}
                         type="button"
                         className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedTags.includes(tag)
-                            ? "bg-indigo-600 text-white"
-                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          ? "bg-indigo-600 text-white"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                           }`}
                         onClick={() => handleTagToggle(tag)}
                       >

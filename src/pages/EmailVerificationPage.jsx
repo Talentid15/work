@@ -16,8 +16,7 @@ const EmailVerificationPage = () => {
     async function verifyUserEmail() {
       try {
         setLoading(true);
-        setError(null); // Reset error before API call
-
+        setError(null);
         const response = await axios.get(`${backendUrl}/api/auth/verifyUserEmail/${token}`);
 
         if (response.data.success) {

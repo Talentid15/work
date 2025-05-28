@@ -15,21 +15,21 @@ export const setupAxiosInterceptors = () => {
 
   interceptorId = api.interceptors.response.use(
     (response) => {
-      console.log("api.js: API Response:", {
-        method: response.config.method,
-        url: response.config.url,
-        status: response.status,
-        data: response.data,
-      });
+      // console.log("api.js: API Response:", {
+      //   method: response.config.method,
+      //   url: response.config.url,
+      //   status: response.status,
+      //   data: response.data,
+      // });
       return response;
     },
     (error) => {
-      console.log("api.js: API Error:", {
-        method: error.config?.method,
-        url: error.config?.url,
-        status: error.response?.status,
-        data: error.response?.data,
-      });
+      // console.log("api.js: API Error:", {
+      //   method: error.config?.method,
+      //   url: error.config?.url,
+      //   status: error.response?.status,
+      //   data: error.response?.data,
+      // });
 
       const user = useSelector((state) => state.user.data || {});
       if (error.response?.status === 403 && !user?.verifiedDocuments) {

@@ -13,7 +13,6 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
   const [uploadError, setUploadError] = useState("");
   const [documentStatus, setDocumentStatus] = useState(null);
 
-  // Use Redux userId as fallback if Zustand userId is missing
   const effectiveUserId = zustandUserId || reduxUserId;
 
   console.log("DocumentUploadPopup.jsx: Rendering with state:", {
@@ -103,13 +102,11 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
     onSkip();
   };
 
-  // Hide popup if backend has verified documents
   if (backendVerifiedDocuments === true) {
     setVerifiedDocuments(true);
     return null;
   }
 
-  // Show verifying message if documents are pending
   if ((verifiedDocuments || documentStatus === "pending") && !backendVerifiedDocuments) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

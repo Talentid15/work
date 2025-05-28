@@ -148,7 +148,7 @@ function App() {
         return response;
       } catch (error) {
         console.error("App.jsx: Retry failed:", error);
-        toast.error(error.response?.data?.message || "Failed to retry action");
+        // toast.error(error.response?.data?.message || "Failed to retry action");
       }
     }
   };

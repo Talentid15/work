@@ -17,7 +17,7 @@ const Job_Offer = () => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
   const token = useSelector((state) => state.user.data?.token);
   const data = useSelector((state) => state.user.data);
@@ -30,23 +30,38 @@ const Job_Offer = () => {
         const response = await api.get(`${API_URL}/api/offer/get-all-offers`, {
           withCredentials: true,
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: token ? `Bearer ${token}` : undefined,
           },
         });
+
         console.log("Fetched Offers Data:", response.data);
-        const sortedData = response.data.sort((a,b) => {
+
+        const fetchedOffers = Array.isArray(response.data) ? response.data : [];
+
+        const sortedData = fetchedOffers.sort((a, b) => {
           return new Date(b.offerDate) - new Date(a.offerDate);
-        })
+        });
+
         dispatch(setOfferData(sortedData));
       } catch (error) {
         console.error("Error fetching offers data:", error);
-        setError("Failed to fetch offers. Please try again later.");
+
+        if (error.response && error.response.status === 404) {
+          dispatch(setOfferData([])); 
+        } else {
+          // setError("Failed to fetch offers. Please try again later.");
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOffersData();
+    if (token) {
+      fetchOffersData();
+    } else {
+      setLoading(false);
+      setError("No authentication token found. Please log in.");
+    }
   }, [dispatch, token]);
 
   const handleSendEmail = async (offerId) => {
@@ -54,7 +69,12 @@ const Job_Offer = () => {
       const response = await api.post(
         `${API_URL}/api/offer/send-offer-email/${offerId}`,
         {},
-        { withCredentials: true }
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: token ? `Bearer ${token}` : undefined,
+          },
+        }
       );
       toast.success(response.data.message);
     } catch (error) {
@@ -73,11 +93,14 @@ const Job_Offer = () => {
     "Retracted",
   ];
 
-  const visibleOffers = offersData?.filter((offer) => offer.showOffer !== false);
+  const visibleOffers = (Array.isArray(offersData) ? offersData : []).filter(
+    (offer) => offer.showOffer !== false
+  );
+
   const filteredOffers =
     statusFilter === "All"
       ? visibleOffers
-      : visibleOffers?.filter((offer) => offer.status === statusFilter);
+      : visibleOffers?.filter((offer) => offer.status === statusFilter) || [];
 
   const handleReleaseOption = (option) => {
     setIsDropdownOpen(false);
@@ -107,11 +130,9 @@ const Job_Offer = () => {
               </option>
             ))}
           </select>
-          {/* Dropdown Menu */}
           <div className="relative w-full sm:w-auto">
             <button
               className="flex items-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto justify-center sm:justify-start"
-              // onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               onClick={() => navigate("/release-offer")}
             >
               <FaFileAlt />
@@ -136,16 +157,14 @@ const Job_Offer = () => {
           </div>
         </div>
 
-        {/* Content */}
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <Loader />
           </div>
         ) : error ? (
           <div className="text-center text-red-500 font-medium py-8">{error}</div>
-        ) : filteredOffers?.length > 0 ? (
+        ) : filteredOffers.length > 0 ? (
           <>
-            {/* Desktop Table View */}
             <div className="hidden lg:block overflow-x-auto rounded-xl border border-gray-200 mb-6">
               <table className="w-full bg-white">
                 <thead className="bg-purple-50 text-purple-800">
@@ -187,7 +206,7 @@ const Job_Offer = () => {
                             <MdMarkEmailUnread className="text-purple-600" size={20} />
                           </button>
                         ) : (
-                          <div className="w-10 h-10 flex-shrink-0" /> // Placeholder for alignment
+                          <div className="w-10 h-10 flex-shrink-0" />
                         )}
                         <button
                           className="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all text-sm font-medium"
@@ -202,7 +221,6 @@ const Job_Offer = () => {
               </table>
             </div>
 
-            {/* Mobile Card View */}
             <div className="lg:hidden space-y-4">
               {filteredOffers.map((offer) => (
                 <div
@@ -218,7 +236,7 @@ const Job_Offer = () => {
                       {offer.status}
                     </span>
                     <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
-                      {offer.offerLetterStatus}
+                      {offer.offerLetterStatus || "N/A"}
                     </span>
                   </div>
                   <p className="text-sm text-gray-500 mt-3">
@@ -234,7 +252,7 @@ const Job_Offer = () => {
                         Send Email
                       </button>
                     ) : (
-                      <div className="w-0 sm:w-28 h-10 flex-shrink-0" /> // Placeholder for alignment
+                      <div className="w-0 sm:w-28 h-10 flex-shrink-0" />
                     )}
                     <button
                       className="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all text-sm font-medium"
@@ -248,7 +266,15 @@ const Job_Offer = () => {
             </div>
           </>
         ) : (
-          <p className="text-center text-gray-500 font-medium py-8">No offers available.</p>
+          <div className="text-center text-gray-500 font-medium py-8">
+            <p>No offers released. Please release an offer.</p>
+            {/* <button
+              className="mt-4 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md"
+              onClick={() => navigate("/release-offer")}
+            >
+              Release an Offer
+            </button> */}
+          </div>
         )}
 
         <div className="mt-8">

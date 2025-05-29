@@ -16,6 +16,7 @@ const OfferPunch = () => {
   const [statusFilter] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+    const data = useSelector((state) => state.user.data);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [formData, setFormData] = useState({
     jobTitle: "",
@@ -75,7 +76,6 @@ const OfferPunch = () => {
     } else if (!/^\d{10}$/.test(formData.candidatePhoneNo)) {
       newErrors.candidatePhoneNo = "Phone number must be 10 digits";
     }
-    if (!formData.companyName.trim()) newErrors.companyName = "Company Name is required";
     if (!formData.joiningDate) newErrors.joiningDate = "Joining Date is required";
     if (!formData.expiryDate) newErrors.expiryDate = "Expiry Date is required";
     else if (new Date(formData.expiryDate) <= new Date(formData.joiningDate)) {
@@ -166,7 +166,7 @@ const OfferPunch = () => {
         candidateName: "",
         candidateEmail: "",
         candidatePhoneNo: "",
-        companyName: "",
+        companyName: data?.company,
         joiningDate: "",
         expiryDate: "",
         offerLetter: null,
@@ -307,11 +307,12 @@ const OfferPunch = () => {
               <InputField
                 label="Company Name"
                 name="companyName"
-                value={formData.companyName}
+                value={data?.company}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={errors.companyName}
                 touched={touched.companyName}
+                
               />
               <div className="grid grid-cols-2 gap-4">
                 <InputField
@@ -505,7 +506,7 @@ const InputField = ({ label, type = "text", name, value, onChange, onBlur, error
         value={value}
         onChange={onChange}
         onBlur={onBlur}
-        className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
+        className={`border p-3 rounded-lg w-full ${name === 'companyName' && 'bg-gray-200'} focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
           error && touched ? "border-red-500" : "border-gray-300"
         }`}
         aria-invalid={error && touched ? "true" : "false"}

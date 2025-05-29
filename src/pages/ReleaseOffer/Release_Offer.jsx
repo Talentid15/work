@@ -98,7 +98,7 @@ const Release_Offer = () => {
     companyName: data?.company || "",
     offerLetter: null,
     candidateResume: null,
-    currentCTC: "", // Added currentCTC to form state
+    currentCTC: "",
   });
   const [errors, setErrors] = useState({});
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
@@ -144,20 +144,13 @@ const Release_Offer = () => {
     return "";
   };
 
-  const validateExpiryDate = (expiryDate, joiningDate) => {
+  const validateExpiryDate = (expiryDate) => {
     if (!expiryDate) return "Expiry date is required";
-    const expiry = new Date(expiryDate);
-    if (isNaN(expiry.getTime())) return "Invalid expiry date format";
-    if (!joiningDate) return "Please enter the joining date first";
-    const joining = new Date(joiningDate);
-    if (expiry <= joining) return "Expiry date must be after the joining date";
-    const diffDays = Math.ceil((expiry - joining) / (1000 * 60 * 60 * 24));
-    if (diffDays > 90) return "Expiry date must be within 90 days of the joining date";
     return "";
   };
 
   const validateCurrentCTC = (currentCTC) => {
-    if (!currentCTC) return ""; // Optional field, default to 0 on server
+    if (!currentCTC) return "";
     const ctc = parseFloat(currentCTC);
     if (isNaN(ctc) || ctc < 0) return "Current CTC must be a positive number";
     return "";
@@ -480,8 +473,8 @@ const Release_Offer = () => {
                 className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${name === "companyName" ? "bg-gray-100 cursor-not-allowed" : ""
                   } ${errors[name] ? "border-red-500" : "border-gray-300"}`}
                 readOnly={name === "companyName"}
-                min={name === "currentCTC" ? "0" : undefined} // Ensure non-negative CTC
-                step={name === "currentCTC" ? "0.01" : undefined} // Allow decimal values for CTC
+                min={name === "currentCTC" ? "0" : undefined}
+                step={name === "currentCTC" ? "0.01" : undefined}
               />
               {errors[name] && (
                 <p className="text-red-500 text-xs mt-1">{errors[name]}</p>

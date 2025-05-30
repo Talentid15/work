@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import api from "../../utils/api";
 import { useSelector } from "react-redux";
 
@@ -15,9 +15,10 @@ const CompanyForm = () => {
     address: "",
     website: "",
     about: "",
+    bio: "",
     contactPhone: "",
     contactEmail: "",
-    companySize: "", 
+    companySize: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -27,9 +28,7 @@ const CompanyForm = () => {
     const fetchCompany = async () => {
       setIsLoading(true);
       try {
-        console.log(`🚀 Fetching company: ${companyName}`);
         const response = await api.get(`${API_URL}/api/company/${companyName}`);
-        console.log("✅ API response:", response.data);
         setFormData(
           response.data.data || {
             companyName: companyName,
@@ -37,21 +36,21 @@ const CompanyForm = () => {
             address: "",
             website: "",
             about: "",
+            bio: "",
             contactPhone: "",
             contactEmail: "",
-            companySize: "", // Initialize companySize
+            companySize: "",
           }
         );
       } catch (error) {
-        console.error("❌ Error fetching company:", error.response?.data);
         if (error.response?.status === 404) {
-          console.log(`ℹ️ Company not found, showing empty form`);
           setFormData({
             companyName: companyName,
             logo: "",
             address: "",
             website: "",
             about: "",
+            bio: "",
             contactPhone: "",
             contactEmail: "",
             companySize: "",
@@ -99,6 +98,7 @@ const CompanyForm = () => {
       newErrors.website = "Valid website URL is required.";
     }
     if (!formData.about) newErrors.about = "About is required.";
+    if (!formData.bio) newErrors.bio = "Bio is required.";
     if (!formData.contactPhone || !/^\+?\d{10,15}$/.test(formData.contactPhone)) {
       newErrors.contactPhone = "Valid phone number is required.";
     }
@@ -115,8 +115,7 @@ const CompanyForm = () => {
     if (validateForm()) {
       setIsLoading(true);
       try {
-        console.log(`📤 Saving company: ${formData.companyName}`);
-        const response = await api.put(
+        await api.put(
           `${API_URL}/api/company/${companyName}`,
           formData,
           {
@@ -126,7 +125,6 @@ const CompanyForm = () => {
             },
           }
         );
-        console.log(`✅ Save response:`, response.data);
         localStorage.setItem(
           `company_${companyName}`,
           JSON.stringify({
@@ -134,10 +132,11 @@ const CompanyForm = () => {
             address: formData.address,
           })
         );
-        toast.success("Company saved successfully!");
+        toast.success("Company saved successfully!", {
+
+        });
         window.location.reload();
       } catch (error) {
-        console.error(`❌ Error saving company:`, error.response?.data);
         toast.error(error.response?.data?.error || "Failed to save company.");
       } finally {
         setIsLoading(false);
@@ -189,7 +188,7 @@ const CompanyForm = () => {
           />
           {errors.companyName && <p className="text-red-500 text-sm mt-1">{errors.companyName}</p>}
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Logo</label>
           {formData.logo && (
@@ -258,6 +257,18 @@ const CompanyForm = () => {
         </div>
 
         <div>
+          <label className="block text-sm font-medium text-gray-700">Bio</label>
+          <textarea
+            name="bio"
+            value={formData.bio}
+            onChange={handleChange}
+            className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-purple-500 focus:border-purple-500"
+            rows="4"
+          />
+          {errors.bio && <p className="text-red-500 text-sm mt-1">{errors.bio}</p>}
+        </div>
+
+        <div>
           <label className="block text-sm font-medium text-gray-700">Contact Phone</label>
           <input
             type="tel"
@@ -292,9 +303,8 @@ const CompanyForm = () => {
           </button>
           <button
             type="submit"
-            className={`bg-purple-600 text-white px-6 py-3 rounded-xl hover:bg-purple-700 transition-all flex items-center gap-2 ${
-              isLoading ? "opacity-75 cursor-not-allowed" : ""
-            }`}
+            className={`bg-purple-600 text-white px-6 py-3 rounded-xl hover:bg-purple-700 transition-all flex items-center gap-2 ${isLoading ? "opacity-75 cursor-not-allowed" : ""
+              }`}
             disabled={isLoading}
           >
             {isLoading ? (

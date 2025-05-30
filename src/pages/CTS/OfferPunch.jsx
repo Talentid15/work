@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import api from "../../utils/api";
 import Loader from "../../components/common/Loader";
-import { AlertTriangle, CheckCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle, X } from "lucide-react";
 
 const OfferPunch = () => {
   const navigate = useNavigate();
@@ -16,8 +16,10 @@ const OfferPunch = () => {
   const [statusFilter] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-    const data = useSelector((state) => state.user.data);
+  const data = useSelector((state) => state.user.data);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
   const [formData, setFormData] = useState({
     jobTitle: "",
     candidateName: "",
@@ -47,10 +49,11 @@ const OfferPunch = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        const sortedData = offerPunchesResponse.data.sort((a,b) => {
+        const sortedData = offerPunchesResponse.data.sort((a, b) => {
           return new Date(b.joiningDate) - new Date(a.joiningDate);
-        })
-        setOfferPunches(sortedData|| []);
+        });
+        console.log(sortedData);
+        setOfferPunches(sortedData || []);
       } catch (error) {
         console.error("Error fetching offer punches:", error);
         setError("Failed to fetch offer punches. Please try again later.");
@@ -140,7 +143,6 @@ const OfferPunch = () => {
       return;
     }
     
-    // Show confirmation popup instead of submitting directly
     setShowConfirmation(true);
   };
 
@@ -183,7 +185,7 @@ const OfferPunch = () => {
       });
       const sortedData = offerPunchesResponse.data.sort((a,b) => {
         return new Date(b.joiningDate) - new Date(a.joiningDate);
-      })
+      });
       setOfferPunches(sortedData|| []);
     } catch (error) {
       console.error("Submission Error:", error.response?.data || error.message);
@@ -213,6 +215,16 @@ const OfferPunch = () => {
     setErrors({});
     setTouched({});
     toast.success("Form reset successfully!");
+  };
+
+  const handleRowClick = (punch) => {
+    setSelectedUser(punch);
+    setShowPopup(true);
+  };
+
+  const closePopup = () => {
+    setShowPopup(false);
+    setSelectedUser(null);
   };
 
   const completionPercentage = Math.round(
@@ -312,7 +324,6 @@ const OfferPunch = () => {
                 onBlur={handleBlur}
                 error={errors.companyName}
                 touched={touched.companyName}
-                
               />
               <div className="grid grid-cols-2 gap-4">
                 <InputField
@@ -401,7 +412,6 @@ const OfferPunch = () => {
                         <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Status</th>
                         <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Offer Letter</th>
                         <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Date Added</th>
-                        {/* Action column removed for list view */}
                       </tr>
                     </thead>
                     <tbody>
@@ -409,29 +419,30 @@ const OfferPunch = () => {
                         <tr
                           key={punch._id}
                           className="border-b hover:bg-purple-50 transition-all cursor-pointer"
+                          onClick={() => handleRowClick(punch)}
                         >
                           <td className="p-4 text-gray-700">{punch.candidateName || "N/A"}</td>
                           <td className="p-4 text-gray-700">{punch.jobTitle || "N/A"}</td>
-          
                           <td className="p-4">
                             <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
                               {punch.companyName || "N/A"}
                             </span>
                           </td>
-                          <td className="p-4 text-gray-700">{punch.joiningDate ? new Date(punch.joiningDate).toLocaleDateString() : "N/A"}</td>
+                          <td className="p-4 text-gray-700">
+                            {punch.joiningDate ? new Date(punch.joiningDate).toLocaleDateString() : "N/A"}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
 
-                {/* Mobile Card View */}
                 <div className="lg:hidden space-y-4">
                   {filteredPunches.map((punch) => (
                     <div
                       key={punch._id}
                       className="p-6 bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer"
-                      onClick={() => navigate(`/offer-punch/${punch._id}`)}
+                      onClick={() => handleRowClick(punch)}
                     >
                       <h3 className="text-lg font-semibold text-purple-800">
                         {punch.candidateName || "N/A"}
@@ -458,7 +469,6 @@ const OfferPunch = () => {
           </>
         )}
 
-        {/* Confirmation Popup */}
         {showConfirmation && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
@@ -483,6 +493,10 @@ const OfferPunch = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {showPopup && selectedUser && (
+          <UserDetailsPopup user={selectedUser} onClose={closePopup} />
         )}
 
         <div className="mt-8">
@@ -554,6 +568,90 @@ const FileInput = ({ label, name, value, onChange, onBlur, error, touched }) => 
     {error && touched && (
       <p id={`${name}-error`} className="text-red-500 text-sm mt-1">{error}</p>
     )}
+  </div>
+);
+
+// User Details Popup Component
+const UserDetailsPopup = ({ user, onClose }) => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-bold text-purple-800">Candidate Details</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 transition-colors"
+            aria-label="Close popup"
+          >
+            <X size={24} />
+          </button>
+        </div>
+        <div className="space-y-4">
+          <DetailItem label="Candidate Name" value={user.candidateName || "N/A"} />
+          <DetailItem label="Email" value={user.candidateEmail || "N/A"} />
+          <DetailItem label="Phone Number" value={user.candidatePhoneNo || "N/A"} />
+          <DetailItem label="Job Title" value={user.jobTitle || "N/A"} />
+          <DetailItem label="Company Name" value={user.companyName || "N/A"} />
+          <DetailItem
+            label="Joining Date"
+            value={user.joiningDate ? new Date(user.joiningDate).toLocaleDateString() : "N/A"}
+          />
+          <DetailItem
+            label="Expiry Date"
+            value={user.expiryDate ? new Date(user.expiryDate).toLocaleDateString() : "N/A"}
+          />
+          <DetailItem
+            label="Offer Letter"
+            value={
+              user.offerLetter ? (
+                <a
+                  href={user.offerLetter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-purple-600 hover:text-purple-800 underline"
+                >
+                  View Offer Letter
+                </a>
+              ) : (
+                "N/A"
+              )
+            }
+          />
+          <DetailItem
+            label="Resume"
+            value={
+              user.candidateResume ? (
+                <a
+                  href={user.candidateResume}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-purple-600 hover:text-purple-800 underline"
+                >
+                  View Resume
+                </a>
+              ) : (
+                "N/A"
+              )
+            }
+          />
+        </div>
+        <div className="mt-6 flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all text-sm font-medium"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const DetailItem = ({ label, value }) => (
+  <div className="flex flex-col sm:flex-row sm:items-center border-b border-gray-200 py-3">
+    <span className="font-semibold text-gray-700 w-40 text-sm">{label}</span>
+    <span className="text-gray-600 text-sm">{value}</span>
   </div>
 );
 

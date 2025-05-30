@@ -328,7 +328,11 @@ const Release_Offer = () => {
       );
 
       console.log("Release_Offer.jsx: API response:", response.data);
-      toast.success("Offer released successfully!");
+      toast.success("Offer released successfully!",{
+        style:{
+          
+        }
+      });
       if (!isPredictionMode) {
         setTimeout(() => {
           navigate("/joboffers");

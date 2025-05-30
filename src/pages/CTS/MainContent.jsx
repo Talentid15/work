@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { PipelineContext } from "../../context/PipelineContext";
 import PopUps from "../../components/PopUps";
 import { useSelector } from "react-redux";
-import toast from "react-hot-toast";
+import {toast} from "sonner";
 
 const StatusCard = ({ company, status, offerDate, statusColor, iconColor }) => {
   return (

@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import backgroundImage2 from "../assets/rb_3790.png";
 import InputField from "../components/InputField";
 import { UserContext } from "../context/UserContext";
@@ -141,20 +141,35 @@ const SignUpForm = () => {
   };
 
   const handleResendOtp = () => {
-    toast.success("OTP resent successfully. Check your email.", { id: "otp-resent" });
+    toast.success("OTP resent successfully. Check your email.", { id: "otp-resent" }, {
+      style: {
+        backgroundColor: '#652d96',
+        color: '#ffffff',
+      },
+    });
   };
 
   const handleSkipDocument = () => {
     setVerifiedDocuments(false);
     setShowDocumentPopup(false);
-    toast.success("Signup completed! Please log in to continue.");
+    toast.success("Signup completed! Please log in to continue.", {
+      style: {
+        backgroundColor: '#652d96',
+        color: '#ffffff',
+      },
+    });
     navigate("/login");
   };
 
   const handleDocumentSubmit = () => {
     setVerifiedDocuments(true);
     setShowDocumentPopup(false);
-    toast.success("Document uploaded! Verifying documents...");
+    toast.success("Document uploaded! Verifying documents...", {
+      style: {
+        backgroundColor: '#652d96',
+        color: '#ffffff',
+      },
+    });
     navigate("/login");
   };
 

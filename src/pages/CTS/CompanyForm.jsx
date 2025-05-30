@@ -133,7 +133,10 @@ const CompanyForm = () => {
           })
         );
         toast.success("Company saved successfully!", {
-
+          style: {
+            backgroundColor: '#652d96',
+            color: '#ffffff',
+          },
         });
         window.location.reload();
       } catch (error) {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { FaPencilAlt, FaTrash, FaUserPlus } from "react-icons/fa";
 import { useSelector } from "react-redux";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import api from "../../utils/api";
 
 const UserManagement = () => {
@@ -10,10 +10,10 @@ const UserManagement = () => {
   const [currentMemberId, setCurrentMemberId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // State for delete confirmation popup
-  const [memberToDelete, setMemberToDelete] = useState(null); // Store the member ID to delete
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState(null);
   const user = useSelector((state) => state.user.data);
-  const  token  = useSelector((state) => state.user.data?.token);;
+  const token = useSelector((state) => state.user.data?.token);;
 
   const [teamMembers, setTeamMembers] = useState([]);
   const [newMember, setNewMember] = useState({
@@ -22,7 +22,7 @@ const UserManagement = () => {
     workEmail: "",
     role: "User",
   });
-  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL?? '';
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
 
   useEffect(() => {
     fetchTeamMembers();
@@ -99,7 +99,12 @@ const UserManagement = () => {
         }
       );
       setTeamMembers([...teamMembers, response.data]);
-      toast.success("Team member added successfully");
+      toast.success("Team member added successfully", {
+        style: {
+          backgroundColor: '#652d96',
+          color: '#ffffff',
+        },
+      });
       resetForm();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to add team member");
@@ -141,7 +146,12 @@ const UserManagement = () => {
           member._id === currentMemberId ? response.data : member
         )
       );
-      toast.success("Team member updated successfully");
+      toast.success("Team member updated successfully", {
+        style: {
+          backgroundColor: '#652d96',
+          color: '#ffffff',
+        },
+      });
       resetForm();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update team member");
@@ -161,7 +171,12 @@ const UserManagement = () => {
 
       if (response.status === 200) {
         setTeamMembers(teamMembers.filter((member) => member._id !== id));
-        toast.success("Team member deleted successfully");
+        toast.success("Team member deleted successfully", {
+          style: {
+            backgroundColor: '#652d96',
+            color: '#ffffff',
+          },
+        });
       }
     } catch (error) {
       console.error("Error deleting team member:", error);
@@ -265,11 +280,10 @@ const UserManagement = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
-                          className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            member.role === "Admin"
+                          className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${member.role === "Admin"
                               ? "bg-blue-100 text-blue-800"
                               : "bg-gray-100 text-gray-800"
-                          }`}
+                            }`}
                         >
                           {member.role}
                         </span>

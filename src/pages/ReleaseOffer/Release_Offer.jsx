@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import api from "../../utils/api";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -328,10 +328,11 @@ const Release_Offer = () => {
       );
 
       console.log("Release_Offer.jsx: API response:", response.data);
-      toast.success("Offer released successfully!",{
-        style:{
-          
-        }
+      toast.success("Offer released successfully!", {
+        style: {
+          backgroundColor: '#652d96',
+          color: '#ffffff',
+        },
       });
       if (!isPredictionMode) {
         setTimeout(() => {
@@ -393,7 +394,12 @@ const Release_Offer = () => {
       );
 
       setTestSchedule(response.data);
-      toast.success(`Scheduled ${selectedFreq.count} tests for ${form.candidateName}! Tests have been emailed to the candidate.`);
+      toast.success(`Scheduled ${selectedFreq.count} tests for ${form.candidateName}! Tests have been emailed to the candidate.`, {
+        style: {
+          backgroundColor: '#652d96',
+          color: '#ffffff',
+        },
+      });
       console.log("Scheduled Tests Response:", response.data);
     } catch (error) {
       console.error("Error scheduling tests:", error);

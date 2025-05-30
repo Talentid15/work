@@ -6,7 +6,7 @@ import App from './App.jsx';
 import { Provider } from 'react-redux';
 import store from './redux/store.js';
 
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from '@/components/ui/sonner';
 
 import PipelineContextProvider from './context/PipelineContext.jsx';
 import UserContextProvider from './context/UserContext.jsx';

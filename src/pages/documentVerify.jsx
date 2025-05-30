@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useUserStore, useVerificationStore } from "../redux/userStore";
 import { useSelector } from "react-redux";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
   const { userId: zustandUserId, verifiedDocuments, setVerifiedDocuments } = useUserStore();
@@ -82,6 +82,11 @@ const DocumentUploadPopup = ({ apiUrl, onClose, onSkip, onSubmit }) => {
           setVerifiedDocuments(true);
           toast.success("Document uploaded. Verifying documents...", {
             id: "document-verified",
+          }, {
+            style: {
+              backgroundColor: '#652d96',
+              color: '#ffffff',
+            },
           });
           onSubmit();
         }

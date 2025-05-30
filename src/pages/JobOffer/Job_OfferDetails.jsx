@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { MdArrowBack, MdDownload } from "react-icons/md";
 import { format } from "date-fns";
 import api from "../../utils/api";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 export const company_size_value = {
   Startup: "1-10",
@@ -150,7 +150,12 @@ const OfferDetail = () => {
         }
       );
       setFeedbackSuccess("Feedback submitted successfully!");
-      toast.success("Feedback submitted successfully!");
+      toast.success("Feedback submitted successfully!", {
+        style: {
+          backgroundColor: '#652d96',
+          color: '#ffffff',
+        },
+      });
       setTimeout(() => {
         setShowFeedbackPopup(false);
         setFeedbackRating(1);
@@ -178,7 +183,12 @@ const OfferDetail = () => {
         }
       );
       if (response.data) {
-        toast.success("Offer retracted successfully");
+        toast.success("Offer retracted successfully", {
+          style: {
+            backgroundColor: '#652d96',
+            color: '#ffffff',
+          },
+        });
         navigate(0);
       } else {
         throw new Error("Failed to retract offer");
@@ -200,7 +210,12 @@ const OfferDetail = () => {
         }
       );
       if (response.data) {
-        toast.success("Offer deleted successfully");
+        toast.success("Offer deleted successfully", {
+          style: {
+            backgroundColor: '#652d96',
+            color: '#ffffff',
+          },
+        });
         navigate("/joboffers");
       } else {
         throw new Error("Failed to delete offer");
@@ -222,7 +237,12 @@ const OfferDetail = () => {
         }
       );
       if (response.data) {
-        toast.success("Offer marked as ghosted successfully");
+        toast.success("Offer marked as ghosted successfully", {
+          style: {
+            backgroundColor: '#652d96',
+            color: '#ffffff',
+          },
+        });
         setTimeout(() => {
           window.location.reload();
         }, 300);
@@ -275,15 +295,14 @@ const OfferDetail = () => {
               <p>
                 <strong>Status:</strong>{" "}
                 <span
-                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    status === "Pending"
+                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${status === "Pending"
                       ? "bg-yellow-100 text-yellow-700"
                       : status === "Retracted"
-                      ? "bg-orange-100 text-orange-700"
-                      : status === "Ghosted"
-                      ? "bg-red-100 text-red-700"
-                      : "bg-green-100 text-green-700"
-                  }`}
+                        ? "bg-orange-100 text-orange-700"
+                        : status === "Ghosted"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-green-100 text-green-700"
+                    }`}
                 >
                   {status}
                 </span>
@@ -301,32 +320,29 @@ const OfferDetail = () => {
 
             <div className="mt-4 flex gap-2">
               <button
-                className={`px-3 py-1 rounded text-xs font-medium ${
-                  viewing === "resume"
+                className={`px-3 py-1 rounded text-xs font-medium ${viewing === "resume"
                     ? "bg-purple-700 text-white"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
+                  }`}
                 onClick={() => setViewing("resume")}
               >
                 Resume
               </button>
               <button
-                className={`px-3 py-1 rounded text-xs font-medium ${
-                  viewing === "offer"
+                className={`px-3 py-1 rounded text-xs font-medium ${viewing === "offer"
                     ? "bg-purple-700 text-white"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
+                  }`}
                 onClick={() => setViewing("offer")}
               >
                 Offer
               </button>
               {acceptedLetter && (
                 <button
-                  className={`px-3 py-1 rounded text-xs font-medium ${
-                    viewing === "accepted"
+                  className={`px-3 py-1 rounded text-xs font-medium ${viewing === "accepted"
                       ? "bg-purple-700 text-white"
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
+                    }`}
                   onClick={() => setViewing("accepted")}
                 >
                   Accepted
@@ -372,19 +388,19 @@ const OfferDetail = () => {
                 {viewing === "resume"
                   ? "Candidate Resume"
                   : viewing === "offer"
-                  ? "Offer Letter"
-                  : "Accepted Letter"}
+                    ? "Offer Letter"
+                    : "Accepted Letter"}
               </h2>
               {(viewing === "resume" && candidate?.resumeLink) ||
-              (viewing === "offer" && offerLetterLink) ||
-              (viewing === "accepted" && acceptedLetter) ? (
+                (viewing === "offer" && offerLetterLink) ||
+                (viewing === "accepted" && acceptedLetter) ? (
                 <a
                   href={
                     viewing === "resume"
                       ? candidate?.resumeLink
                       : viewing === "offer"
-                      ? offerLetterLink
-                      : acceptedLetter
+                        ? offerLetterLink
+                        : acceptedLetter
                   }
                   download
                   className="flex items-center gap-1 px-2 py-1 bg-purple-700 text-white rounded text-xs font-medium hover:bg-purple-800"

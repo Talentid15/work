@@ -3,7 +3,7 @@ import axios from "axios";
 import { FaRegEdit, FaSave } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import ChangePassword from "../../components/settings/ChangePassword";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import api from "../../utils/api";
 
@@ -103,7 +103,12 @@ const Profiles = () => {
       );
 
       if (response.data?.success) {
-        toast.success("Profile updated successfully!");
+        toast.success("Profile updated successfully!", {
+          style: {
+            backgroundColor: '#652d96',
+            color: '#ffffff',
+          },
+        });
         setProfileData((prev) => ({
           user: response.data.user || prev.user,
           additionalDetails: response.data.additionalDetails || prev.additionalDetails,
@@ -195,9 +200,8 @@ const Profiles = () => {
                     value={formData[input.name]}
                     onChange={handleChange}
                     readOnly={input.readOnly}
-                    className={`w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 ${
-                      input.readOnly ? "bg-gray-100" : ""
-                    }`}
+                    className={`w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 ${input.readOnly ? "bg-gray-100" : ""
+                      }`}
                   />
                 ) : (
                   <input
@@ -206,9 +210,8 @@ const Profiles = () => {
                     value={formData[input.name]}
                     onChange={handleChange}
                     readOnly={input.readOnly}
-                    className={`w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 ${
-                      input.readOnly ? "bg-gray-100" : ""
-                    }`}
+                    className={`w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 ${input.readOnly ? "bg-gray-100" : ""
+                      }`}
                   />
                 )}
               </div>
@@ -226,9 +229,8 @@ const Profiles = () => {
                   value={formData[input.name]}
                   onChange={handleChange}
                   readOnly={input.readOnly}
-                  className={`w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 ${
-                    input.readOnly ? "bg-gray-100" : ""
-                  }`}
+                  className={`w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 ${input.readOnly ? "bg-gray-100" : ""
+                    }`}
                 />
               </div>
             ))}
@@ -246,11 +248,10 @@ const Profiles = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className={`px-4 py-2 flex items-center gap-2 rounded-lg transition-all duration-300 shadow-md ${
-                isEditing
+              className={`px-4 py-2 flex items-center gap-2 rounded-lg transition-all duration-300 shadow-md ${isEditing
                   ? "bg-green-600 text-white hover:bg-green-700 hover:scale-105"
                   : "bg-purple-600 text-white hover:bg-purple-700 hover:scale-105"
-              } disabled:opacity-50`}
+                } disabled:opacity-50`}
             >
               {isLoading ? (
                 "Processing..."

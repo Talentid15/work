@@ -8,7 +8,7 @@ import { setOfferData } from "../../redux/offerSlice";
 import { formateDate } from "../../utils";
 import api from "../../utils/api";
 import Loader from "../../components/common/Loader";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 const Job_Offer = () => {
   const offersData = useSelector((state) => state.offer.data);
@@ -76,7 +76,12 @@ const Job_Offer = () => {
           },
         }
       );
-      toast.success(response.data.message);
+      toast.success(response.data.message,{
+                style: {
+          backgroundColor: '#652d96',
+          color: '#ffffff',
+        },
+      });
     } catch (error) {
       console.error("Error sending email:", error);
       toast.error("Failed to send email");

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { FaFileAlt } from "react-icons/fa";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import api from "../../utils/api";
 import Loader from "../../components/common/Loader";
 import { AlertTriangle, CheckCircle, X } from "lucide-react";
@@ -142,7 +142,7 @@ const OfferPunch = () => {
       formRef.current.querySelector(`[name="${firstErrorField}"]`)?.focus();
       return;
     }
-    
+
     setShowConfirmation(true);
   };
 
@@ -160,9 +160,14 @@ const OfferPunch = () => {
           withCredentials: true,
         }
       );
-      toast.success("Offer punch submitted successfully!");
-      setShowForm(false); 
-      setShowConfirmation(false); 
+      toast.success("Offer punch submitted successfully!", {
+        style: {
+          backgroundColor: '#652d96',
+          color: '#ffffff',
+        },
+      });
+      setShowForm(false);
+      setShowConfirmation(false);
       setFormData({
         jobTitle: "",
         candidateName: "",
@@ -183,10 +188,10 @@ const OfferPunch = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      const sortedData = offerPunchesResponse.data.sort((a,b) => {
+      const sortedData = offerPunchesResponse.data.sort((a, b) => {
         return new Date(b.joiningDate) - new Date(a.joiningDate);
       });
-      setOfferPunches(sortedData|| []);
+      setOfferPunches(sortedData || []);
     } catch (error) {
       console.error("Submission Error:", error.response?.data || error.message);
       toast.error("Failed to submit offer punch. Please try again.");
@@ -214,7 +219,12 @@ const OfferPunch = () => {
     });
     setErrors({});
     setTouched({});
-    toast.success("Form reset successfully!");
+    toast.success("Form reset successfully!", {
+      style: {
+        backgroundColor: '#652d96',
+        color: '#ffffff',
+      },
+    });
   };
 
   const handleRowClick = (punch) => {
@@ -520,9 +530,8 @@ const InputField = ({ label, type = "text", name, value, onChange, onBlur, error
         value={value}
         onChange={onChange}
         onBlur={onBlur}
-        className={`border p-3 rounded-lg w-full ${name === 'companyName' && 'bg-gray-200'} focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
-          error && touched ? "border-red-500" : "border-gray-300"
-        }`}
+        className={`border p-3 rounded-lg w-full ${name === 'companyName' && 'bg-gray-200'} focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${error && touched ? "border-red-500" : "border-gray-300"
+          }`}
         aria-invalid={error && touched ? "true" : "false"}
         aria-describedby={`${name}-error`}
       />
@@ -552,9 +561,8 @@ const FileInput = ({ label, name, value, onChange, onBlur, error, touched }) => 
         accept="application/pdf"
         onChange={onChange}
         onBlur={onBlur}
-        className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
-          error && touched ? "border-red-500" : "border-gray-300"
-        }`}
+        className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${error && touched ? "border-red-500" : "border-gray-300"
+          }`}
         aria-invalid={error && touched ? "true" : "false"}
         aria-describedby={`${name}-error`}
       />

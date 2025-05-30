@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useUserStore, useVerificationStore } from "./redux/userStore";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import api, { setupAxiosInterceptors } from "./utils/api";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -59,9 +59,9 @@ function App() {
 
     if (user?.verifiedDocuments === true) {
       setVerifiedDocuments(true);
-      setDocumentPopup(false); 
+      setDocumentPopup(false);
     } else if (user?.verifiedDocuments === false && verifiedDocuments) {
-      toast("Verifying documents...", { id: "document-verifying" });
+      toast.success("Verifying documents...", { id: "document-verifying" });
     }
 
     const unsubscribe = useVerificationStore.subscribe((state) => {
@@ -82,7 +82,7 @@ function App() {
           setVerifiedDocuments(true);
           setDocumentPopup(false);
         } else if (verifiedDocuments && !user?.verifiedDocuments) {
-          toast("Verifying documents...", { id: "document-verifying" });
+          toast.success("Verifying documents...", { id: "document-verifying" });
         }
         return response;
       },
@@ -94,7 +94,7 @@ function App() {
           setVerifiedDocuments(true);
           setDocumentPopup(false);
         } else if (verifiedDocuments && !user?.verifiedDocuments) {
-          toast("Verifying documents...", { id: "document-verifying" });
+          toast.success("Verifying documents...", { id: "document-verifying" });
         }
         return Promise.reject(error);
       }
@@ -124,7 +124,12 @@ function App() {
 
   const handleOtpResend = () => {
     console.log("App.jsx: Resending OTP");
-    toast.success("OTP resent successfully. Check your email.", { id: "otp-resent" });
+    toast.success("OTP resent successfully. Check your email.", { id: "otp-resent" }, {
+      style: {
+        backgroundColor: '#652d96',
+        color: '#ffffff',
+      },
+    });
   };
 
   const handleOtpSkip = () => {

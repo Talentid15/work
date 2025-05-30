@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; // Added useEffect
+import { useState, useEffect } from "react";
 import { IoArrowForwardSharp } from "react-icons/io5";
 import backgroundImage2 from "../assets/rb_24598.png";
 import logo from "../assets/logo.png";
@@ -6,15 +6,15 @@ import InputField from "../components/InputField";
 import ForgotPasswordCard from "../components/ForgotPasswordCard";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux"; // Added useSelector
+import {toast} from "sonner";
+import { useDispatch, useSelector } from "react-redux"; 
 import { setData } from "../redux/UserSlice";
 import { useUserStore } from "../redux/userStore";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
   const { setVerifiedDocuments } = useUserStore();
-  const { loggedIn } = useSelector((state) => state.user); // Check loggedIn state
+  const { loggedIn } = useSelector((state) => state.user); 
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
   const navigate = useNavigate();
 
@@ -89,7 +89,12 @@ const LoginForm = () => {
         console.log("Login response:", response.data);
         dispatch(setData(response.data));
         setVerifiedDocuments(response.data.verifiedDocuments || false);
-        toast.success("Logged in successfully!");
+        toast.success("Logged in successfully!",{
+                  style: {
+          backgroundColor: '#652d96',
+          color: '#ffffff',
+        },
+        });
         console.log("Navigating to /dashboard");
         navigate("/dashboard", { replace: true });
       } catch (error) {

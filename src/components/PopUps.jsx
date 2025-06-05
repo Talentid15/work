@@ -40,7 +40,7 @@ function PopUps({ setshowPopUps, emailSearch, setSearchedResponseData, setError 
         backendUrl,
         { email: emailSearch, userId: data?._id },
         {
-          withCredentials: true,
+          withCredentials: true,  
           headers: {
             Authorization: `Bearer ${token}`,
 

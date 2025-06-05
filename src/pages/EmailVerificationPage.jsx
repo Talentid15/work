@@ -26,7 +26,7 @@ const EmailVerificationPage = () => {
         }
       } catch (err) {
         console.error("Error occurred during verification:", err);
-        setError('The verification token is invalid or expired.');
+        setError('The verification tokenm is invalid or expired.');
       } finally {
         setLoading(false);
       }

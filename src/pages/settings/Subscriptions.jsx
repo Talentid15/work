@@ -1,275 +1,235 @@
-import { FaCheckCircle, FaRegEdit, FaHistory } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 
 const SubscriptionPage = () => {
-    const location = useLocation();
-    const token = useSelector((state) => state.user.data?.token);
-    const [userData, setUserData] = useState(null);
-    const [selectedPlan, setSelectedPlan] = useState("FREE");
-    const [loading, setLoading] = useState(true);
-    const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
+  const location = useLocation();
+  const user = useSelector((state) => state.user.data);
+  const token = user?.token;
+  console.log(user)
+  const [selectedPlan, setSelectedPlan] = useState(user?.subscriptionPlan || "FREE");
+  const [loading, setLoading] = useState(false);
+  const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
 
-    const pastTransactions = [
-        { id: 1, plan: "STARTER", email: "jai@gmail.com", date: "2025-02-01", amount: "₹2500.99", status: "Completed" },
-        { id: 2, plan: "PRO", email: "jai@gmail.com", date: "2025-02-01", amount: "₹3500.99", status: "Completed" },
-        { id: 3, plan: "STARTER", email: "jai@gmail.com", date: "2025-02-01", amount: "₹2500.99", status: "Completed" },
-    ];
+  const plans = {
+    FREE: {
+      name: "Free",
+      price: "₹0",
+      description: "Perfect for trying out basic features.",
+      features: [
+        "Up to 5 offers/month",
+        "10 Candidate Ghosting Alerts",
+        "10 Candidate Search",
+        "Basic Offer Punch",
+        "Basic Analytics",
+        "Email Support",
+      ],
+    },
+    STARTER: {
+      name: "Starter",
+      price: "₹799",
+      description: "Perfect for small teams making up to 10 offers per month.",
+      features: [
+        "Up to 10 offers/month",
+        "30 Candidate Ghosting Alerts",
+        "30 Candidate Search",
+        "Unlimited Offer Punch",
+        "Basic Analytics",
+        "Email Support",
+      ],
+    },
+    GROWTH: {
+      name: "Growth",
+      price: "₹2499",
+      description: "Ideal for growing teams making up to 50 offers per month.",
+      features: [
+        "Up to 50 offers/month",
+        "200 Candidate Ghosting Alerts",
+        "200 Candidate Search",
+        "Unlimited Offer Punch",
+        "Full Analytics Suite",
+        "Priority Support",
+      ],
+    },
+    ENTERPRISE: {
+      name: "Enterprise",
+      price: "Custom",
+      description: "For large organizations with custom requirements.",
+      features: [
+        "Unlimited offers",
+        "Unlimited Candidate Ghosting Alerts",
+        "Unlimited Candidate Search",
+        "Unlimited Offer Punch",
+        "Dedicated Account Manager",
+        "Custom Integrations",
+        "SLA & Premium Support",
+      ],
+    },
+  };
 
-    // Plan details
-    const plans = {
-        FREE: {
-            name: "Free Plan",
-            price: "₹0",
-            credits: "100/1000",
-            offerPunch: "10",
-            offerReleases: "5",
-            ghostingNotifications: "2",
-            features: [
-                "Basic interview tracking",
-                "Limited candidate management",
-                "Email support",
-            ],
-        },
-        PAID: {
-            name: "Starter Plan",
-            price: "₹1",
-            credits: "680/1000",
-            offerPunch: "150",
-            offerReleases: "45",
-            ghostingNotifications: "12",
-            features: [
-                "Advanced interview tracking",
-                "Unlimited candidate management",
-                "Priority email support",
-                "Analytics dashboard",
-                "Custom notifications",
-            ],
-        },
-    };
-
-    // Fetch user subscription details
-    const fetchUserData = async () => {
+  useEffect(() => {
+    const orderId = new URLSearchParams(location.search).get("orderId");
+    if (orderId) {
+      const checkOrderStatus = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
-            const response = await fetch(`${API_URL}/api/users`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            });
-            const data = await response.json();
-            if (data.subscriptionPlan === "Starter") {
-                setSelectedPlan("PAID");
-            } else {
-                setSelectedPlan("FREE");
-            }
-            setUserData(data);
+          const response = await fetch(`${API_URL}/api/orders/${orderId}`, {
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+          const order = await response.json();
+          if (order.data.paymentStatus === "SUCCESS") {
+            setSelectedPlan("STARTER");
+          }
         } catch (error) {
-            console.error("Error fetching user data:", error);
-            alert("Failed to load subscription details. Please try again.");
+          console.error("Error checking order status:", error);
+          alert("Failed to verify payment status. Please try again.");
         } finally {
-            setLoading(false);
+          setLoading(false);
         }
-    };
-
-    useEffect(() => {
-        fetchUserData();
-
-        // Handle redirect after payment
-        const orderId = new URLSearchParams(location.search).get("orderId");
-        if (orderId) {
-            // Optionally, you can fetch the order status to confirm payment
-            const checkOrderStatus = async () => {
-                try {
-                    const response = await fetch(`${API_URL}/api/orders/${orderId}`, {
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
-                            "Content-Type": "application/json",
-                        },
-                    });
-                    const order = await response.json();
-                    if (order.paymentStatus === "SUCCESS") {
-                        fetchUserData(); // Refresh user data to reflect updated subscription
-                    }
-                } catch (error) {
-                    console.error("Error checking order status:", error);
-                }
-            };
-            checkOrderStatus();
-        }
-    }, [location, token]);
-
-    const handlePlanSelection = async (plan) => {
-        setSelectedPlan(plan);
-        if (plan === "PAID") {
-            try {
-                const response = await fetch(`${API_URL}/api/payments/create-payment-link`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                        customerDetails: {
-                            customer_name: userData?.fullname || "Jai User",
-                            customer_email: userData?.email || "jai@gmail.com",
-                            customer_phone: userData?.phone || "1234567890",
-                            customer_id: userData?._id || "67494527994341a870ceaf7b",
-                        },
-                        orderAmount: 1,
-                        credits: 680,
-                        orderId: `ORDER_${Date.now()}`,
-                    }),
-                });
-                const data = await response.json();
-                if (data.data.paymentLink) {
-                    window.location.href = data.data.paymentLink;
-                } else {
-                    throw new Error(data.message || "Failed to get payment link");
-                }
-            } catch (error) {
-                console.error("Error initiating payment:", error);
-                alert("Failed to initiate payment. Please try again.");
-            }
-        }
-    };
-
-    if (loading) {
-        return <div className="text-center p-6">Loading subscription details...</div>;
+      };
+      checkOrderStatus();
     }
+  }, [location, token]);
 
-    return (
-        <div className="w-full mx-auto p-6">
-            <div className="bg-white rounded-3xl shadow-2xl p-8 animate-fade-in">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Subscriptions</h2>
+  const handlePlanSelection = async (plan) => {
+    if (plan === selectedPlan) return;
+    if (plan === "FREE") {
+      setSelectedPlan("FREE");
+      return;
+    }
+    if (plan === "ENTERPRISE") {
+      window.open("https://offers.talentid.app/contact-sales", "_blank");
+      return;
+    }
+    setLoading(true);
+    try {
+      const orderId = `ORDER_${Date.now()}`;
+      const response = await fetch(`${API_URL}/api/payments/create-payment-link`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          customerDetails: {
+            customer_name: user?.fullname || "Jai User",
+            customer_email: user?.email || "jai@gmail.com",
+            customer_phone: user?.phone || "1234567890",
+            customer_id: user?._id || "67494527994341a870ceaf7b",
+          },
+          orderAmount: plan === "STARTER" ? 1 : 1,
+          credits: plan === "STARTER" ? 30 : 200,
+          orderId,
+        }),
+      });
+      const data = await response.json();
+      if (data.data.paymentLink) {
+        window.open(data.data.paymentLink, "_blank");
+      } else {
+        throw new Error(data.message || "Failed to get payment link");
+      }
+    } catch (error) {
+      console.error("Error initiating payment:", error);
+      alert("Failed to initiate payment. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                {/* Plan Selection */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    {Object.keys(plans).map((planKey) => (
-                        <div
-                            key={planKey}
-                            className={`bg-gray-50 rounded-2xl p-6 shadow-md ${
-                                selectedPlan === planKey ? "border-2 border-purple-600" : ""
-                            }`}
-                        >
-                            <h3 className="text-xl font-bold text-purple-900">{plans[planKey].name}</h3>
-                            <p className="text-2xl font-semibold text-gray-800 mt-2">{plans[planKey].price}</p>
-                            <ul className="mt-4 space-y-2">
-                                {plans[planKey].features.map((feature, index) => (
-                                    <li key={index} className="flex items-center text-gray-600">
-                                        <FaCheckCircle className="text-green-500 mr-2" /> {feature}
-                                    </li>
-                                ))}
-                            </ul>
-                            <button
-                                onClick={() => handlePlanSelection(planKey)}
-                                className={`mt-6 w-full flex items-center justify-center gap-2 ${
-                                    planKey === "FREE"
-                                        ? "bg-gray-400 text-white"
-                                        : "bg-purple-600 text-white hover:bg-purple-700"
-                                } px-4 py-2 rounded-full hover:scale-105 transition-all duration-300 shadow-md`}
-                                aria-label={`Select ${plans[planKey].name}`}
-                            >
-                                {planKey === "FREE" ? "Active" : "Upgrade to Starter"}
-                            </button>
-                        </div>
-                    ))}
-                </div>
+  const PlanFeature = ({ text }) => (
+    <div className="flex items-center gap-3">
+      <svg className="w-5 h-5 text-[#3affa0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+      </svg>
+      <span className="text-sm">{text}</span>
+    </div>
+  );
 
-                {/* Subscription Details Card */}
-                <div className="bg-gray-50 rounded-2xl p-6 mb-8 shadow-md">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                        <div>
-                            <p className="text-gray-600">You are currently on</p>
-                            <p className="text-2xl font-bold text-purple-900">{plans[selectedPlan].name}</p>
-                        </div>
-                        {selectedPlan === "FREE" && (
-                            <button
-                                onClick={() => handlePlanSelection("PAID")}
-                                className="mt-4 sm:mt-0 flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-full hover:bg-purple-700 hover:scale-105 transition-all duration-300 shadow-md"
-                                aria-label="Upgrade plan"
-                            >
-                                <FaRegEdit /> Upgrade to Starter
-                            </button>
-                        )}
-                    </div>
+  const PlanButton = ({ text, bg, hover, shadow = "", onClick }) => (
+    <button
+      className={`w-full ${bg} ${hover} ${shadow} text-white py-3 rounded-lg font-semibold transition-colors duration-200`}
+      onClick={onClick}
+      disabled={loading}
+    >
+      {loading ? "Processing..." : text}
+    </button>
+  );
 
-                    <div className="space-y-4">
-                        {[
-                            { label: "Interview tracking credits left", value: userData?.credits || plans[selectedPlan].credits, progress: selectedPlan === "PAID" ? 68 : 10 },
-                            { label: "No. of Offer Punch", value: plans[selectedPlan].offerPunch, progress: null },
-                            { label: "Offer Releases", value: plans[selectedPlan].offerReleases, progress: null },
-                            { label: "Candidate Ghosting Notification", value: plans[selectedPlan].ghostingNotifications, progress: null },
-                        ].map((item, index) => (
-                            <div key={index} className="flex flex-col">
-                                <div className="flex justify-between items-center">
-                                    <p className="text-gray-600">{item.label}</p>
-                                    <p className="text-gray-800 font-semibold">{item.value}</p>
-                                </div>
-                                {item.progress && (
-                                    <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                                        <div
-                                            className="bg-purple-600 h-2 rounded-full transition-all duration-500"
-                                            style={{ width: `${item.progress}%` }}
-                                        ></div>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
+  if (loading) {
+    return <div className="text-center p-6 text-gray-600">Loading...</div>;
+  }
 
-                    <div className="mt-6 text-center">
-                        <p className="text-red-600">Your plan expires on</p>
-                        <p className="text-sm font-bold text-gray-500">
-                            {userData?.subscriptionExpiry
-                                ? new Date(userData.subscriptionExpiry).toLocaleDateString()
-                                : "15/07/2025"}
-                        </p>
-                    </div>
-                </div>
-
-                {/* Past Transactions Table */}
-                <div className="bg-gray-50 rounded-2xl p-6 shadow-md">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <FaHistory className="mr-2" /> Past Transactions
-                    </h3>
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-gray-100">
-                                <tr>
-                                    {["Plan", "Email", "Start Date", "Amount", "Status"].map((header) => (
-                                        <th
-                                            key={header}
-                                            className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        >
-                                            {header}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {pastTransactions.map((transaction) => (
-                                    <tr key={transaction.id} className="hover:bg-purple-50 transition-all duration-200">
-                                        <td className="px-4 py-3 text-gray-800">{transaction.plan}</td>
-                                        <td className="px-4 py-3 text-gray-800">{transaction.email}</td>
-                                        <td className="px-4 py-3 text-gray-800">{transaction.date}</td>
-                                        <td className="px-4 py-3 text-gray-800">{transaction.amount}</td>
-                                        <td className="px-4 py-3 text-gray-800">
-                                            <span className="flex items-center">
-                                                <FaCheckCircle className="text-green-500 mr-2" /> {transaction.status}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="min-h-screen py-16 px-4 bg-white">
+      <div className="max-w-6xl mx-auto" id="pricing">
+        <div className="text-center mb-16">
+          <div className="inline-block mb-6">
+            <span className="bg-[#d7ffec] text-[#652d96] font-normal px-3 py-1 rounded-full text-sm">
+              Simple Pricing
+            </span>
+          </div>
+          <h1 className="text-black text-4xl md:text-5xl font-bold mb-6">
+            Choose Your Plan
+          </h1>
+          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            Transparent pricing with no hidden fees. All plans include our core predictive features.
+          </p>
         </div>
-    );
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {Object.keys(plans).map((planKey) => (
+            <div
+              key={planKey}
+              className={`bg-gray-900 rounded-2xl p-8 text-white relative ${
+                planKey === "GROWTH" ? "transform scale-105" : ""
+              }`}
+            >
+              {planKey === "GROWTH" && (
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-green-500 text-white px-4 py-1 rounded-full text-xs font-medium">
+                    MOST POPULAR
+                  </span>
+                </div>
+              )}
+              <div className="mb-8">
+                <h3 className="text-[#3affa0] text-lg font-semibold mb-4">{plans[planKey].name}</h3>
+                <div className="mb-2">
+                  <span className="text-4xl font-bold">{plans[planKey].price}</span>
+                  {planKey !== "FREE" && planKey !== "ENTERPRISE" && (
+                    <span className="text-gray-300 text-lg">/month</span>
+                  )}
+                </div>
+                <p className={`text-sm ${planKey === "GROWTH" ? "text-purple-200" : "text-gray-300"}`}>
+                  {plans[planKey].description}
+                </p>
+              </div>
+              <div className="space-y-4 mb-8">
+                {plans[planKey].features.map((feature, index) => (
+                  <PlanFeature key={index} text={feature} />
+                ))}
+              </div>
+              <PlanButton
+                text={selectedPlan === planKey ? "Current Plan" : planKey === "ENTERPRISE" ? "Contact Sales" : "Get Started"}
+                bg={planKey === "GROWTH" ? "bg-green-500" : "bg-gray-700"}
+                hover={planKey === "GROWTH" ? "hover:bg-[#3affa0]" : "hover:bg-gray-600"}
+                shadow={planKey === "GROWTH" ? "shadow-[0_0_10px_#38ff9f]" : ""}
+                onClick={() => handlePlanSelection(planKey)}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="text-center mt-12">
+          <p className="text-gray-600 text-sm">
+            All plans include a 14-day free trial. No credit card required.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default SubscriptionPage;

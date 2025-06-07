@@ -43,6 +43,7 @@ import InvitePage from "./pages/CTS/InvitePage";
 import DocumentUploadPopup from "./pages/documentVerify";
 import OtpVerificationPopup from "./pages/OtpVerify";
 import CompanyForm from "./pages/CTS/CompanyForm";
+import CheckoutPage from "./pages/Checkout";
 
 function App() {
   const { showOtpPopup, showDocumentPopup, failedRequest, setOtpPopup, setDocumentPopup } =
@@ -153,7 +154,6 @@ function App() {
         return response;
       } catch (error) {
         console.error("App.jsx: Retry failed:", error);
-        // toast.error(error.response?.data?.message || "Failed to retry action");
       }
     }
   };
@@ -188,6 +188,7 @@ function App() {
           <Route path="/joboffers" element={<Job_Offer />} />
           <Route path="/company/edit/:companyName" element={<CompanyForm />} />
           <Route path="/release-offer" element={<Release_Offer />} />
+          <Route path="/subscription/checkout/:id" element={<CheckoutPage/>} />
           <Route path="/extractInfo" element={<ExtractDataFromPdf />} />
           <Route path="/joboffers/:id" element={<OfferDetail />} />
           <Route path="backgroundchecks" element={<BackgroundChecks />}>

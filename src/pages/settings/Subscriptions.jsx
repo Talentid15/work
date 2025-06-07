@@ -1,71 +1,16 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { plans } from "../../constants/index";
 
 const SubscriptionPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const user = useSelector((state) => state.user.data);
   const token = user?.token;
-  console.log(user)
   const [selectedPlan, setSelectedPlan] = useState(user?.subscriptionPlan || "FREE");
   const [loading, setLoading] = useState(false);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
-
-  const plans = {
-    FREE: {
-      name: "Free",
-      price: "₹0",
-      description: "Perfect for trying out basic features.",
-      features: [
-        "Up to 5 offers/month",
-        "10 Candidate Ghosting Alerts",
-        "10 Candidate Search",
-        "Basic Offer Punch",
-        "Basic Analytics",
-        "Email Support",
-      ],
-    },
-    STARTER: {
-      name: "Starter",
-      price: "₹799",
-      description: "Perfect for small teams making up to 10 offers per month.",
-      features: [
-        "Up to 10 offers/month",
-        "30 Candidate Ghosting Alerts",
-        "30 Candidate Search",
-        "Unlimited Offer Punch",
-        "Basic Analytics",
-        "Email Support",
-      ],
-    },
-    GROWTH: {
-      name: "Growth",
-      price: "₹2499",
-      description: "Ideal for growing teams making up to 50 offers per month.",
-      features: [
-        "Up to 50 offers/month",
-        "200 Candidate Ghosting Alerts",
-        "200 Candidate Search",
-        "Unlimited Offer Punch",
-        "Full Analytics Suite",
-        "Priority Support",
-      ],
-    },
-    ENTERPRISE: {
-      name: "Enterprise",
-      price: "Custom",
-      description: "For large organizations with custom requirements.",
-      features: [
-        "Unlimited offers",
-        "Unlimited Candidate Ghosting Alerts",
-        "Unlimited Candidate Search",
-        "Unlimited Offer Punch",
-        "Dedicated Account Manager",
-        "Custom Integrations",
-        "SLA & Premium Support",
-      ],
-    },
-  };
 
   useEffect(() => {
     const orderId = new URLSearchParams(location.search).get("orderId");
@@ -104,39 +49,7 @@ const SubscriptionPage = () => {
       window.open("https://offers.talentid.app/contact-sales", "_blank");
       return;
     }
-    setLoading(true);
-    try {
-      const orderId = `ORDER_${Date.now()}`;
-      const response = await fetch(`${API_URL}/api/payments/create-payment-link`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          customerDetails: {
-            customer_name: user?.fullname || "Jai User",
-            customer_email: user?.email || "jai@gmail.com",
-            customer_phone: user?.phone || "1234567890",
-            customer_id: user?._id || "67494527994341a870ceaf7b",
-          },
-          orderAmount: plan === "STARTER" ? 1 : 1,
-          credits: plan === "STARTER" ? 30 : 200,
-          orderId,
-        }),
-      });
-      const data = await response.json();
-      if (data.data.paymentLink) {
-        window.open(data.data.paymentLink, "_blank");
-      } else {
-        throw new Error(data.message || "Failed to get payment link");
-      }
-    } catch (error) {
-      console.error("Error initiating payment:", error);
-      alert("Failed to initiate payment. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    navigate(`/subscription/checkout/${plan.toLowerCase()}`);
   };
 
   const PlanFeature = ({ text }) => (

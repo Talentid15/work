@@ -10,6 +10,7 @@ const SubscriptionPage = () => {
   const token = user?.token;
   const [selectedPlan, setSelectedPlan] = useState(user?.subscriptionPlan || "FREE");
   const [loading, setLoading] = useState(false);
+  const [isYearly, setIsYearly] = useState(false);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
 
   useEffect(() => {
@@ -49,7 +50,7 @@ const SubscriptionPage = () => {
       window.open("https://offers.talentid.app/contact-sales", "_blank");
       return;
     }
-    navigate(`/subscription/checkout/${plan.toLowerCase()}`);
+    navigate(`/subscription/checkout/${plan.toLowerCase()}?billing=${isYearly ? 'yearly' : 'monthly'}`);
   };
 
   const PlanFeature = ({ text }) => (
@@ -71,6 +72,43 @@ const SubscriptionPage = () => {
     </button>
   );
 
+  const getPlanPrice = (planKey) => {
+    if (isYearly && planKey === "STARTER") {
+      return "₹7999";
+    }
+    if (isYearly && planKey === "GROWTH") {
+      return "₹24999";
+    }
+    return plans[planKey].price;
+  };
+
+  const getPlanBasePrice = (planKey) => {
+    if (isYearly && planKey === "STARTER") {
+      return 7999;
+    }
+    if (isYearly && planKey === "GROWTH") {
+      return 24999;
+    }
+    return plans[planKey].basePrice;
+  };
+
+  const getPlanFeatures = (planKey) => {
+    if (!isYearly) return plans[planKey].features;
+    return plans[planKey].features.map(feature => {
+      const match = feature.match(/^Up to (\d+) (\w+)/);
+      if (match) {
+        const number = parseInt(match[1]) * 12;
+        return `Up to ${number} ${match[2]}/year`;
+      }
+      const alertMatch = feature.match(/^(\d+) Candidate (Ghosting Alerts|Search)/);
+      if (alertMatch) {
+        const number = parseInt(alertMatch[1]) * 12;
+        return `${number} Candidate ${alertMatch[2]}/year`;
+      }
+      return feature.replace(/\/month$/, '/year');
+    });
+  };
+
   if (loading) {
     return <div className="text-center p-6 text-gray-600">Loading...</div>;
   }
@@ -90,11 +128,27 @@ const SubscriptionPage = () => {
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
             Transparent pricing with no hidden fees. All plans include our core predictive features.
           </p>
+          <div className="mt-6 flex justify-center">
+            <div className="bg-gray-200 rounded-full p-1 inline-flex">
+              <button
+                className={`px-4 py-2 rounded-full text-sm font-medium ${!isYearly ? 'bg-white text-gray-900' : 'text-gray-600'}`}
+                onClick={() => setIsYearly(false)}
+              >
+                Monthly
+              </button>
+              <button
+                className={`px-4 py-2 rounded-full text-sm font-medium ${isYearly ? 'bg-white text-gray-900' : 'text-gray-600'}`}
+                onClick={() => setIsYearly(true)}
+              >
+                Yearly
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {["STARTER", "GROWTH", "ENTERPRISE"].map((planKey) => (
+          <div className={`grid grid-cols-1 ${isYearly ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-6`}>
+            {(isYearly ? ["STARTER", "GROWTH"] : ["STARTER", "GROWTH", "ENTERPRISE"]).map((planKey) => (
               <div
                 key={planKey}
                 className={`bg-gray-900 rounded-2xl p-8 text-white relative ${
@@ -111,9 +165,9 @@ const SubscriptionPage = () => {
                 <div className="mb-8">
                   <h3 className="text-[#3affa0] text-lg font-semibold mb-4">{plans[planKey].name}</h3>
                   <div className="mb-2">
-                    <span className="text-4xl font-bold">{plans[planKey].price}</span>
+                    <span className="text-4xl font-bold">{getPlanPrice(planKey)}</span>
                     {planKey !== "ENTERPRISE" && (
-                      <span className="text-gray-300 text-lg">/month</span>
+                      <span className="text-gray-300 text-lg">{isYearly ? "/year" : "/month"}</span>
                     )}
                   </div>
                   <p className={`text-sm ${planKey === "GROWTH" ? "text-purple-200" : "text-gray-300"}`}>
@@ -121,7 +175,7 @@ const SubscriptionPage = () => {
                   </p>
                 </div>
                 <div className="space-y-4 mb-8">
-                  {plans[planKey].features.map((feature, index) => (
+                  {getPlanFeatures(planKey).map((feature, index) => (
                     <PlanFeature key={index} text={feature} />
                   ))}
                 </div>
@@ -136,7 +190,7 @@ const SubscriptionPage = () => {
             ))}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {["FREE", "EARLY"].map((planKey) => (
+            {["FREE"].map((planKey) => (
               <div
                 key={planKey}
                 className="bg-gray-900 rounded-2xl p-8 text-white"
@@ -152,7 +206,7 @@ const SubscriptionPage = () => {
                   <p className="text-gray-300 text-sm">{plans[planKey].description}</p>
                 </div>
                 <div className="space-y-4 mb-8">
-                  {plans[planKey].features.map((feature, index) => (
+                  {getPlanFeatures(planKey).map((feature, index) => (
                     <PlanFeature key={index} text={feature} />
                   ))}
                 </div>

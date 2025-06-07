@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { plans } from "../constants/index";
 
 const CheckoutPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useSelector((state) => state.user.data);
   const token = user?.token;
   const [loading, setLoading] = useState(false);
@@ -13,6 +14,8 @@ const CheckoutPage = () => {
   const [isAnimated, setIsAnimated] = useState(false);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? '';
 
+  const billing = new URLSearchParams(location.search).get("billing") || "monthly";
+  const isYearly = billing === "yearly";
   const plan = plans[id?.toUpperCase()];
   const isValidPlan = plan && id.toUpperCase() !== "FREE" && id.toUpperCase() !== "ENTERPRISE";
 
@@ -28,7 +31,9 @@ const CheckoutPage = () => {
       setLoading(true);
       try {
         const orderId = `ORDER_${Date.now()}`;
-        const total_amount = plan.basePrice + (plan.basePrice * 0.18);
+        const basePrice = isYearly ? plan.yearlyBasePrice : plan.basePrice;
+        const total_amount = basePrice + (basePrice * 0.18);
+        const credits = id.toUpperCase() === "STARTER" ? (isYearly ? 360 : 30) : (isYearly ? 2400 : 200);
         const response = await fetch(`${API_URL}/api/payments/create-payment-link`, {
           method: "POST",
           headers: {
@@ -43,7 +48,7 @@ const CheckoutPage = () => {
               customer_id: user?._id || "67494527994341a870ceaf7b",
             },
             orderAmount: total_amount?.toFixed(2),
-            credits: id.toUpperCase() === "STARTER" ? 30 : 200,
+            credits,
             orderId,
           }),
         });
@@ -63,15 +68,32 @@ const CheckoutPage = () => {
     };
 
     initiatePayment();
-  }, [id, token, navigate, plan]);
+  }, [id, token, navigate, plan, isYearly]);
 
   const calculateGST = (basePrice) => {
     return basePrice * 0.18;
   };
 
+  const getPlanFeatures = () => {
+    if (!isYearly) return plan.features;
+    return plan.features.map(feature => {
+      const match = feature.match(/^Up to (\d+) (\w+)/);
+      if (match) {
+        const number = parseInt(match[1]) * 12;
+        return `Up to ${number} ${match[2]}/year`;
+      }
+      const alertMatch = feature.match(/^(\d+) Candidate (Ghosting Alerts|Search)/);
+      if (alertMatch) {
+        const number = parseInt(alertMatch[1]) * 12;
+        return `${number} Candidate ${alertMatch[2]}/year`;
+      }
+      return feature.replace(/\/month$/, '/year');
+    });
+  };
+
   const PlanFeature = ({ text, index }) => (
     <div 
-      className={`flex items-center gap-3 p-2 rounded-lg bg-gradient-to-r from-purple-50 to-white border border-purple-100 transform transition-all duration-500 hover:shadow-md${
+      className={`flex items-center gap-3 p-2 rounded-lg bg-gradient-to-r from-purple-50 to-white border border-purple-100 transform transition-all duration-500 hover:shadow-md ${
         isAnimated ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
       }`}
       style={{ transitionDelay: `${index * 100}ms` }}
@@ -104,7 +126,7 @@ const CheckoutPage = () => {
     );
   }
 
-  const basePrice = plan.basePrice;
+  const basePrice = isYearly ? plan.yearlyBasePrice : plan.basePrice;
   const gst = calculateGST(basePrice);
   const totalPrice = basePrice + gst;
 
@@ -151,9 +173,9 @@ const CheckoutPage = () => {
               </div>
 
               <div className="flex-1 min-h-0">
-                <h3 className="text-sm font-semibold text-gray-800 mb-3">What&apos;s included:</h3>
+                <h3 className="text-sm font-semibold text-gray-800 mb-3">What's included:</h3>
                 <div className="space-y-2 overflow-y-auto max-h-72">
-                  {plan.features.map((feature, index) => (
+                  {getPlanFeatures().map((feature, index) => (
                     <PlanFeature key={index} text={feature} index={index} />
                   ))}
                 </div>
@@ -244,6 +266,7 @@ const CheckoutPage = () => {
                         Bank Grade Security
                       </span>
                     </div>
+                    <p className="text-xs text-gray-400 mt-3">*All prices inclusive of GST*</p>
                   </div>
                 </div>
               </div>

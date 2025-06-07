@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { plans } from "../../constants/index";
+import { plans } from "@/constants";
 
 const SubscriptionPage = () => {
   const location = useLocation();
@@ -20,7 +20,7 @@ const SubscriptionPage = () => {
         try {
           const response = await fetch(`${API_URL}/api/orders/${orderId}`, {
             headers: {
-              "Authorization": `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           });
@@ -135,28 +135,37 @@ const SubscriptionPage = () => {
               </div>
             ))}
           </div>
-                    <div className="bg-gray-900 rounded-2xl p-8 text-white">
-            <div className="mb-8">
-              <h3 className="text-[#3affa0] text-lg font-semibold mb-4">{plans.FREE.name}</h3>
-              <div className="mb-2">
-                <span className="text-4xl font-bold">{plans.FREE.price}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {["FREE", "EARLY"].map((planKey) => (
+              <div
+                key={planKey}
+                className="bg-gray-900 rounded-2xl p-8 text-white"
+              >
+                <div className="mb-8">
+                  <h3 className="text-[#3affa0] text-lg font-semibold mb-4">{plans[planKey].name}</h3>
+                  <div className="mb-2">
+                    <span className="text-4xl font-bold">{plans[planKey].price}</span>
+                    <span className="text-gray-300 text-lg">
+                      {planKey === "FREE" ? "/month" : "/year"}
+                    </span>
+                  </div>
+                  <p className="text-gray-300 text-sm">{plans[planKey].description}</p>
+                </div>
+                <div className="space-y-4 mb-8">
+                  {plans[planKey].features.map((feature, index) => (
+                    <PlanFeature key={index} text={feature} />
+                  ))}
+                </div>
+                <PlanButton
+                  text={selectedPlan === planKey ? "Current Plan" : "Get Started"}
+                  bg="bg-gray-700"
+                  hover="hover:bg-gray-600"
+                  onClick={() => handlePlanSelection(planKey)}
+                />
               </div>
-              <p className="text-gray-300 text-sm">{plans.FREE.description}</p>
-            </div>
-            <div className="space-y-4 mb-8">
-              {plans.FREE.features.map((feature, index) => (
-                <PlanFeature key={index} text={feature} />
-              ))}
-            </div>
-            <PlanButton
-              text={selectedPlan === "FREE" ? "Current Plan" : "Get Started"}
-              bg="bg-gray-700"
-              hover="hover:bg-gray-600"
-              onClick={() => handlePlanSelection("FREE")}
-            />
+            ))}
           </div>
         </div>
-
         <div className="text-center mt-12">
           <p className="text-gray-600 text-sm">
             All plans include a 14-day free trial. No credit card required.

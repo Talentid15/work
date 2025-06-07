@@ -41,6 +41,20 @@ export const plans = {
       "Priority Support",
     ],
   },
+  EARLY: {
+    name: "Early",
+    price: "₹29988",
+    basePrice: 24999,
+    description: "Ideal for growing teams making up to 50 offers per month, billed yearly.",
+    features: [
+      "Up to 600 offers/month",
+      "2400 Candidate Ghosting Alerts",
+      "2400 Candidate Search",
+      "Unlimited Offer Punch",
+      "Full Analytics Suite",
+      "Priority Support",
+    ],
+  },
   ENTERPRISE: {
     name: "Enterprise",
     price: "Custom",

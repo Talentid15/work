@@ -92,47 +92,69 @@ const SubscriptionPage = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {Object.keys(plans).map((planKey) => (
-            <div
-              key={planKey}
-              className={`bg-gray-900 rounded-2xl p-8 text-white relative ${
-                planKey === "GROWTH" ? "transform scale-105" : ""
-              }`}
-            >
-              {planKey === "GROWTH" && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-green-500 text-white px-4 py-1 rounded-full text-xs font-medium">
-                    MOST POPULAR
-                  </span>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {["STARTER", "GROWTH", "ENTERPRISE"].map((planKey) => (
+              <div
+                key={planKey}
+                className={`bg-gray-900 rounded-2xl p-8 text-white relative ${
+                  planKey === "GROWTH" ? "transform scale-105" : ""
+                }`}
+              >
+                {planKey === "GROWTH" && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-green-500 text-white px-4 py-1 rounded-full text-xs font-medium">
+                      MOST POPULAR
+                    </span>
+                  </div>
+                )}
+                <div className="mb-8">
+                  <h3 className="text-[#3affa0] text-lg font-semibold mb-4">{plans[planKey].name}</h3>
+                  <div className="mb-2">
+                    <span className="text-4xl font-bold">{plans[planKey].price}</span>
+                    {planKey !== "ENTERPRISE" && (
+                      <span className="text-gray-300 text-lg">/month</span>
+                    )}
+                  </div>
+                  <p className={`text-sm ${planKey === "GROWTH" ? "text-purple-200" : "text-gray-300"}`}>
+                    {plans[planKey].description}
+                  </p>
                 </div>
-              )}
-              <div className="mb-8">
-                <h3 className="text-[#3affa0] text-lg font-semibold mb-4">{plans[planKey].name}</h3>
-                <div className="mb-2">
-                  <span className="text-4xl font-bold">{plans[planKey].price}</span>
-                  {planKey !== "FREE" && planKey !== "ENTERPRISE" && (
-                    <span className="text-gray-300 text-lg">/month</span>
-                  )}
+                <div className="space-y-4 mb-8">
+                  {plans[planKey].features.map((feature, index) => (
+                    <PlanFeature key={index} text={feature} />
+                  ))}
                 </div>
-                <p className={`text-sm ${planKey === "GROWTH" ? "text-purple-200" : "text-gray-300"}`}>
-                  {plans[planKey].description}
-                </p>
+                <PlanButton
+                  text={selectedPlan === planKey ? "Current Plan" : planKey === "ENTERPRISE" ? "Contact Sales" : "Get Started"}
+                  bg={planKey === "GROWTH" ? "bg-green-500" : "bg-gray-700"}
+                  hover={planKey === "GROWTH" ? "hover:bg-[#3affa0]" : "hover:bg-gray-600"}
+                  shadow={planKey === "GROWTH" ? "shadow-[0_0_10px_#38ff9f]" : ""}
+                  onClick={() => handlePlanSelection(planKey)}
+                />
               </div>
-              <div className="space-y-4 mb-8">
-                {plans[planKey].features.map((feature, index) => (
-                  <PlanFeature key={index} text={feature} />
-                ))}
+            ))}
+          </div>
+                    <div className="bg-gray-900 rounded-2xl p-8 text-white">
+            <div className="mb-8">
+              <h3 className="text-[#3affa0] text-lg font-semibold mb-4">{plans.FREE.name}</h3>
+              <div className="mb-2">
+                <span className="text-4xl font-bold">{plans.FREE.price}</span>
               </div>
-              <PlanButton
-                text={selectedPlan === planKey ? "Current Plan" : planKey === "ENTERPRISE" ? "Contact Sales" : "Get Started"}
-                bg={planKey === "GROWTH" ? "bg-green-500" : "bg-gray-700"}
-                hover={planKey === "GROWTH" ? "hover:bg-[#3affa0]" : "hover:bg-gray-600"}
-                shadow={planKey === "GROWTH" ? "shadow-[0_0_10px_#38ff9f]" : ""}
-                onClick={() => handlePlanSelection(planKey)}
-              />
+              <p className="text-gray-300 text-sm">{plans.FREE.description}</p>
             </div>
-          ))}
+            <div className="space-y-4 mb-8">
+              {plans.FREE.features.map((feature, index) => (
+                <PlanFeature key={index} text={feature} />
+              ))}
+            </div>
+            <PlanButton
+              text={selectedPlan === "FREE" ? "Current Plan" : "Get Started"}
+              bg="bg-gray-700"
+              hover="hover:bg-gray-600"
+              onClick={() => handlePlanSelection("FREE")}
+            />
+          </div>
         </div>
 
         <div className="text-center mt-12">

@@ -147,11 +147,12 @@ const SubscriptionPage = () => {
         </div>
 
         <div className="space-y-6">
-          <div className={`grid grid-cols-1 ${isYearly ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-6`}>
-            {(isYearly ? ["STARTER", "GROWTH"] : ["STARTER", "GROWTH", "ENTERPRISE"]).map((planKey) => (
+          {/* Other Plans (Starter, Growth, Enterprise) */}
+          <div className={`grid grid-cols-1 ${isYearly ? 'md:grid-cols-3' : 'md:grid-cols-3'} gap-6`}>
+            {(isYearly ? ["STARTER", "GROWTH", "ENTERPRISE"] : ["STARTER", "GROWTH", "ENTERPRISE"]).map((planKey) => (
               <div
                 key={planKey}
-                className={`bg-gray-900 rounded-2xl p-8 text-white relative ${
+                className={`bg-gray-900 rounded-2xl p-8 text-white relative transition-transform duration-300 hover:shadow-lg ${
                   planKey === "GROWTH" ? "transform scale-105" : ""
                 }`}
               >
@@ -189,41 +190,40 @@ const SubscriptionPage = () => {
               </div>
             ))}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {["FREE"].map((planKey) => (
-              <div
-                key={planKey}
-                className="bg-gray-900 rounded-2xl p-8 text-white"
-              >
-                <div className="mb-8">
-                  <h3 className="text-[#3affa0] text-lg font-semibold mb-4">{plans[planKey].name}</h3>
-                  <div className="mb-2">
-                    <span className="text-4xl font-bold">{plans[planKey].price}</span>
-                    <span className="text-gray-300 text-lg">
-                      {planKey === "FREE" ? "/month" : "/year"}
-                    </span>
+
+          {/* Free Plan (only in Monthly billing) */}
+          {!isYearly && (
+            <div className="grid grid-cols-1 gap-6">
+              {["FREE"].map((planKey) => (
+                <div
+                  key={planKey}
+                  className="bg-gray-900 rounded-2xl p-6 text-white transition-transform duration-300 hover:shadow-lg"
+                >
+                  <div className="mb-4">
+                    <h3 className="text-[#3affa0] text-lg font-semibold mb-2">{plans[planKey].name}</h3>
+                    <div className="mb-2">
+                      <span className="text-4xl font-bold">{plans[planKey].price}</span>
+                      <span className="text-gray-300 text-lg">
+                        {planKey === "FREE" ? "/month" : "/year"}
+                      </span>
+                    </div>
+                    <p className="text-gray-300 text-sm">{plans[planKey].description}</p>
                   </div>
-                  <p className="text-gray-300 text-sm">{plans[planKey].description}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+                    {getPlanFeatures(planKey).map((feature, index) => (
+                      <PlanFeature key={index} text={feature} />
+                    ))}
+                  </div>
+                  <PlanButton
+                    text={selectedPlan === planKey ? "Current Plan" : "Get Started"}
+                    bg="bg-gray-700"
+                    hover="hover:bg-gray-600"
+                    onClick={() => handlePlanSelection(planKey)}
+                  />
                 </div>
-                <div className="space-y-4 mb-8">
-                  {getPlanFeatures(planKey).map((feature, index) => (
-                    <PlanFeature key={index} text={feature} />
-                  ))}
-                </div>
-                <PlanButton
-                  text={selectedPlan === planKey ? "Current Plan" : "Get Started"}
-                  bg="bg-gray-700"
-                  hover="hover:bg-gray-600"
-                  onClick={() => handlePlanSelection(planKey)}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="text-center mt-12">
-          <p className="text-gray-600 text-sm">
-            All plans include a 14-day free trial. No credit card required.
-          </p>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

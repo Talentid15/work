@@ -325,8 +325,19 @@ const Release_Offer = () => {
           },
           withCredentials: true,
         }
-      );
-
+      ); 
+      console.log("rr")
+       if (response.status === 403) {
+        const errorMessage = `You've reached your monthly offer limit. Upgrade to continue releasing offers.`;
+        toast.error(errorMessage, {
+          style: {
+            backgroundColor: "#ff4d4f",
+            color: "#ffffff",
+          },
+          duration: 5000,
+        });
+        return;
+      } 
       console.log("Release_Offer.jsx: API response:", response.data);
       toast.success("Offer released successfully!", {
         style: {
@@ -342,9 +353,25 @@ const Release_Offer = () => {
         setStep(3);
       }
     } catch (error) {
-      console.error("Release_Offer.jsx: Error submitting form:", error);
-      const errorMessage = error.response?.data?.error || "Failed to release offer. Please try again.";
-      toast.error(errorMessage);
+      console.log(error.response?.status,error.response?.data?.error?.includes("Monthly offer limit"))
+      console.log(error)
+      if (error.response?.status === 403 && error.response?.data?.error?.includes("Monthly offer limit")) {
+        const planName = error.response.data.error.match(/of (\w+) plan/)?.[1] || "your";
+              console.log("ddddswsdw")
+
+        const errorMessage = `You've reached your monthly offer limit for the ${planName} plan. Upgrade to continue releasing offers.`;
+        toast.error(errorMessage, {
+          style: {
+            backgroundColor: "#ff4d4f",
+            color: "#ffffff",
+          },
+          duration: 5000,
+        });
+      } else {
+        const errorMessage = "failed to release offer"
+        console.error("Release_Offer.jsx: Error submitting form:", error);
+        toast.error(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }

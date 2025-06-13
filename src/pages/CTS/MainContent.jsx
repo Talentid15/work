@@ -238,7 +238,7 @@ const MainContent = () => {
           ) : (
             <p className="text-gray-500 text-center">
               {searchedResponseData.hiringCandidateData?.offers?.length > 0
-                ? "No non-pending offers found for this candidate."
+                ? "No offers found for this candidate."
                 : "No offers found for this candidate."}
             </p>
           )}

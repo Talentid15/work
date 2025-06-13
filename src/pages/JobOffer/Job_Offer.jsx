@@ -15,6 +15,7 @@ const Job_Offer = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("All");
+  const [searchQuery, setSearchQuery] = useState(""); // New state for search query
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -47,7 +48,7 @@ const Job_Offer = () => {
         console.error("Error fetching offers data:", error);
 
         if (error.response && error.response.status === 404) {
-          dispatch(setOfferData([])); 
+          dispatch(setOfferData([]));
         } else {
           // setError("Failed to fetch offers. Please try again later.");
         }
@@ -76,8 +77,8 @@ const Job_Offer = () => {
           },
         }
       );
-      toast.success(response.data.message,{
-                style: {
+      toast.success(response.data.message, {
+        style: {
           backgroundColor: '#652d96',
           color: '#ffffff',
         },
@@ -102,10 +103,14 @@ const Job_Offer = () => {
     (offer) => offer.showOffer !== false
   );
 
-  const filteredOffers =
-    statusFilter === "All"
-      ? visibleOffers
-      : visibleOffers?.filter((offer) => offer.status === statusFilter) || [];
+  // Filter offers based on status and search query
+  const filteredOffers = visibleOffers.filter((offer) => {
+    const matchesStatus = statusFilter === "All" || offer.status === statusFilter;
+    const matchesSearch = searchQuery
+      ? offer?.candidate?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+    return matchesStatus && matchesSearch;
+  });
 
   const handleReleaseOption = (option) => {
     setIsDropdownOpen(false);
@@ -124,17 +129,26 @@ const Job_Offer = () => {
         </h1>
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-          <select
-            className="w-full sm:w-48 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-700"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            {statusOptions.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <input
+              type="text"
+              placeholder="Search by candidate name..."
+              className="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-700"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <select
+              className="w-full sm:w-48 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-700"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="relative w-full sm:w-auto">
             <button
               className="flex items-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto justify-center sm:justify-start"
@@ -272,13 +286,7 @@ const Job_Offer = () => {
           </>
         ) : (
           <div className="text-center text-gray-500 font-medium py-8">
-            <p>No offers released. Please release an offer.</p>
-            {/* <button
-              className="mt-4 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md"
-              onClick={() => navigate("/release-offer")}
-            >
-              Release an Offer
-            </button> */}
+            <p>No offers found. Please release an offer or adjust your search.</p>
           </div>
         )}
 

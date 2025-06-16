@@ -5,7 +5,7 @@ export const plans = {
     basePrice: 0,
     description: "Perfect for trying out basic features.",
     features: [
-      "Up to 5 offers/month",
+      "Up to 3 offers/month",
       "10 Candidate Ghosting Alerts",
       "10 Candidate Search",
       "Basic Offer Punch",

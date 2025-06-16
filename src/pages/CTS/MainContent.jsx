@@ -27,12 +27,25 @@ const FeedbackCard = ({ rating, comment, createdAt, reviewer }) => {
   return (
     <div className="flex flex-col p-6 bg-white/30 backdrop-blur-lg rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-white/50">
       <div className="flex items-center mb-4">
-        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-purple-100">
-          <span className="text-lg font-semibold text-purple-600">{rating}/5</span>
+        <div className="flex items-center justify-center gap-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <svg
+              key={star}
+              className={`w-6 h-6 ${star <= rating ? "text-purple-600" : "text-gray-300"}`}
+              fill={star <= rating ? "currentColor" : "none"}
+              stroke="currentColor"
+              strokeWidth="1"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l2.069 6.396a1 1 0 00.95.691h6.712c.969 0 1.371 1.24.588 1.81l-5.428 3.947a1 1 0 00-.363 1.118l2.069 6.396c.3.921-.755 1.688-1.54 1.118l-5.428-3.947a1 1 0 00-1.176 0l-5.428 3.947c-.784.57-1.838-.197-1.54-1.118l2.069-6.396a1 1 0 00-.363-1.118L2.59 11.824c-.784-.57-.381-1.81.588-1.81h6.712a1 1 0 00.95-.691l2.069-6.396z"
+              />
+            </svg>
+          ))}
         </div>
-        <p className="ml-4 text-sm font-medium text-gray-700">
-          From: {reviewer?.name || "Anonymous"}
-        </p>
       </div>
       <p className="text-sm text-gray-700">{comment || "No comment provided."}</p>
       <p className="text-xs text-gray-500 mt-2">
@@ -41,6 +54,7 @@ const FeedbackCard = ({ rating, comment, createdAt, reviewer }) => {
     </div>
   );
 };
+
 
 const HiringCandidateDetails = ({ data }) => {
   return (

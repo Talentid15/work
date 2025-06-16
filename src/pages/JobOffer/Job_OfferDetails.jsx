@@ -531,15 +531,33 @@ const OfferDetail = () => {
             <div className="space-y-3 mb-4">
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Rating (1–5)</label>
-                <select
-                  value={feedbackRating}
-                  onChange={(e) => setFeedbackRating(Number(e.target.value))}
-                  className="block w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
-                >
-                  {[1, 2, 3, 4, 5].map((num) => (
-                    <option key={num} value={num}>{num}</option>
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      onClick={() => setFeedbackRating(star)}
+                      className="focus:outline-none"
+                      aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
+                    >
+                      <svg
+                        className={`w-6 h-6 transition-colors duration-200 ${
+                          star <= feedbackRating ? "text-purple-600" : "text-gray-300"
+                        } hover:text-purple-500`}
+                        fill={star <= feedbackRating ? "currentColor" : "none"}
+                        stroke="currentColor"
+                        strokeWidth="1"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l2.069 6.396a1 1 0 00.95.691h6.712c.969 0 1.371 1.24.588 1.81l-5.428 3.947a1 1 0 00-.363 1.118l2.069 6.396c.3.921-.755 1.688-1.54 1.118l-5.428-3.947a1 1 0 00-1.176 0l-5.428 3.947c-.784.57-1.838-.197-1.54-1.118l2.069-6.396a1 1 0 00-.363-1.118L2.59 11.824c-.784-.57-.381-1.81.588-1.81h6.712a1 1 0 00.95-.691l2.069-6.396z"
+                        />
+                      </svg>
+                    </button>
                   ))}
-                </select>
+                </div>
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">

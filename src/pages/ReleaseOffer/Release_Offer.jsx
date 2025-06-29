@@ -101,6 +101,8 @@ const Release_Offer = () => {
     currentCTC: "",
   });
   const [errors, setErrors] = useState({});
+  const [bulkOffers, setBulkOffers] = useState([]);
+  const [showBulkPopup, setShowBulkPopup] = useState(false);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
   const token = useSelector((state) => state.user.data?.token);
 
@@ -309,8 +311,8 @@ const Release_Offer = () => {
       formData.append("companyName", form.companyName);
       formData.append("offerLetter", form.offerLetter, form.offerLetter.name);
       formData.append("candidateResume", form.candidateResume, form.candidateResume.name);
-      formData.append("digioReqBody", JSON.stringify(digioRequestBody));
-      formData.append("currentCTC", form.currentCTC || "0"); // Send currentCTC, default to 0 if not provided
+      formunifuData.append("digioReqBody", JSON.stringify(digioRequestBody));
+      formData.append("currentCTC", form.currentCTC || "0");
       if (isPredictionMode && resumeData) {
         formData.append("resumeData", JSON.stringify(resumeData));
       }
@@ -325,9 +327,9 @@ const Release_Offer = () => {
           },
           withCredentials: true,
         }
-      ); 
-      console.log("rr")
-       if (response.status === 403) {
+      );
+
+      if (response.status === 403) {
         const errorMessage = `You've reached your monthly offer limit. Upgrade to continue releasing offers.`;
         toast.error(errorMessage, {
           style: {
@@ -337,8 +339,8 @@ const Release_Offer = () => {
           duration: 5000,
         });
         return;
-      } 
-      console.log("Release_Offer.jsx: API response:", response.data);
+      }
+
       toast.success("Offer released successfully!", {
         style: {
           backgroundColor: '#652d96',
@@ -353,12 +355,8 @@ const Release_Offer = () => {
         setStep(3);
       }
     } catch (error) {
-      console.log(error.response?.status,error.response?.data?.error?.includes("Monthly offer limit"))
-      console.log(error)
       if (error.response?.status === 403 && error.response?.data?.error?.includes("Monthly offer limit")) {
         const planName = error.response.data.error.match(/of (\w+) plan/)?.[1] || "your";
-              console.log("ddddswsdw")
-
         const errorMessage = `You've reached your monthly offer limit for the ${planName} plan. Upgrade to continue releasing offers.`;
         toast.error(errorMessage, {
           style: {
@@ -368,8 +366,8 @@ const Release_Offer = () => {
           duration: 5000,
         });
       } else {
-        const errorMessage = "failed to release offer"
-        console.error("Release_Offer.jsx: Error submitting form:", error);
+        const errorMessage = "Failed to release offer";
+        console.error("Error submitting form:", error);
         toast.error(errorMessage);
       }
     } finally {
@@ -427,11 +425,223 @@ const Release_Offer = () => {
           color: '#ffffff',
         },
       });
-      console.log("Scheduled Tests Response:", response.data);
     } catch (error) {
-      console.error("Error scheduling tests:", error);
       const errorMessage = error.response?.data?.error || "Failed to schedule tests. Please try again.";
       toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const downloadTemplateCSV = () => {
+    const headers = [
+      "jobTitle",
+      "candidateName",
+      "candidateEmail",
+      "candidatePhoneNo",
+      "joiningDate",
+      "expiryDate",
+      "emailSubject",
+      "emailMessage",
+      "companyName",
+      "currentCTC",
+    ];
+    const csvContent = [
+      headers.join(","),
+      headers.map(() => "").join(","), // Empty row for user to fill
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "offer_template.csv";
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
+
+  const handleCSVImport = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.name.endsWith(".csv")) {
+      toast.error("Please upload a CSV file.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const rows = text.split("\n").map(row => row.split(",").map(cell => cell.trim()));
+      const headers = rows[0];
+      const dataRows = rows.slice(1).filter(row => row.some(cell => cell));
+
+      const expectedHeaders = [
+        "jobTitle",
+        "candidateName",
+        "candidateEmail",
+        "candidatePhoneNo",
+        "joiningDate",
+        "expiryDate",
+        "emailSubject",
+        "emailMessage",
+        "companyName",
+        "currentCTC",
+      ];
+
+      if (!expectedHeaders.every(header => headers.includes(header))) {
+        toast.error("Invalid CSV format. Please use the provided template.");
+        return;
+      }
+
+      const offers = dataRows.map(row => {
+        const offer = {};
+        headers.forEach((header, index) => {
+          offer[header] = row[index] || "";
+        });
+        offer.offerLetter = null;
+        offer.candidateResume = null;
+        offer.errors = {};
+        return offer;
+      });
+
+      setBulkOffers(offers);
+      setShowBulkPopup(true);
+    };
+    reader.readAsText(file);
+  };
+
+  const validateBulkOffer = (offer) => {
+    const errors = {
+      jobTitle: !offer.jobTitle ? "Job title is required" : "",
+      candidateName: !offer.candidateName ? "Candidate name is required" : "",
+      candidateEmail: validateEmail(offer.candidateEmail),
+      candidatePhoneNo: validatePhoneNumber(offer.candidatePhoneNo),
+      joiningDate: validateJoiningDate(offer.joiningDate),
+      expiryDate: validateExpiryDate(offer.expiryDate, offer.joiningDate),
+      companyName: !offer.companyName ? "Company name is required" : "",
+      emailSubject: !offer.emailSubject ? "Email subject is required" : "",
+      emailMessage: !offer.emailMessage || offer.emailMessage === "<p><br></p>" ? "Email message is required" : "",
+      offerLetter: validateFile(offer.offerLetter, "Offer letter"),
+      candidateResume: validateFile(offer.candidateResume, "Candidate resume"),
+      currentCTC: validateCurrentCTC(offer.currentCTC),
+    };
+    return errors;
+  };
+
+  const handleBulkOfferChange = (index, field, value) => {
+    setBulkOffers(prev => {
+      const newOffers = [...prev];
+      newOffers[index] = { ...newOffers[index], [field]: value };
+      newOffers[index].errors = validateBulkOffer(newOffers[index]);
+      return newOffers;
+    });
+  };
+
+  const handleBulkFileChange = (index, field, file) => {
+    setBulkOffers(prev => {
+      const newOffers = [...prev];
+      newOffers[index] = { ...newOffers[index], [field]: file };
+      newOffers[index].errors = validateBulkOffer(newOffers[index]);
+      return newOffers;
+    });
+  };
+
+  const handleBulkSubmit = async () => {
+    const invalidOffers = bulkOffers.filter(offer => {
+      const errors = validateBulkOffer(offer);
+      offer.errors = errors;
+      return !Object.values(errors).every(error => error === "");
+    });
+
+    if (invalidOffers.length > 0) {
+      setBulkOffers([...bulkOffers]);
+      toast.error("Please correct errors in the form before submitting.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const responses = await Promise.all(bulkOffers.map(async (offer) => {
+        const offerLetterBase64 = await readFileAsBase64(offer.offerLetter);
+        const digioRequestBody = {
+          file_name: `offer-letter-${offer.candidateName}`,
+          file_data: offerLetterBase64,
+          signers: [
+            {
+              identifier: offer.candidateEmail,
+              reason: "for signing the offer letter",
+              sign_type: "electronic",
+            },
+          ],
+          display_on_page: "All",
+          include_authentication_url: true,
+        };
+
+        const formData = new FormData();
+        formData.append("jobTitle", offer.jobTitle);
+        formData.append("joiningDate", offer.joiningDate);
+        formData.append("expiryDate", offer.expiryDate);
+        formData.append("emailSubject", offer.emailSubject);
+        formData.append("emailMessage", offer.emailMessage);
+        formData.append("candidateEmail", offer.candidateEmail);
+        formData.append("candidateName", offer.candidateName);
+        formData.append("candidatePhoneNo", offer.candidatePhoneNo);
+        formData.append("companyName", offer.companyName);
+        formData.append("offerLetter", offer.offerLetter, offer.offerLetter.name);
+        formData.append("candidateResume", offer.candidateResume, offer.candidateResume.name);
+        formData.append("digioReqBody", JSON.stringify(digioRequestBody));
+        formData.append("currentCTC", offer.currentCTC || "0");
+
+        try {
+          const response = await api.post(
+            `${API_URL}/api/offer/create-offer`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
+              },
+              withCredentials: true,
+            }
+          );
+          return { success: true, candidateName: offer.candidateName };
+        } catch (error) {
+          return { success: false, candidateName: offer.candidateName, error };
+        }
+      }));
+
+      const successes = responses.filter(res => res.success);
+      const failures = responses.filter(res => !res.success);
+
+      if (successes.length > 0) {
+        toast.success(`${successes.length} offer(s) released successfully!`, {
+          style: { backgroundColor: '#652d96', color: '#ffffff' },
+        });
+      }
+
+      if (failures.length > 0) {
+        failures.forEach(failure => {
+          if (failure.error.response?.status === 403 && failure.error.response?.data?.error?.includes("Monthly offer limit")) {
+            const planName = failure.error.response.data.error.match(/of (\w+) plan/)?.[1] || "your";
+            toast.error(`Offer for ${failure.candidateName} failed: Monthly offer limit reached for ${planName} plan.`, {
+              style: { backgroundColor: "#ff4d4f", color: "#ffffff" },
+              duration: 5000,
+            });
+          } else {
+            toast.error(`Offer for ${failure.candidateName} failed.`, {
+              style: { backgroundColor: "#ff4d4f", color: "#ffffff" },
+            });
+          }
+        });
+      }
+
+      if (successes.length === bulkOffers.length) {
+        setShowBulkPopup(false);
+        setBulkOffers([]);
+        navigate("/joboffers");
+      }
+    } catch (error) {
+      toast.error("An error occurred while processing offers.");
     } finally {
       setIsLoading(false);
     }
@@ -449,20 +659,37 @@ const Release_Offer = () => {
 
   return (
     <div className="max-w-4xl w-full mx-auto px-4 sm:px-8 bg-white p-6 sm:p-8 shadow-xl rounded-xl mt-10 border border-gray-200">
+      <div className="flex justify-end space-x-4 mb-6">
+        <button
+          type="button"
+          className="bg-[#74449D] text-white px-4 py-2 rounded-lg  transition-all"
+          onClick={downloadTemplateCSV}
+        >
+          Download CSV Template
+        </button>
+        <label className="bg-[#74449D] text-white px-4 py-2 rounded-lg transition-all cursor-pointer">
+          Import CSV
+          <input
+            type="file"
+            accept=".csv"
+            className="hidden"
+            onChange={handleCSVImport}
+          />
+        </label>
+      </div>
+
       {/* Stepper Navigation */}
       <div className="flex justify-between items-center mb-10 relative">
         {["Offer Details", "Release Offer", ...(isPredictionMode ? ["Candidate Profile"] : [])].map(
           (label, index) => (
             <div key={index} className="flex flex-col items-center z-10">
               <div
-                className={`w-10 h-10 flex items-center justify-center rounded-full text-white text-base font-semibold transition-all duration-300 ${step >= index + 1 ? "bg-indigo-600" : "bg-gray-300"
-                  }`}
+                className={`w-10 h-10 flex items-center justify-center rounded-full text-white text-base font-semibold transition-all duration-300 ${step >= index + 1 ? "bg-indigo-600" : "bg-gray-300"}`}
               >
                 {index + 1}
               </div>
               <p
-                className={`text-xs mt-2 font-medium text-center max-w-[100px] ${step >= index + 1 ? "text-indigo-600" : "text-gray-500"
-                  }`}
+                className={`text-xs mt-2 font-medium text-center max-w-[100px] ${step >= index + 1 ? "text-indigo-600" : "text-gray-500"}`}
               >
                 {label}
               </p>
@@ -488,7 +715,7 @@ const Release_Offer = () => {
             "companyName",
             "joiningDate",
             "expiryDate",
-            "currentCTC", // Added currentCTC field to form
+            "currentCTC",
           ].map((name, index) => (
             <div key={index}>
               <label className="block text-sm font-semibold text-gray-700 capitalize mb-2">
@@ -507,8 +734,7 @@ const Release_Offer = () => {
                 name={name}
                 value={form[name]}
                 onChange={handleChange}
-                className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${name === "companyName" ? "bg-gray-100 cursor-not-allowed" : ""
-                  } ${errors[name] ? "border-red-500" : "border-gray-300"}`}
+                className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${name === "companyName" ? "bg-gray-100 cursor-not-allowed" : ""} ${errors[name] ? "border-red-500" : "border-gray-300"}`}
                 readOnly={name === "companyName"}
                 min={name === "currentCTC" ? "0" : undefined}
                 step={name === "currentCTC" ? "0.01" : undefined}
@@ -531,6 +757,7 @@ const Release_Offer = () => {
         </form>
       )}
 
+      {/* Step 2 - Release Offer */}
       {step === 2 && (
         <div className="w-full space-y-6">
           {isLoading ? (
@@ -566,8 +793,7 @@ const Release_Offer = () => {
                   name="emailSubject"
                   value={form.emailSubject}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${errors.emailSubject ? "border-red-500" : "border-gray-300"
-                    }`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${errors.emailSubject ? "border-red-500" : "border-gray-300"}`}
                   disabled={isLoading}
                 />
                 {errors.emailSubject && (
@@ -580,8 +806,7 @@ const Release_Offer = () => {
                   theme="snow"
                   value={form.emailMessage}
                   onChange={(value) => setForm((prev) => ({ ...prev, emailMessage: value }))}
-                  className={`w-full border rounded-lg ${errors.emailMessage ? "border-red-500" : "border-gray-300"
-                    }`}
+                  className={`w-full border rounded-lg ${errors.emailMessage ? "border-red-500" : "border-gray-300"}`}
                   modules={{
                     toolbar: [
                       [{ header: [1, 2, false] }],
@@ -600,15 +825,14 @@ const Release_Offer = () => {
               {["candidateResume", "offerLetter"].map((name, index) => (
                 <div key={index}>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Upload {name.replace(/([A-Z])/g, " $1")} (PDF, Max 5MB)
+                    Upload {name.replace(/([A-Z])/g, " $1")} (PDF, Max 100MB)
                   </label>
                   <input
                     type="file"
                     name={name}
                     accept=".pdf"
                     onChange={handleFileChange}
-                    className={`w-full border rounded-lg p-3 text-gray-700 ${errors[name] ? "border-red-500" : "border-gray-300"
-                      }`}
+                    className={`w-full border rounded-lg p-3 text-gray-700 ${errors[name] ? "border-red-500" : "border-gray-300"}`}
                     disabled={isLoading}
                   />
                   {errors[name] && (
@@ -667,6 +891,7 @@ const Release_Offer = () => {
         </div>
       )}
 
+      {/* Step 3 - Candidate Profile (if prediction mode) */}
       {step === 3 && isPredictionMode && (
         <div className="w-full space-y-8">
           <h2 className="text-3xl font-bold text-indigo-600">Candidate Profile & Test Scheduling</h2>
@@ -707,10 +932,7 @@ const Release_Offer = () => {
                   <p className="text-gray-600 text-sm">{resumeData.phone || "N/A"}</p>
                 </div>
               </div>
-
-              {/* Profile Details */}
               <div className="space-y-8">
-                {/* Skills */}
                 <div>
                   <h4 className="text-xl font-medium text-gray-700 mb-4">Programming Languages</h4>
                   <div className="flex flex-wrap gap-3">
@@ -730,16 +952,12 @@ const Release_Offer = () => {
                     )}
                   </div>
                 </div>
-
-                {/* About */}
                 {resumeData.about && (
                   <div>
                     <h4 className="text-xl font-medium text-gray-700 mb-4">About</h4>
                     <p className="text-gray-600 text-sm leading-relaxed">{resumeData.about}</p>
                   </div>
                 )}
-
-                {/* Tags */}
                 <div>
                   <h4 className="text-xl font-medium text-gray-700 mb-4">Assessment Tags</h4>
                   <div className="flex flex-wrap gap-3">
@@ -749,8 +967,7 @@ const Release_Offer = () => {
                         type="button"
                         className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedTags.includes(tag)
                           ? "bg-indigo-600 text-white"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                          }`}
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
                         onClick={() => handleTagToggle(tag)}
                       >
                         {tag}
@@ -763,15 +980,12 @@ const Release_Offer = () => {
                     </p>
                   )}
                 </div>
-
-                {/* Frequency Dropdown */}
                 <div>
                   <h4 className="text-xl font-medium text-gray-700 mb-4">Test Frequency</h4>
                   <select
                     value={frequency}
                     onChange={(e) => setFrequency(e.target.value)}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${!form.joiningDate ? "bg-gray-100 cursor-not-allowed" : ""
-                      }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${!form.joiningDate ? "bg-gray-100 cursor-not-allowed" : ""}`}
                     disabled={!form.joiningDate}
                   >
                     <option value="">Select Frequency</option>
@@ -792,8 +1006,6 @@ const Release_Offer = () => {
                     </p>
                   )}
                 </div>
-
-                {/* Test Schedule Display */}
                 {testSchedule && (
                   <div>
                     <h4 className="text-xl font-medium text-gray-700 mb-4">Scheduled Tests</h4>
@@ -871,6 +1083,143 @@ const Release_Offer = () => {
           </div>
         </div>
       )}
+
+      {/* Bulk Offer Popup */}
+      {showBulkPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-2xl max-w-5xl w-full max-h-[80vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold text-indigo-600 mb-6">Bulk Offer Release</h2>
+            {bulkOffers.map((offer, index) => (
+              <div key={index} className="border-b border-gray-200 py-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Offer {index + 1}: {offer.candidateName || "New Candidate"}</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {[
+                    "jobTitle",
+                    "candidateName",
+                    "candidateEmail",
+                    "candidatePhoneNo",
+                    "companyName",
+                    "joiningDate",
+                    "expiryDate",
+                    "emailSubject",
+                    "currentCTC",
+                  ].map((field) => (
+                    <div key={field}>
+                      <label className="block text-sm font-semibold text-gray-700 capitalize mb-2">
+                        {field === "currentCTC" ? "Current CTC (Optional)" : field.replace(/([A-Z])/g, " $1")}
+                      </label>
+                      <input
+                        type={
+                          field.includes("Date")
+                            ? "date"
+                            : field === "candidateEmail"
+                              ? "email"
+                              : field === "currentCTC"
+                                ? "number"
+                                : "text"
+                        }
+                        value={offer[field]}
+                        onChange={(e) => handleBulkOfferChange(index, field, e.target.value)}
+                        className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${offer.errors[field] ? "border-red-500" : "border-gray-300"}`}
+                        readOnly={field === "companyName"}
+                        min={field === "currentCTC" ? "0" : undefined}
+                        step={field === "currentCTC" ? "0.01" : undefined}
+                      />
+                      {offer.errors[field] && (
+                        <p className="text-red-500 text-xs mt-1">{offer.errors[field]}</p>
+                      )}
+                    </div>
+                  ))}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Email Message</label>
+                    <ReactQuill
+                      theme="snow"
+                      value={offer.emailMessage}
+                      onChange={(value) => handleBulkOfferChange(index, "emailMessage", value)}
+                      className={`w-full border rounded-lg ${offer.errors.emailMessage ? "border-red-500" : "border-gray-300"}`}
+                      modules={{
+                        toolbar: [
+                          [{ header: [1, 2, false] }],
+                          ["bold", "italic", "underline"],
+                          ["link"],
+                          [{ list: "ordered" }, { list: "bullet" }],
+                          ["clean"],
+                        ],
+                      }}
+                    />
+                    {offer.errors.emailMessage && (
+                      <p className="text-red-500 text-xs mt-1">{offer.errors.emailMessage}</p>
+                    )}
+                  </div>
+                  {["offerLetter", "candidateResume"].map((field) => (
+                    <div key={field}>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Upload {field.replace(/([A-Z])/g, " $1")} (PDF, Max 100MB)
+                      </label>
+                      <input
+                        type="file"
+                        accept=".pdf"
+                        onChange={(e) => handleBulkFileChange(index, field, e.target.files[0])}
+                        className={`w-full border rounded-lg p-3 text-gray-700 ${offer.errors[field] ? "border-red-500" : "border-gray-300"}`}
+                      />
+                      {offer[field] && (
+                        <p className="text-gray-600 text-xs mt-1">Selected: {offer[field].name}</p>
+                      )}
+                      {offer.errors[field] && (
+                        <p className="text-red-500 text-xs mt-1">{offer.errors[field]}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <div className="flex justify-end gap-4 mt-6">
+              <button
+                type="button"
+                className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all"
+                onClick={() => setShowBulkPopup(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-all disabled:bg-indigo-400 disabled:cursor-not-allowed"
+                onClick={handleBulkSubmit}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 mr-2 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Releasing...
+                  </>
+                ) : (
+                  "Release Offers"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col justify-center items-center p-3 w-full">
         <Outlet />
       </div>

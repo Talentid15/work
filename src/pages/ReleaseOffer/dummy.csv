@@ -1,0 +1,3 @@
+jobTitle,candidateName,candidateEmail,candidatePhoneNo,joiningDate,expiryDate,emailSubject,emailMessage,companyName,currentCTC
+Software Engineer,John Doe,john.doe@example.com,9876543210,2025-07-15,2025-07-10,Offer for Software Engineer Position,We are pleased to offer you the position of Software Engineer at Tech Corp.,Tech Corp,500000
+Data Analyst,Jane Smith,jane.smith@example.com,8765432109,2025-08-01,2025-07-20,Offer for Data Analyst Position,We are excited to offer you the role of Data Analyst at Tech Corp.,Tech Corp,600000

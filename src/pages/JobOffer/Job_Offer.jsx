@@ -3,22 +3,23 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { MdMarkEmailUnread } from "react-icons/md";
 import { FaFileAlt } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-
 import { setOfferData } from "../../redux/offerSlice";
 import { formateDate } from "../../utils";
 import api from "../../utils/api";
 import Loader from "../../components/common/Loader";
 import { toast } from "sonner";
+import { parse, isValid, isBefore, startOfDay } from "date-fns";
 
 const Job_Offer = () => {
   const offersData = useSelector((state) => state.offer.data);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("All");
-  const [searchQuery, setSearchQuery] = useState(""); // New state for search query
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [bulkOffers, setBulkOffers] = useState([]);
+  const [showBulkPopup, setShowBulkPopup] = useState(false);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
   const token = useSelector((state) => state.user.data?.token);
   const data = useSelector((state) => state.user.data);
@@ -103,7 +104,6 @@ const Job_Offer = () => {
     (offer) => offer.showOffer !== false
   );
 
-  // Filter offers based on status and search query
   const filteredOffers = visibleOffers.filter((offer) => {
     const matchesStatus = statusFilter === "All" || offer.status === statusFilter;
     const matchesSearch = searchQuery
@@ -112,14 +112,317 @@ const Job_Offer = () => {
     return matchesStatus && matchesSearch;
   });
 
-  const handleReleaseOption = (option) => {
-    setIsDropdownOpen(false);
-    if (option === "release") {
-      navigate("/release-offer");
-    } else if (option === "release-with-prediction") {
-      navigate("/release-offer?prediction=true");
-    }
+  const downloadTemplateCSV = () => {
+    const headers = [
+      "jobTitle",
+      "candidateName",
+      "candidateEmail",
+      "candidatePhoneNo",
+      "joiningDate",
+      "expiryDate",
+      "emailSubject",
+      "emailMessage",
+      "companyName",
+      "currentCTC",
+    ];
+    const csvContent = [
+      headers.join(","),
+      headers.map(() => "").join(","), // Empty row for user to fill
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "offer_template.csv";
+    link.click();
+    URL.revokeObjectURL(link.href);
   };
+
+  const handleCSVImport = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.name.endsWith(".csv")) {
+      toast.error("Please upload a CSV file.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const rows = text.split("\n").map(row => row.split(",").map(cell => cell.trim()));
+      const headers = rows[0];
+      const dataRows = rows.slice(1).filter(row => row.some(cell => cell));
+
+      const expectedHeaders = [
+        "jobTitle",
+        "candidateName",
+        "candidateEmail",
+        "candidatePhoneNo",
+        "joiningDate",
+        "expiryDate",
+        "emailSubject",
+        "emailMessage",
+        "companyName",
+        "currentCTC",
+      ];
+
+      if (!expectedHeaders.every(header => headers.includes(header))) {
+        toast.error("Invalid CSV format. Please use the provided template.");
+        return;
+      }
+
+      const offers = dataRows.map(row => {
+        const offer = {};
+        headers.forEach((header, index) => {
+          offer[header] = row[index] || "";
+        });
+        offer.offerLetter = null;
+        offer.candidateResume = null;
+        offer.errors = {};
+        return offer;
+      });
+
+      setBulkOffers(offers);
+      // setErr({});
+      setShowBulkPopup(true);
+    };
+    reader.readAsText(file);
+  };
+
+  const validatePhoneNumber = (phoneNo) => {
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneNo) return "Phone number is required";
+    if (!phoneRegex.test(phoneNo)) return "Phone number must be 10 digits";
+    return "";
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) return "Candidate email is required";
+    if (!emailRegex.test(email)) return "Invalid email format";
+    return "";
+  };
+
+  const validateJoiningDate = (joiningDate) => {
+    if (!joiningDate) return "Joining date is required";
+
+    const formats = [
+      "yyyy-MM-dd",
+      "MM/dd/yyyy",
+      "dd-MM-yyyy",
+      "dd/MM/yyyy",
+      "MMMM dd, yyyy",
+    ];
+
+    let parsedDate;
+    for (const format of formats) {
+      parsedDate = parse(joiningDate, format, new Date());
+      if (isValid(parsedDate)) break;
+    }
+
+    if (!isValid(parsedDate)) return "Invalid joining date format";
+
+    const today = startOfDay(new Date());
+    if (isBefore(parsedDate, today)) return "Joining date must be today or a future date";
+
+    return "";
+  };
+
+  const validateExpiryDate = (expiryDate) => {
+    if (!expiryDate) return "Expiry date is required";
+
+    // Supported date formats
+    const formats = [
+      "yyyy-MM-dd",
+      "MM/dd/yyyy",
+      "dd-MM-yyyy",
+      "dd/MM/yyyy",
+      "MMMM dd, yyyy",
+    ];
+
+    let parsedDate;
+    for (const format of formats) {
+      parsedDate = parse(expiryDate, format, new Date());
+      if (isValid(parsedDate)) break;
+    }
+
+    if (!isValid(parsedDate)) return "Invalid expiry date format";
+
+    return "";
+  };
+
+  const validateCurrentCTC = (currentCTC) => {
+    if (!currentCTC) return "";
+    const ctc = parseFloat(currentCTC);
+    if (isNaN(ctc) || ctc < 0) return "Current CTC must be a positive number";
+    return "";
+  };
+
+  const validateFile = (file, fieldName) => {
+    if (!file) return `${fieldName} is required`;
+    const maxSize = 100 * 1024 * 1024;
+    const allowedTypes = ["application/pdf"];
+    if (!allowedTypes.includes(file.type)) {
+      return `${fieldName} must be a PDF file`;
+    }
+    if (file.size > maxSize) {
+      toast.error(`${fieldName} must be less than 100MB`);
+      return `${fieldName} must be less than 100MB`;
+    }
+    return "";
+  };
+
+  const readFileAsBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result.split(",", 2)[1]);
+      reader.onerror = reject;
+    });
+  };
+
+  const handleBulkOfferChange = (index, field, value) => {
+    setBulkOffers(prev => {
+      const newOffers = [...prev];
+      newOffers[index] = { ...newOffers[index], [field]: value };
+      newOffers[index].errors = validateBulkOffer(newOffers[index]);
+      return newOffers;
+    });
+  };
+
+  const handleBulkFileChange = (index, field, file) => {
+    setBulkOffers(prev => {
+      const newOffers = [...prev];
+      newOffers[index] = { ...newOffers[index], [field]: file };
+      newOffers[index].errors = validateBulkOffer(newOffers[index]);
+      return newOffers;
+    });
+  };
+
+  const validateBulkOffer = (offer) => {
+    const errors = {
+      jobTitle: !offer.jobTitle ? "Job title is required" : "",
+      candidateName: !offer.candidateName ? "Candidate name is required" : "",
+      candidateEmail: validateEmail(offer.candidateEmail),
+      candidatePhoneNo: validatePhoneNumber(offer.candidatePhoneNo),
+      joiningDate: validateJoiningDate(offer.joiningDate),
+      expiryDate: validateExpiryDate(offer.expiryDate),
+      companyName: !offer.companyName ? "Company name is required" : "",
+      emailSubject: !offer.emailSubject ? "Email subject is required" : "",
+      emailMessage: !offer.emailMessage ? "Email message is required" : "",
+      offerLetter: validateFile(offer.offerLetter, "Offer letter"),
+      candidateResume: validateFile(offer.candidateResume, "Candidate resume"),
+      currentCTC: validateCurrentCTC(offer.currentCTC),
+    };
+    return errors;
+  };
+
+const handleBulkSubmit = async () => {
+  const invalidOffers = bulkOffers.filter(offer => {
+    const errors = validateBulkOffer(offer);
+    offer.errors = errors;
+    return !Object.values(errors).every(error => error === "");
+  });
+
+  if (invalidOffers.length > 0) {
+    setBulkOffers([...bulkOffers]);
+    toast.error("Please correct errors in the form before submitting.");
+    return;
+  }
+
+  const confirmed = window.confirm(
+    `Are you sure you want to release ${bulkOffers.length} offer(s)? This action cannot be undone.`
+  );
+  if (!confirmed) {
+    return;
+  }
+
+  setLoading(true);
+  const responses = [];
+  
+  for (const offer of bulkOffers) {
+    try {
+      const offerLetterBase64 = await readFileAsBase64(offer.offerLetter);
+      const digioRequestBody = {
+        file_name: `offer-letter-${offer.candidateName}`,
+        file_data: offerLetterBase64,
+        signers: [
+          {
+            identifier: offer.candidateEmail,
+            reason: "for signing the offer letter",
+            sign_type: "electronic",
+          },
+        ],
+        display_on_page: "All",
+        include_authentication_url: true,
+      };
+
+      const formData = new FormData();
+      formData.append("jobTitle", offer.jobTitle);
+      formData.append("joiningDate", offer.joiningDate);
+      formData.append("expiryDate", offer.expiryDate);
+      formData.append("emailSubject", offer.emailSubject);
+      formData.append("emailMessage", offer.emailMessage);
+      formData.append("candidateEmail", offer.candidateEmail);
+      formData.append("candidateName", offer.candidateName);
+      formData.append("candidatePhoneNo", offer.candidatePhoneNo);
+      formData.append("companyName", offer.companyName);
+      formData.append("offerLetter", offer.offerLetter, offer.offerLetter.name);
+      formData.append("candidateResume", offer.candidateResume, offer.candidateResume.name);
+      formData.append("digioReqBody", JSON.stringify(digioRequestBody));
+      formData.append("currentCTC", offer.currentCTC || "0");
+
+      const response = await api.post(
+        `${API_URL}/api/offer/create-offer`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+      responses.push({ success: true, candidateName: offer.candidateName });
+    } catch (error) {
+      responses.push({ success: false, candidateName: offer.candidateName, error });
+    }
+  }
+
+  const successes = responses.filter(res => res.success);
+  const failures = responses.filter(res => !res.success);
+
+  if (successes.length > 0) {
+    toast.success(`${successes.length} offer(s) released successfully!`, {
+      style: { backgroundColor: '#652d96', color: '#ffffff' },
+    });
+  }
+
+  if (failures.length > 0) {
+    failures.forEach(failure => {
+      if (failure.error.response?.status === 403 && failure.error.response?.data?.error?.includes("Monthly offer limit")) {
+        const planName = failure.error.response.data.error.match(/of (\w+) plan/)?.[1] || "your";
+        toast.error(`Offer for ${failure.candidateName} failed: Monthly offer limit reached for ${planName} plan.`, {
+          style: { backgroundColor: "#ff4d4f", color: "#ffffff" },
+          duration: 5000,
+        });
+      } else {
+        toast.error(`Offer for ${failure.candidateName} failed: ${failure.error.response?.data?.error || "Unknown error"}`, {
+          style: { backgroundColor: "#ff4d4f", color: "#ffffff" },
+        });
+      }
+    });
+  }
+
+  if (successes.length === bulkOffers.length) {
+    setShowBulkPopup(false);
+    setBulkOffers([]);
+    navigate("/joboffers");
+  }
+
+  setLoading(false);
+};
 
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
@@ -128,8 +431,8 @@ const Job_Offer = () => {
           Job Offers Dashboard
         </h1>
 
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+        <div className="flex flex-col gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row gap-4">
             <input
               type="text"
               placeholder="Search by candidate name..."
@@ -149,30 +452,30 @@ const Job_Offer = () => {
               ))}
             </select>
           </div>
-          <div className="relative w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-4">
             <button
-              className="flex items-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto justify-center sm:justify-start"
+              className="flex items-center justify-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto"
+              onClick={downloadTemplateCSV}
+            >
+              <FaFileAlt />
+              Download CSV Template
+            </button>
+            <label className="flex items-center justify-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md cursor-pointer w-full sm:w-auto">
+              Import CSV
+              <input
+                type="file"
+                accept=".csv"
+                className="hidden"
+                onChange={handleCSVImport}
+              />
+            </label>
+            <button
+              className="flex items-center justify-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto"
               onClick={() => navigate("/release-offer")}
             >
               <FaFileAlt />
               Release Offer
             </button>
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                <button
-                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-purple-100 transition-all"
-                  onClick={() => handleReleaseOption("release")}
-                >
-                  Release Offer
-                </button>
-                <button
-                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-purple-100 transition-all"
-                  onClick={() => handleReleaseOption("release-with-prediction")}
-                >
-                  Release Offer with Prediction
-                </button>
-              </div>
-            )}
           </div>
         </div>
 
@@ -287,6 +590,134 @@ const Job_Offer = () => {
         ) : (
           <div className="text-center text-gray-500 font-medium py-8">
             <p>No offers found. Please release an offer or adjust your search.</p>
+          </div>
+        )}
+
+        {showBulkPopup && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl shadow-2xl max-w-5xl w-full max-h-[80vh] overflow-y-auto">
+              <h2 className="text-2xl font-bold text-purple-800 mb-6">Bulk Offer Release</h2>
+              {bulkOffers.map((offer, index) => (
+                <div key={index} className="border-b border-gray-200 py-4">
+                  <h3 className="text-lg font-semibold text-purple-800 mb-4">
+                    Offer {index + 1}: <span className="text-purple-800">{offer.candidateName || "New Candidate"}</span>
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {[
+                      "jobTitle",
+                      "candidateName",
+                      "candidateEmail",
+                      "candidatePhoneNo",
+                      "companyName",
+                      "joiningDate",
+                      "expiryDate",
+                      "emailSubject",
+                      "currentCTC",
+                    ].map((field) => (
+                      <div key={field}>
+                        <label className="block text-sm font-semibold text-gray-700 capitalize mb-2">
+                          {field === "currentCTC" ? "Current CTC (Optional)" : field.replace(/([A-Z])/g, " $1")}
+                        </label>
+                        <input
+                          type={
+                            field.includes("Date")
+                              ? "date"
+                              : field === "candidateEmail"
+                                ? "email"
+                                : field === "currentCTC"
+                                  ? "number"
+                                  : "text"
+                          }
+                          value={offer[field]}
+                          onChange={(e) => handleBulkOfferChange(index, field, e.target.value)}
+                          className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${offer.errors[field] ? "border-red-500" : "border-gray-300"}`}
+                          readOnly={field === "companyName"}
+                          min={field === "currentCTC" ? "0" : undefined}
+                          step={field === "currentCTC" ? "0.01" : undefined}
+                        />
+                        {offer.errors[field] && (
+                          <p className="text-red-500 text-xs mt-1">{offer.errors[field]}</p>
+                        )}
+                      </div>
+                    ))}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Email Message</label>
+                      <textarea
+                        value={offer.emailMessage}
+                        onChange={(e) => handleBulkOfferChange(index, "emailMessage", e.target.value)}
+                        className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${offer.errors.emailMessage ? "border-red-500" : "border-gray-300"}`}
+                        rows={4}
+                      />
+                      {offer.errors.emailMessage && (
+                        <p className="text-red-500 text-xs mt-1">{offer.errors.emailMessage}</p>
+                      )}
+                    </div>
+                    {["offerLetter", "candidateResume"].map((field) => (
+                      <div key={field}>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Upload {field.replace(/([A-Z])/g, " $1")} (PDF, Max 100MB)
+                        </label>
+                        <input
+                          type="file"
+                          accept=".pdf"
+                          onChange={(e) => handleBulkFileChange(index, field, e.target.files[0])}
+                          className={`w-full border rounded-lg p-3 text-gray-700 ${offer.errors[field] ? "border-red-500" : "border-gray-300"}`}
+                        />
+                        {offer[field] && (
+                          <p className="text-gray-600 text-xs mt-1">Selected: {offer[field].name}</p>
+                        )}
+                        {offer.errors[field] && (
+                          <p className="text-red-500 text-xs mt-1">{offer.errors[field]}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <div className="flex justify-end gap-4 mt-6">
+                <button
+                  type="button"
+                  className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all"
+                  onClick={() => setShowBulkPopup(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="bg-purple-700 text-white px-6 py-3 rounded-lg hover:bg-purple-800 transition-all disabled:bg-purple-400 disabled:cursor-not-allowed"
+                  onClick={handleBulkSubmit}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Releasing...
+                    </>
+                  ) : (
+                    "Release Offers"
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

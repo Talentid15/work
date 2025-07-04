@@ -311,7 +311,7 @@ const Release_Offer = () => {
       formData.append("companyName", form.companyName);
       formData.append("offerLetter", form.offerLetter, form.offerLetter.name);
       formData.append("candidateResume", form.candidateResume, form.candidateResume.name);
-      formunifuData.append("digioReqBody", JSON.stringify(digioRequestBody));
+      formData.append("digioReqBody", JSON.stringify(digioRequestBody));
       formData.append("currentCTC", form.currentCTC || "0");
       if (isPredictionMode && resumeData) {
         formData.append("resumeData", JSON.stringify(resumeData));

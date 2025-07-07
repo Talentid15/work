@@ -25,7 +25,7 @@ const OfferPunch = () => {
     candidateName: "",
     candidateEmail: "",
     candidatePhoneNo: "",
-    companyName: "",
+    companyName: data?.company || "",
     joiningDate: "",
     expiryDate: "",
     offerLetter: null,
@@ -49,10 +49,9 @@ const OfferPunch = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        const sortedData = offerPunchesResponse.data.sort((a, b) => {
-          return new Date(b.joiningDate) - new Date(a.joiningDate);
-        });
-        console.log(sortedData);
+        const sortedData = offerPunchesResponse.data.sort((a, b) =>
+          new Date(b.joiningDate) - new Date(a.joiningDate)
+        );
         setOfferPunches(sortedData || []);
       } catch (error) {
         console.error("Error fetching offer punches:", error);
@@ -86,7 +85,6 @@ const OfferPunch = () => {
     }
     if (!formData.offerLetter) newErrors.offerLetter = "Offer Letter (PDF) is required";
     if (!formData.candidateResume) newErrors.candidateResume = "Candidate Resume (PDF) is required";
-    if (!formData.offerLetterStatus) newErrors.offerLetterStatus = "Status is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -108,24 +106,22 @@ const OfferPunch = () => {
         }
         const reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = () => {
+        reader.onload = () =>
           setFormData((prev) => ({
             ...prev,
             [name]: reader.result,
           }));
-          setErrors((prev) => ({ ...prev, [name]: "" }));
-          setTouched((prev) => ({ ...prev, [name]: true }));
-        };
-        reader.onerror = () => toast.error(`Error reading ${name === "offerLetter" ? "Offer Letter" : "Resume"}`);
+        reader.onerror = () =>
+          toast.error(`Error reading ${name === "offerLetter" ? "Offer Letter" : "Resume"}`);
       }
-    } else {
+    } else if (name !== "companyName") {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
       }));
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-      setTouched((prev) => ({ ...prev, [name]: true }));
     }
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+    setTouched((prev) => ({ ...prev, [name]: true }));
   };
 
   const handleBlur = (e) => {
@@ -142,7 +138,6 @@ const OfferPunch = () => {
       formRef.current.querySelector(`[name="${firstErrorField}"]`)?.focus();
       return;
     }
-
     setShowConfirmation(true);
   };
 
@@ -151,7 +146,11 @@ const OfferPunch = () => {
     try {
       await api.post(
         `${API_URL}/api/offer/create-offer-punch`,
-        formData,
+        {
+          ...formData,
+          offerLetter: formData.offerLetter ? formData.offerLetter.split(",")[1] : null,
+          candidateResume: formData.candidateResume ? formData.candidateResume.split(",")[1] : null,
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -161,10 +160,7 @@ const OfferPunch = () => {
         }
       );
       toast.success("Offer punch submitted successfully!", {
-        style: {
-          backgroundColor: '#652d96',
-          color: '#ffffff',
-        },
+        style: { backgroundColor: "#652d96", color: "#ffffff" },
       });
       setShowForm(false);
       setShowConfirmation(false);
@@ -173,24 +169,22 @@ const OfferPunch = () => {
         candidateName: "",
         candidateEmail: "",
         candidatePhoneNo: "",
-        companyName: data?.company,
+        companyName: data?.company || "",
         joiningDate: "",
         expiryDate: "",
         offerLetter: null,
         candidateResume: null,
-        offerLetterStatus: "",
+        offerLetterStatus: "Offer letter released",
       });
       setErrors({});
       setTouched({});
       const offerPunchesResponse = await api.get(`${API_URL}/api/offer/get-offer-punches`, {
         withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-      const sortedData = offerPunchesResponse.data.sort((a, b) => {
-        return new Date(b.joiningDate) - new Date(a.joiningDate);
-      });
+      const sortedData = offerPunchesResponse.data.sort((a, b) =>
+        new Date(b.joiningDate) - new Date(a.joiningDate)
+      );
       setOfferPunches(sortedData || []);
     } catch (error) {
       console.error("Submission Error:", error.response?.data || error.message);
@@ -200,9 +194,7 @@ const OfferPunch = () => {
     }
   };
 
-  const cancelSubmit = () => {
-    setShowConfirmation(false);
-  };
+  const cancelSubmit = () => setShowConfirmation(false);
 
   const resetForm = () => {
     setFormData({
@@ -210,20 +202,17 @@ const OfferPunch = () => {
       candidateName: "",
       candidateEmail: "",
       candidatePhoneNo: "",
-      companyName: "",
+      companyName: data?.company || "",
       joiningDate: "",
       expiryDate: "",
       offerLetter: null,
       candidateResume: null,
-      offerLetterStatus: "",
+      offerLetterStatus: "Offer letter released",
     });
     setErrors({});
     setTouched({});
     toast.success("Form reset successfully!", {
-      style: {
-        backgroundColor: '#652d96',
-        color: '#ffffff',
-      },
+      style: { backgroundColor: "#652d96", color: "#ffffff" },
     });
   };
 
@@ -238,7 +227,9 @@ const OfferPunch = () => {
   };
 
   const completionPercentage = Math.round(
-    (Object.values(formData).filter((val) => val !== "" && val !== null).length / Object.keys(formData).length) * 100
+    (Object.values(formData).filter((val) => val !== "" && val !== null && val !== data?.company).length /
+      (Object.keys(formData).length - 1)) *
+    100
   );
 
   const isFormValid = Object.keys(errors).length === 0 && Object.values(formData).every((val) => val !== "" && val !== null);
@@ -250,11 +241,8 @@ const OfferPunch = () => {
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-xl p-6 sm:p-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-purple-800 mb-6">
-          Offer Punch Dashboard
-        </h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-purple-800 mb-6">Offer Punch Dashboard</h1>
 
-        {/* Header Controls */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <button
             className="flex items-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto justify-center sm:justify-start"
@@ -272,11 +260,7 @@ const OfferPunch = () => {
         ) : error ? (
           <div className="text-center text-red-500 font-medium py-8">{error}</div>
         ) : showForm ? (
-          <form
-            ref={formRef}
-            onSubmit={handleFormSubmit}
-            className="w-full space-y-6"
-          >
+          <form ref={formRef} onSubmit={handleFormSubmit} className="w-full space-y-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-700">Enter Candidate Details</h2>
               <div className="text-sm text-gray-600">
@@ -329,11 +313,12 @@ const OfferPunch = () => {
               <InputField
                 label="Company Name"
                 name="companyName"
-                value={data?.company}
+                value={formData.companyName}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={errors.companyName}
                 touched={touched.companyName}
+                readOnly
               />
               <div className="grid grid-cols-2 gap-4">
                 <InputField
@@ -359,7 +344,6 @@ const OfferPunch = () => {
               </div>
             </div>
 
-            {/* Documents Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FileInput
                 label="Offer Letter (PDF)"
@@ -397,8 +381,18 @@ const OfferPunch = () => {
                 aria-label="Submit offer punch"
               >
                 {isSubmitting && (
-                  <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2 text-white"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
                     <path
                       className="opacity-75"
                       fill="currentColor"
@@ -419,8 +413,8 @@ const OfferPunch = () => {
                     <thead className="bg-purple-50 text-purple-800">
                       <tr>
                         <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Name</th>
+                        <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Job Title</th>
                         <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Status</th>
-                        <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Offer Letter</th>
                         <th className="p-4 text-left font-semibold text-sm uppercase tracking-wide">Date Added</th>
                       </tr>
                     </thead>
@@ -434,8 +428,8 @@ const OfferPunch = () => {
                           <td className="p-4 text-gray-700">{punch.candidateName || "N/A"}</td>
                           <td className="p-4 text-gray-700">{punch.jobTitle || "N/A"}</td>
                           <td className="p-4">
-                            <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
-                              {punch.companyName || "N/A"}
+                            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+                              {punch.offerLetterStatus || "N/A"}
                             </span>
                           </td>
                           <td className="p-4 text-gray-700">
@@ -461,9 +455,6 @@ const OfferPunch = () => {
                       <div className="mt-3 flex items-center gap-2 flex-wrap">
                         <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
                           {punch.offerLetterStatus || "N/A"}
-                        </span>
-                        <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
-                          {punch.companyName || "N/A"}
                         </span>
                       </div>
                       <p className="text-sm text-gray-500 mt-3">
@@ -518,11 +509,9 @@ const OfferPunch = () => {
 };
 
 // Input Field Component
-const InputField = ({ label, type = "text", name, value, onChange, onBlur, error, touched }) => (
+const InputField = ({ label, type = "text", name, value, onChange, onBlur, error, touched, readOnly = false }) => (
   <div className="relative">
-    <label className="block text-sm font-semibold text-gray-700 mb-2">
-      {label}
-    </label>
+    <label className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
     <div className="relative">
       <input
         type={type}
@@ -530,30 +519,22 @@ const InputField = ({ label, type = "text", name, value, onChange, onBlur, error
         value={value}
         onChange={onChange}
         onBlur={onBlur}
-        className={`border p-3 rounded-lg w-full ${name === 'companyName' && 'bg-gray-200'} focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${error && touched ? "border-red-500" : "border-gray-300"
-          }`}
+        className={`border p-3 rounded-lg w-full ${readOnly ? "bg-gray-200" : ""} focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${error && touched ? "border-red-500" : "border-gray-300"}`}
         aria-invalid={error && touched ? "true" : "false"}
         aria-describedby={`${name}-error`}
+        readOnly={readOnly}
       />
-      {touched && !error && value && (
-        <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 pointer-events-none" size={20} />
-      )}
-      {touched && error && (
-        <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 pointer-events-none" size={20} />
-      )}
+      {touched && !error && value && <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 pointer-events-none" size={20} />}
+      {touched && error && <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 pointer-events-none" size={20} />}
     </div>
-    {error && touched && (
-      <p id={`${name}-error`} className="text-red-500 text-sm mt-1">{error}</p>
-    )}
+    {error && touched && <p id={`${name}-error`} className="text-red-500 text-sm mt-1">{error}</p>}
   </div>
 );
 
 // File Input Component
 const FileInput = ({ label, name, value, onChange, onBlur, error, touched }) => (
   <div className="relative">
-    <label className="block text-sm font-semibold text-gray-700 mb-2">
-      {label}
-    </label>
+    <label className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
     <div className="relative">
       <input
         type="file"
@@ -561,100 +542,87 @@ const FileInput = ({ label, name, value, onChange, onBlur, error, touched }) => 
         accept="application/pdf"
         onChange={onChange}
         onBlur={onBlur}
-        className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${error && touched ? "border-red-500" : "border-gray-300"
-          }`}
+        className={`border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${error && touched ? "border-red-500" : "border-gray-300"}`}
         aria-invalid={error && touched ? "true" : "false"}
         aria-describedby={`${name}-error`}
       />
-      {touched && !error && value && (
-        <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 pointer-events-none" size={20} />
-      )}
-      {touched && error && (
-        <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 pointer-events-none" size={20} />
-      )}
+      {touched && !error && value && <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 pointer-events-none" size={20} />}
+      {touched && error && <AlertTriangle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 pointer-events-none" size={20} />}
     </div>
-    {error && touched && (
-      <p id={`${name}-error`} className="text-red-500 text-sm mt-1">{error}</p>
-    )}
+    {error && touched && <p id={`${name}-error`} className="text-red-500 text-sm mt-1">{error}</p>}
   </div>
 );
 
 // User Details Popup Component
-const UserDetailsPopup = ({ user, onClose }) => {
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-bold text-purple-800">Candidate Details</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
-            aria-label="Close popup"
-          >
-            <X size={24} />
-          </button>
-        </div>
-        <div className="space-y-4">
-          <DetailItem label="Candidate Name" value={user.candidateName || "N/A"} />
-          <DetailItem label="Email" value={user.candidateEmail || "N/A"} />
-          <DetailItem label="Phone Number" value={user.candidatePhoneNo || "N/A"} />
-          <DetailItem label="Job Title" value={user.jobTitle || "N/A"} />
-          <DetailItem label="Company Name" value={user.companyName || "N/A"} />
-          <DetailItem
-            label="Joining Date"
-            value={user.joiningDate ? new Date(user.joiningDate).toLocaleDateString() : "N/A"}
-          />
-          <DetailItem
-            label="Expiry Date"
-            value={user.expiryDate ? new Date(user.expiryDate).toLocaleDateString() : "N/A"}
-          />
-          <DetailItem
-            label="Offer Letter"
-            value={
-              user.offerLetter ? (
-                <a
-                  href={user.offerLetter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-purple-600 hover:text-purple-800 underline"
-                >
-                  View Offer Letter
-                </a>
-              ) : (
-                "N/A"
-              )
-            }
-          />
-          <DetailItem
-            label="Resume"
-            value={
-              user.candidateResume ? (
-                <a
-                  href={user.candidateResume}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-purple-600 hover:text-purple-800 underline"
-                >
-                  View Resume
-                </a>
-              ) : (
-                "N/A"
-              )
-            }
-          />
-        </div>
-        <div className="mt-6 flex justify-end">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all text-sm font-medium"
-          >
-            Close
-          </button>
-        </div>
+const UserDetailsPopup = ({ user, onClose }) => (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-xl font-bold text-purple-800">Candidate Details</h3>
+        <button onClick={onClose} className="text-gray-500 hover:text-gray-700 transition-colors" aria-label="Close popup">
+          <X size={24} />
+        </button>
+      </div>
+      <div className="space-y-4">
+        <DetailItem label="Candidate Name" value={user.candidateName || "N/A"} />
+        <DetailItem label="Email" value={user.candidateEmail || "N/A"} />
+        <DetailItem label="Phone Number" value={user.candidatePhoneNo || "N/A"} />
+        <DetailItem label="Job Title" value={user.jobTitle || "N/A"} />
+        <DetailItem label="Company Name" value={user.companyName || "N/A"} />
+        <DetailItem
+          label="Joining Date"
+          value={user.joiningDate ? new Date(user.joiningDate).toLocaleDateString() : "N/A"}
+        />
+        <DetailItem
+          label="Expiry Date"
+          value={user.expiryDate ? new Date(user.expiryDate).toLocaleDateString() : "N/A"}
+        />
+        <DetailItem
+          label="Offer Letter"
+          value={
+            user.offerLetter ? (
+              <a
+                href={user.offerLetter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-purple-600 hover:text-purple-800 underline"
+              >
+                View Offer Letter
+              </a>
+            ) : (
+              "N/A"
+            )
+          }
+        />
+        <DetailItem
+          label="Resume"
+          value={
+            user.candidateResume ? (
+              <a
+                href={user.candidateResume}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-purple-600 hover:text-purple-800 underline"
+              >
+                View Resume
+              </a>
+            ) : (
+              "N/A"
+            )
+          }
+        />
+      </div>
+      <div className="mt-6 flex justify-end">
+        <button
+          onClick={onClose}
+          className="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all text-sm font-medium"
+        >
+          Close
+        </button>
       </div>
     </div>
-  );
-};
+  </div>
+);
 
 const DetailItem = ({ label, value }) => (
   <div className="flex flex-col sm:flex-row sm:items-center border-b border-gray-200 py-3">

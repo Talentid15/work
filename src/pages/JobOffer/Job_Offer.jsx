@@ -20,6 +20,7 @@ const Job_Offer = () => {
   const [error, setError] = useState(null);
   const [bulkOffers, setBulkOffers] = useState([]);
   const [showBulkPopup, setShowBulkPopup] = useState(false);
+  const [showFilePopup, setShowFilePopup] = useState(false);
   const API_URL = import.meta.env.VITE_REACT_BACKEND_URL ?? "";
   const token = useSelector((state) => state.user.data?.token);
   const data = useSelector((state) => state.user.data);
@@ -184,7 +185,7 @@ const Job_Offer = () => {
       });
 
       setBulkOffers(offers);
-      // setErr({});
+      setShowFilePopup(false);
       setShowBulkPopup(true);
     };
     reader.readAsText(file);
@@ -232,7 +233,6 @@ const Job_Offer = () => {
   const validateExpiryDate = (expiryDate) => {
     if (!expiryDate) return "Expiry date is required";
 
-    // Supported date formats
     const formats = [
       "yyyy-MM-dd",
       "MM/dd/yyyy",
@@ -318,111 +318,111 @@ const Job_Offer = () => {
     return errors;
   };
 
-const handleBulkSubmit = async () => {
-  const invalidOffers = bulkOffers.filter(offer => {
-    const errors = validateBulkOffer(offer);
-    offer.errors = errors;
-    return !Object.values(errors).every(error => error === "");
-  });
+  const handleBulkSubmit = async () => {
+    const invalidOffers = bulkOffers.filter(offer => {
+      const errors = validateBulkOffer(offer);
+      offer.errors = errors;
+      return !Object.values(errors).every(error => error === "");
+    });
 
-  if (invalidOffers.length > 0) {
-    setBulkOffers([...bulkOffers]);
-    toast.error("Please correct errors in the form before submitting.");
-    return;
-  }
-
-  const confirmed = window.confirm(
-    `Are you sure you want to release ${bulkOffers.length} offer(s)? This action cannot be undone.`
-  );
-  if (!confirmed) {
-    return;
-  }
-
-  setLoading(true);
-  const responses = [];
-  
-  for (const offer of bulkOffers) {
-    try {
-      const offerLetterBase64 = await readFileAsBase64(offer.offerLetter);
-      const digioRequestBody = {
-        file_name: `offer-letter-${offer.candidateName}`,
-        file_data: offerLetterBase64,
-        signers: [
-          {
-            identifier: offer.candidateEmail,
-            reason: "for signing the offer letter",
-            sign_type: "electronic",
-          },
-        ],
-        display_on_page: "All",
-        include_authentication_url: true,
-      };
-
-      const formData = new FormData();
-      formData.append("jobTitle", offer.jobTitle);
-      formData.append("joiningDate", offer.joiningDate);
-      formData.append("expiryDate", offer.expiryDate);
-      formData.append("emailSubject", offer.emailSubject);
-      formData.append("emailMessage", offer.emailMessage);
-      formData.append("candidateEmail", offer.candidateEmail);
-      formData.append("candidateName", offer.candidateName);
-      formData.append("candidatePhoneNo", offer.candidatePhoneNo);
-      formData.append("companyName", offer.companyName);
-      formData.append("offerLetter", offer.offerLetter, offer.offerLetter.name);
-      formData.append("candidateResume", offer.candidateResume, offer.candidateResume.name);
-      formData.append("digioReqBody", JSON.stringify(digioRequestBody));
-      formData.append("currentCTC", offer.currentCTC || "0");
-
-      const response = await api.post(
-        `${API_URL}/api/offer/create-offer`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-          withCredentials: true,
-        }
-      );
-      responses.push({ success: true, candidateName: offer.candidateName });
-    } catch (error) {
-      responses.push({ success: false, candidateName: offer.candidateName, error });
+    if (invalidOffers.length > 0) {
+      setBulkOffers([...bulkOffers]);
+      toast.error("Please correct errors in the form before submitting.");
+      return;
     }
-  }
 
-  const successes = responses.filter(res => res.success);
-  const failures = responses.filter(res => !res.success);
+    const confirmed = window.confirm(
+      `Are you sure you want to release ${bulkOffers.length} offer(s)? This action cannot be undone.`
+    );
+    if (!confirmed) {
+      return;
+    }
 
-  if (successes.length > 0) {
-    toast.success(`${successes.length} offer(s) released successfully!`, {
-      style: { backgroundColor: '#652d96', color: '#ffffff' },
-    });
-  }
+    setLoading(true);
+    const responses = [];
+    
+    for (const offer of bulkOffers) {
+      try {
+        const offerLetterBase64 = await readFileAsBase64(offer.offerLetter);
+        const digioRequestBody = {
+          file_name: `offer-letter-${offer.candidateName}`,
+          file_data: offerLetterBase64,
+          signers: [
+            {
+              identifier: offer.candidateEmail,
+              reason: "for signing the offer letter",
+              sign_type: "electronic",
+            },
+          ],
+          display_on_page: "All",
+          include_authentication_url: true,
+        };
 
-  if (failures.length > 0) {
-    failures.forEach(failure => {
-      if (failure.error.response?.status === 403 && failure.error.response?.data?.error?.includes("Monthly offer limit")) {
-        const planName = failure.error.response.data.error.match(/of (\w+) plan/)?.[1] || "your";
-        toast.error(`Offer for ${failure.candidateName} failed: Monthly offer limit reached for ${planName} plan.`, {
-          style: { backgroundColor: "#ff4d4f", color: "#ffffff" },
-          duration: 5000,
-        });
-      } else {
-        toast.error(`Offer for ${failure.candidateName} failed: ${failure.error.response?.data?.error || "Unknown error"}`, {
-          style: { backgroundColor: "#ff4d4f", color: "#ffffff" },
-        });
+        const formData = new FormData();
+        formData.append("jobTitle", offer.jobTitle);
+        formData.append("joiningDate", offer.joiningDate);
+        formData.append("expiryDate", offer.expiryDate);
+        formData.append("emailSubject", offer.emailSubject);
+        formData.append("emailMessage", offer.emailMessage);
+        formData.append("candidateEmail", offer.candidateEmail);
+        formData.append("candidateName", offer.candidateName);
+        formData.append("candidatePhoneNo", offer.candidatePhoneNo);
+        formData.append("companyName", offer.companyName);
+        formData.append("offerLetter", offer.offerLetter, offer.offerLetter.name);
+        formData.append("candidateResume", offer.candidateResume, offer.candidateResume.name);
+        formData.append("digioReqBody", JSON.stringify(digioRequestBody));
+        formData.append("currentCTC", offer.currentCTC || "0");
+
+        const response = await api.post(
+          `${API_URL}/api/offer/create-offer`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+            withCredentials: true,
+          }
+        );
+        responses.push({ success: true, candidateName: offer.candidateName });
+      } catch (error) {
+        responses.push({ success: false, candidateName: offer.candidateName, error });
       }
-    });
-  }
+    }
 
-  if (successes.length === bulkOffers.length) {
-    setShowBulkPopup(false);
-    setBulkOffers([]);
-    navigate("/joboffers");
-  }
+    const successes = responses.filter(res => res.success);
+    const failures = responses.filter(res => !res.success);
 
-  setLoading(false);
-};
+    if (successes.length > 0) {
+      toast.success(`${successes.length} offer(s) released successfully!`, {
+        style: { backgroundColor: '#652d96', color: '#ffffff' },
+      });
+    }
+
+    if (failures.length > 0) {
+      failures.forEach(failure => {
+        if (failure.error.response?.status === 403 && failure.error.response?.data?.error?.includes("Monthly offer limit")) {
+          const planName = failure.error.response.data.error.match(/of (\w+) plan/)?.[1] || "your";
+          toast.error(`Offer for ${failure.candidateName} failed: Monthly offer limit reached for ${planName} plan.`, {
+            style: { backgroundColor: "#ff4d4f", color: "#ffffff" },
+            duration: 5000,
+          });
+        } else {
+          toast.error(`Offer for ${failure.candidateName} failed: ${failure.error.response?.data?.error || "Unknown error"}`, {
+            style: { backgroundColor: "#ff4d4f", color: "#ffffff" },
+          });
+        }
+      });
+    }
+
+    if (successes.length === bulkOffers.length) {
+      setShowBulkPopup(false);
+      setBulkOffers([]);
+      navigate("/joboffers");
+    }
+
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
@@ -451,30 +451,23 @@ const handleBulkSubmit = async () => {
                 </option>
               ))}
             </select>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4">
+            <select
+              className="w-full sm:w-48 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-700"
+              onChange={(e) => {
+                if (e.target.value === "release-offer") navigate("/release-offer");
+                if (e.target.value === "release-offer-bulk") setShowFilePopup(true);
+              }}
+            >
+              <option value="" disabled selected>Select an action</option>
+              <option value="release-offer">Release Offer</option>
+              <option value="release-offer-bulk">Release Offer Bulk</option>
+            </select>
             <button
               className="flex items-center justify-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto"
               onClick={downloadTemplateCSV}
             >
               <FaFileAlt />
-              Download CSV Template
-            </button>
-            <label className="flex items-center justify-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md cursor-pointer w-full sm:w-auto">
-              Import CSV
-              <input
-                type="file"
-                accept=".csv"
-                className="hidden"
-                onChange={handleCSVImport}
-              />
-            </label>
-            <button
-              className="flex items-center justify-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto"
-              onClick={() => navigate("/release-offer")}
-            >
-              <FaFileAlt />
-              Release Offer
+              Download Template
             </button>
           </div>
         </div>
@@ -715,6 +708,52 @@ const handleBulkSubmit = async () => {
                   ) : (
                     "Release Offers"
                   )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showFilePopup && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl shadow-2xl max-w-md w-full">
+              <h2 className="text-xl font-bold text-purple-800 mb-4">Import CSV for Bulk Release</h2>
+              <div className="border border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <div className="flex flex-col items-center">
+                  <svg
+                    className="w-12 h-12 text-gray-400 mb-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M7 16l-4-4m0 0l4-4m-4 4h18"
+                    />
+                  </svg>
+                  <p className="text-gray-600 mb-2">Drag and drop files here</p>
+                  <p className="text-gray-500 text-sm">or</p>
+                  <label className="inline-flex items-center px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 cursor-pointer transition-all">
+                    Browse files
+                    <input
+                      type="file"
+                      accept=".csv"
+                      className="hidden"
+                      onChange={handleCSVImport}
+                    />
+                  </label>
+                </div>
+              </div>
+              <div className="flex justify-end gap-4 mt-6">
+                <button
+                  type="button"
+                  className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all"
+                  onClick={() => setShowFilePopup(false)}
+                >
+                  Cancel
                 </button>
               </div>
             </div>

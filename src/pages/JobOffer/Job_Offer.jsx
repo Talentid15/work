@@ -340,7 +340,7 @@ const Job_Offer = () => {
 
     setLoading(true);
     const responses = [];
-    
+
     for (const offer of bulkOffers) {
       try {
         const offerLetterBase64 = await readFileAsBase64(offer.offerLetter);
@@ -431,8 +431,8 @@ const Job_Offer = () => {
           Job Offers Dashboard
         </h1>
 
-        <div className="flex flex-col gap-4 mb-8">
-          <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row justify-between gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center">
             <input
               type="text"
               placeholder="Search by candidate name..."
@@ -451,23 +451,33 @@ const Job_Offer = () => {
                 </option>
               ))}
             </select>
-            <select
-              className="w-full sm:w-48 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-700"
-              onChange={(e) => {
-                if (e.target.value === "release-offer") navigate("/release-offer");
-                if (e.target.value === "release-offer-bulk") setShowFilePopup(true);
-              }}
-            >
-              <option value="" disabled selected>Select an action</option>
-              <option value="release-offer">Release Offer</option>
-              <option value="release-offer-bulk">Release Offer Bulk</option>
-            </select>
+          </div>
+          <div className=" flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center">
             <button
               className="flex items-center justify-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto"
-              onClick={downloadTemplateCSV}
+              onClick={() => setShowFilePopup(true)}
             >
-              <FaFileAlt />
-              Download Template
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Upload
+            </button>
+            <button
+              className="flex items-center justify-center gap-2 px-6 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md w-full sm:w-auto"
+              onClick={() => navigate("/release-offer")}
+            >
+              Release offer
             </button>
           </div>
         </div>
@@ -668,6 +678,7 @@ const Job_Offer = () => {
                 </div>
               ))}
               <div className="flex justify-end gap-4 mt-6">
+
                 <button
                   type="button"
                   className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all"
@@ -747,7 +758,14 @@ const Job_Offer = () => {
                   </label>
                 </div>
               </div>
-              <div className="flex justify-end gap-4 mt-6">
+              <div className="flex justify-between gap-4 mt-6">
+                <button
+                  className="flex items-center  text-purple-700 "
+                  onClick={downloadTemplateCSV}
+                >
+                  <FaFileAlt />
+                  Sample of offers.csv
+                </button>
                 <button
                   type="button"
                   className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all"
@@ -755,6 +773,7 @@ const Job_Offer = () => {
                 >
                   Cancel
                 </button>
+
               </div>
             </div>
           </div>
